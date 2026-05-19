@@ -1,18 +1,13 @@
-import { ApplicationError } from "@/lib/utils/errors";
-import { ApplicationResult } from "@/shared/kernel";
+import { ok, Result } from "@/shared/application";
 import { DeskRepository } from "../../domain/repositories";
 import { JoinOrLeaveDeskInput } from "../dto";
-import { getUserErrorMessage } from "@/lib/utils/errors";
 
+type JoinDeskUseCaseResult = Result<void>;
 export class JoinDeskUseCase {
     constructor(private readonly deskRepository: DeskRepository) {}
 
-    async execute(input: JoinOrLeaveDeskInput): Promise<ApplicationResult> {
-        try {
-            await this.deskRepository.join(input);
-            return { success: true as const };
-        } catch (error) {
-            return { success: false as const, error: new ApplicationError(getUserErrorMessage(error)) };
-        }
+    async execute(input: JoinOrLeaveDeskInput): Promise<JoinDeskUseCaseResult> {
+        await this.deskRepository.join(input);
+        return ok(undefined);
     }
 }

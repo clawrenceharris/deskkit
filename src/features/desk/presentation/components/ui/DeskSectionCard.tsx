@@ -1,5 +1,5 @@
 import { DeskSection } from "@/app/providers/HomeNavigationProvider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { motion, type TargetAndTransition } from "motion/react";
 import type { ReactNode } from "react";
@@ -17,100 +17,114 @@ type DeskSectionCardProps = {
   onClick?: (section: DeskSection) => void;
   supplies?: DeskSectionSupply[];
   label: string;
+  selected?: boolean;
   disabled?: boolean;
 }
 
 
-export function DeskSectionCard({ section, label, onClick, supplies =[], disabled = false }: DeskSectionCardProps) {
+export function DeskSectionCard({selected, section, label, onClick, supplies = [], disabled = false }: DeskSectionCardProps) {
   
   return (
-    <motion.div
-      className="flex h-full w-full flex-1 cursor-pointer"
+    <motion.button
       initial="rest"
-      animate="rest"
+      animate={selected ? "hover" : "rest"}
       whileHover="hover"
+      whileFocus="focus"
       onClick={() => onClick?.(section)}
       aria-disabled={disabled}
+      className={cn(
+        `flex-1 
+        cursor-pointer
+        flex
+        items-start
+        justify-start
+        h-full
+        bg-card/60
+        w-full
+        relative
+        p-0
+        text-right
+        flex-col
+        transition-all duration-300 ease-in-out
+        shadow-sm
+        border-muted
+        border
+        overflow-hidden
+        rounded-lg
+        hover:bg-white
+        focus:bg-white
+        `,
+        disabled && "pointer-events-none",
+        // Selected state: apply the same outline and text styles as focus & hover states for each section
+        {
+          "focus:outline-secondary": section === DeskSection.notebooks,
+          "focus:outline-primary": section === DeskSection.chalkboards,
+          "focus:outline-orange-500": section === DeskSection.burningQuestions,
+          "focus:outline-tertiary": section === DeskSection.studyRooms,
+          "text-secondary": section === DeskSection.notebooks,
+          "text-primary": section === DeskSection.chalkboards,
+          "text-orange-500": section === DeskSection.burningQuestions,
+          "text-tertiary": section === DeskSection.studyRooms,
+          // Selected state styles (per section)
+          "outline-2 outline-secondary bg-white border-0":
+            selected && section === DeskSection.notebooks,
+          "outline-2 outline-primary bg-white border-0":
+            selected && section === DeskSection.chalkboards,
+          "outline-2 outline-orange-500 bg-white border-0":
+            selected && section === DeskSection.burningQuestions,
+          "outline-2 outline-tertiary bg-white border-0":
+            selected && section === DeskSection.studyRooms,
+        }
+      )}
     >
-      <Card 
-        className={cn(`
-          
-          flex
-          items-start
-          justify-start
-          h-full
-          w-full
-          relative
-          p-0
-          flex-col
-          transition-all duration-300 ease-in-out
-          shadow-md
-          ring-0
-          overflow-hidden
-          rounded-lg
-          hover:bg-white
-          `,
-          disabled && "pointer-events-none",
-          {
-            "text-secondary": section === DeskSection.notebooks,
-            "text-primary": section === DeskSection.chalkboard,
-            "text-orange-500": section === DeskSection.burningQuestions,
-            "text-tertiary": section === DeskSection.studyRooms,
-          }
-        )} 
+      <div className="relative z-20 px-3 py-5 rounded-t-lg w-full ">
+        <h3 className="font-bold text-lg">
+          {label}
+        </h3>
+      </div>
+      <div
+        className={cn(
+          "w-full h-full p-0 absolute bottom-0 pointer-events-none flex",
+        )}
+        style={{
+          background: (() => {
+            if (section === DeskSection.notebooks)
+              return "radial-gradient(circle at 0% 160%, var(--color-secondary) 0%, transparent 70%)";
+            if (section === DeskSection.chalkboards)
+              return "radial-gradient(circle at 0% 160%, var(--color-primary) 0%, transparent 70%)";
+            if (section === DeskSection.burningQuestions)
+              return "radial-gradient(circle at 0% 160%, var(--color-accent) 0%, transparent 70%)";
+            if (section === DeskSection.studyRooms)
+              return "radial-gradient(circle at 0% 160%, var(--color-tertiary) 0%, transparent 70%)";
+            return undefined;
+          })(),
+        }}
       >
-        <CardHeader className="relative z-20 px-3 py-5 rounded-t-lg w-full ">
-          <CardTitle className="font-bold text-lg">
-            <h3>
-
-            {label}
-            </h3>
-            </CardTitle>
-        </CardHeader>
-
-        <CardContent
-          className={cn(
-            "w-full h-full p-0 absolute bottom-0 pointer-events-none flex",
-          )}
-          style={{
-            background: (() => {
-              if (section === DeskSection.notebooks)
-                return "radial-gradient(circle at 50% -150%, var(--color-secondary) 0%, transparent 80%)";
-              if (section === DeskSection.chalkboard)
-                return "radial-gradient(circle at 50% -150%, var(--color-primary) 0%, transparent 80%)";
-              if (section === DeskSection.burningQuestions)
-                return "radial-gradient(circle at 50% -150%, var(--color-accent) 0%, transparent 80%)"; // purple-500
-              if (section === DeskSection.studyRooms)
-                return "radial-gradient(circle at 50% -150%, var(--color-tertiary) 0%, transparent 80%)";
-              return undefined;
-            })(),
-          }}
-        >
-   
-              {supplies.map((supply, index) => (
-                <motion.div
-                  key={supply.id}
-                  className={cn("absolute origin-top z-10", supply.className, "bottom-0 right-0")}
-                  variants={{
-                    rest: supply.rest,
-                    hover: supply.hover,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 22,
-                    delay: index * 0.045,
-                  }}
-                >
-                  {supply.children}
-                </motion.div>
-              ))}
-           
-
-        
-
-        </CardContent>
-      </Card>
-    </motion.div>
+        {supplies.map((supply, index) => (
+          <motion.div
+            key={supply.id}
+            className={cn(
+              "absolute origin-top z-10",
+              supply.className,
+              "bottom-0 right-0"
+            )}
+            variants={{
+              rest: supply.rest,
+              hover: supply.hover,
+              focus: supply.hover,
+            }}
+            animate={selected ? "hover" : undefined}
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 22,
+              delay: index * 0.045,
+            }}
+          >
+            {supply.children}
+          </motion.div>
+        ))}
+      </div>
+    </motion.button>
   );
 }

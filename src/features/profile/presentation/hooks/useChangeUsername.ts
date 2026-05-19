@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { checkUsernameAvailability } from "@/actions/profile";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { getUserErrorMessage } from "@/shared/utils/errors";
 import { useCallback, useEffect } from "react";
 import {  UseFormReturn, useWatch    } from "react-hook-form";
+import { Profile } from "../../infrastructure/queries";
+import { checkUsernameAction } from "@/actions/profile";
 
 type UseChangeUsernameProps= {
     userId: string | null;
     form: UseFormReturn<any>;
+    profile?: Profile | null;
 }
-export const useChangeUsername = ({userId, form}: UseChangeUsernameProps) => {
+export const useChangeUsername = ({profile, userId, form}: UseChangeUsernameProps) => {
   const { control, clearErrors, setError } = form;
   const username = useWatch({ control, name: "username" });
   useEffect(() => {
@@ -20,10 +22,10 @@ export const useChangeUsername = ({userId, form}: UseChangeUsernameProps) => {
     if(!userId) return;
 
     
-    const result = await checkUsernameAvailability(username, userId);
+    const result = await checkUsernameAction(username, userId);
     if(result.success){
-        if(!result.data.isAvailable){
-            form.setError("username", {message: "Username already exists"});
+        if(!result.data.isValid){
+            form.setError("username", {message: result.data.message});
             return false;
           }
         return true;
@@ -38,9 +40,12 @@ export const useChangeUsername = ({userId, form}: UseChangeUsernameProps) => {
     if(!username) {
         return;
     }
+    if(profile?.username === username) {
+      return;
+    }
     
     checkUsername();
-}, [username, userId, clearErrors, setError, form, checkUsername]);
+}, [username, profile?.username, userId, clearErrors, setError, form, checkUsername]);
 
    return {checkUsername};
 }

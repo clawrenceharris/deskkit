@@ -1,30 +1,16 @@
-import { Prisma, PrismaClientType } from "@/lib/db/prisma";
-import { SchoolRepository } from "../../domain/repositories";
+import { Prisma, PrismaClient } from "@/lib/db/prisma";
+import { SchoolReadRepository, SchoolRepository } from "../../domain/repositories";
 import { SchoolForDetail, schoolForDetailArgs } from "../queries";
-import { CreateSchoolData, GetSchoolsInput, UpdateSchoolData } from "../../application/dto";
+import { CreateSchoolInput, UpdateSchoolInput } from "../../application/dto";
+import { PrismaSchoolReadRepository } from "./PrismaSchoolReadRepository";
 
 export class PrismaSchoolRepository implements SchoolRepository {
-    constructor(private readonly prisma: PrismaClientType) {}
-    
-
-    async getSchools(input?: GetSchoolsInput): Promise<SchoolForDetail[]> {
-        const where: Prisma.SchoolWhereInput = input?.where ?? {};
-        const schools = await this.prisma.school.findMany({
-            where,
-            ...schoolForDetailArgs,
-        });
-        return schools;
+    public readonly query: SchoolReadRepository;
+    constructor(private readonly prisma: PrismaClient) {
+        this.query = new PrismaSchoolReadRepository(prisma);
     }
 
-    async getSchoolById(id: string): Promise<SchoolForDetail | null> {
-        const school = await this.prisma.school.findUnique({
-            where: { id },
-            ...schoolForDetailArgs,
-        });
-        return school;
-    }
-
-    async createSchool(input: CreateSchoolData): Promise<SchoolForDetail> {
+    async createSchool(input: CreateSchoolInput): Promise<SchoolForDetail> {
         const data: Prisma.SchoolCreateInput = {
             name: input.name,
             students: {
@@ -45,7 +31,7 @@ export class PrismaSchoolRepository implements SchoolRepository {
         return newSchool;
     }
     
-    async updateSchool(input: UpdateSchoolData): Promise<SchoolForDetail> {
+    async updateSchool(input: UpdateSchoolInput): Promise<SchoolForDetail> {
         const data: Prisma.SchoolUpdateInput = {
             ...input,
             students: {

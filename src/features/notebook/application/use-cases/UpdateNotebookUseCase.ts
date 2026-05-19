@@ -1,37 +1,34 @@
 import { NotebookRepository } from "../../domain/repositories";
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { UpdateNotebookInput } from "../dto";
+import { UpdateNotebookInput, UpdateNotebookResult } from "../dto";
 import { DeskStorage } from "@/features/desk/domain/services";
-import { getCurrentUser } from "@/actions/auth/getCurrentUser";
-import { ApplicationError, ApplicationResultWithData } from "@/shared/kernel";
-import { NotebookForDetail } from "../../infrastructure/queries";
+import { ApplicationError } from "@/shared/utils/errors";
+import { fail, ok, Result } from "@/shared/application";
+import { AppErrorCode } from "@/types/errors";
 
+type UpdateNotebookUseCaseResult = Result<UpdateNotebookResult>;
 export class UpdateNotebookUseCase {
     constructor(
         private readonly repository: NotebookRepository,
         private readonly storage: DeskStorage
     ) {}
-    async execute(input: UpdateNotebookInput): Promise<ApplicationResultWithData<NotebookForDetail>> {
+    async execute(input: UpdateNotebookInput): Promise<UpdateNotebookUseCaseResult> {
+        const { notebookId, removeMaterialIds, title, description, materials } = input;
         const uploadedPaths: string[] = [];
+        
         try {
-            const [user, existingNotebook] = await Promise.all([
-                getCurrentUser(),
-                this.repository.getById(input.notebookId),
-            ]);
-            if (!user) {
-                return { success: false as const, error: new ApplicationError("User not found") };
-            }
+            const existingNotebook = await this.repository.query.getNotebookDetail(notebookId);
             if (!existingNotebook) {
-                return { success: false as const, error: new ApplicationError("Notebook not found") };
+                const appError = new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Notebook not found"});
+                return fail(appError);
             }
 
             const existingMaterials = existingNotebook.materials;
             const existingMaterialIds = new Set(existingMaterials.map((material) => material.id));
             const explicitRemoveIds = new Set(
-                (input.data.removeMaterialIds ?? []).filter((id) => existingMaterialIds.has(id))
+                (removeMaterialIds ?? []).filter((id) => existingMaterialIds.has(id))
             );
-            const keepMaterialIds = input.data.keepMaterialIds
-                ? new Set(input.data.keepMaterialIds.filter((id) => existingMaterialIds.has(id)))
+            const keepMaterialIds = input.keepMaterialIds
+                ? new Set(input.keepMaterialIds.filter((id) => existingMaterialIds.has(id)))
                 : null;
             const materialIdsToDelete = new Set<string>();
             if (keepMaterialIds) {
@@ -46,10 +43,10 @@ export class UpdateNotebookUseCase {
             }
 
             const uploadedMaterials = await Promise.all(
-                (input.data.materials ?? []).map(async (material) => {
+                (materials ?? []).map(async (material) => {
                     const uploaded = await this.storage.uploadFile({
                         file: material.file,
-                        userId: user.id,
+                        userId: existingNotebook.creatorId,
                         deskId: existingNotebook.deskId,
                     });
                     uploadedPaths.push(uploaded.path);
@@ -59,15 +56,15 @@ export class UpdateNotebookUseCase {
                         path: uploaded.path,
                         title: material.file.name,
                         mimeType: material.file.type,
-                        authorId: user.id,
+                        authorId: existingNotebook.creatorId,
                     };
                 })
             );
 
             const updated = await this.repository.update({
-                notebookId: input.notebookId,
-                title: input.data.title,
-                description: input.data.description,
+                notebookId,
+                title,
+                description,
                 materialsToCreate: uploadedMaterials.length > 0 ? uploadedMaterials : undefined,
                 materialIdsToDelete: materialIdsToDelete.size > 0 ? Array.from(materialIdsToDelete) : undefined,
             });
@@ -78,13 +75,18 @@ export class UpdateNotebookUseCase {
             if (pathsToDelete.length > 0) {
                 await Promise.allSettled(pathsToDelete.map((path) => this.storage.remove(path)));
             }
-            return { success: true as const, data: updated };
+            return ok({
+                notebookId: updated.id, 
+                title: updated.title, 
+                deskId: updated.deskId, 
+                creatorId: updated.creatorId
+            });
         } catch (error) {
             if (uploadedPaths.length > 0) {
                 await Promise.allSettled(uploadedPaths.map((path) => this.storage.remove(path)));
             }
             console.error("Error updating notebook", error);
-            return { success: false as const, error: new ApplicationError(getUserErrorMessage(error)) };
+            throw error;
         }
     }
 }

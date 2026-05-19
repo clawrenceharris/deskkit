@@ -1,43 +1,32 @@
-import { MemberRole, Prisma, PrismaClient } from "../../../../../generated/prisma/client";
-import { DeskRepository } from "../../domain/repositories";
-import { deskForDetailArgs, MyDeskForDetail, myDeskForDetailArgs, SchoolDeskForDetail, schoolDeskForDetailArgs, type DeskForDetail } from "../queries";
-import { CreateDeskData, CreateDeskInput, GetDesksInput, JoinOrLeaveDeskInput} from "../../application/dto";
-import { SchoolForDetail } from "@/features/school/infrastructure/queries";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+import { type Desk, deskArgs, type DeskForDetail, myDeskForDetailArgs, schoolDeskForDetailArgs } from "../queries";
+import { CreateSchoolDeskInput, JoinOrLeaveDeskInput, UpdateDeskInput } from "../../application/dto";
+import {  MemberRole, Prisma, PrismaClient } from "@/lib/db/prisma";
+import { DeskReadRepository, DeskRepository } from "../../domain/repositories";
+import { CreateDeskData } from "../types";
+import { PrismaDeskReadRepository } from "./PrismaDeskReadRepository";
 
 export class PrismaDeskRepository implements DeskRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  public readonly query: DeskReadRepository;
+  private readonly prisma: PrismaClient;
 
-  async getAll(input?: GetDesksInput): Promise<DeskForDetail[]> {
-    const where: Prisma.DeskWhereInput = input?.where ?? {};
-    const desks = await this.prisma.desk.findMany({
-      where, 
-      ...deskForDetailArgs,
-    });
-    return desks;
+  constructor(prisma: PrismaClient) {
+    this.query = new PrismaDeskReadRepository(prisma);
+    this.prisma = prisma;
   }
-
-
-  async getById(id: string): Promise<DeskForDetail | null> {
-    const desk = await this.prisma.desk.findUnique({
-      where: { id },
-      ...deskForDetailArgs,
-    });
-    return desk;
-  }
-  
-  async create(input: CreateDeskData): Promise<DeskForDetail> {
+  async create({name, schoolId, creatorId, isPublic, imageUrl, imagePath, description}: CreateDeskData): Promise<Desk> {
    const data: Prisma.DeskCreateInput = {
-    name: input.name,
-    school: { connect: { id: input.schoolId } },
-    creator: { connect: { userId: input.creatorId } },
-    isPublic: input.isPublic,
-    imageUrl: input.imageUrl,
-    imagePath: input.imagePath,
-    description: input.description,
-    members: { create: { profile: { connect: { userId: input.creatorId } }, role: MemberRole.OWNER } },
+    name,
+    school: { connect: { id: schoolId } },
+    creator: { connect: { userId: creatorId } },
+    isPublic,
+    imageUrl,
+    imagePath,
+    description,
+    members: { create: { profile: { connect: { userId: creatorId } }, role: MemberRole.OWNER } },
    };
-    const newDesk = await this.prisma.desk.create({ data, ...deskForDetailArgs });
+    const newDesk = await this.prisma.desk.create({ 
+      data
+    });
     return newDesk;
   }
 
@@ -48,14 +37,11 @@ export class PrismaDeskRepository implements DeskRepository {
     });
   }
   
-  async update(id: string, input: CreateDeskInput): Promise<DeskForDetail> {
-    const data: Prisma.DeskUpdateInput = {
-      ...input
-    };
+  async update(input: UpdateDeskInput): Promise<Prisma.DeskGetPayload<typeof deskArgs>> {
+    const { deskId, ...data } = input;
     const updatedDesk = await this.prisma.desk.update({
-      where: { id },
+      where: { id: deskId },
       data,
-      ...deskForDetailArgs,
     });
     return updatedDesk;
   } 
@@ -77,37 +63,39 @@ export class PrismaDeskRepository implements DeskRepository {
     });
   }
 
-  async createSchoolDesk(school: SchoolForDetail): Promise<SchoolDeskForDetail> {
-    const students = await this.prisma.profile.findMany({
-      where: { schoolId: school.id },
-      select: {
-        userId: true,
-      },
-    });
-
+  async createSchoolDesk(input: CreateSchoolDeskInput): Promise<DeskForDetail> {
     const deskData: Prisma.DeskCreateInput = {
-      name: `${school.name} Desk`,
-      school: { connect: { id: school.id } },
+      name: `${input.schoolName} Desk`,
+      school: { connect: { id: input.schoolId } },
       isPublic: true,
       creator: { connect: { userId: "system" } },
-      members: { create: students.map(student => ({ profile: { connect: { userId: student.userId } }, role: MemberRole.CONTRIBUTOR })) }
+      members: { create: { profile: { connect: { userId: "system" } }, role: MemberRole.CONTRIBUTOR } }
     };
     const desk = await this.prisma.desk.create({
       data: deskData
     })
     const data: Prisma.SchoolDeskCreateInput = {
-      school: { connect: { id: school.id } },
+      school: { connect: { id: input.schoolId } },
       desk: { connect: { id: desk.id } },
       
     };
     const schoolDesk = await this.prisma.schoolDesk.create({ data,
        ...schoolDeskForDetailArgs,
      });
-    return schoolDesk;
+    return schoolDesk.desk;
   }
 
-  async createMyDesk(profile: ProfileForDetail): Promise<MyDeskForDetail> {
-    
+  async createMyDesk(userId: string): Promise<DeskForDetail> {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      select: {
+        displayName: true,
+        userId: true,
+      },
+    });
+    if(!profile) {
+      throw new Error("Profile not found");
+    }
     const deskData: Prisma.DeskCreateInput = {
       name: `${profile.displayName}'s Desk`,
       creator: { connect: { userId: profile.userId } },
@@ -122,13 +110,7 @@ export class PrismaDeskRepository implements DeskRepository {
     const myDesk = await this.prisma.userDesk.create({ data, 
       ...myDeskForDetailArgs,
      });
-    return myDesk;
+    return myDesk.desk;
   }
-  async getSchoolDesk(schoolId: string): Promise<SchoolDeskForDetail | null> {
-    const schoolDesk = await this.prisma.schoolDesk.findUnique({
-      where: { schoolId },
-      ...schoolDeskForDetailArgs,
-    });
-    return schoolDesk;
-  }
+ 
 }

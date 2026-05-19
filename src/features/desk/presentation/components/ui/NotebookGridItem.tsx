@@ -1,6 +1,6 @@
 "use client";
 import {  Card, CardHeader, CardFooter, CardTitle } from "@/components/ui";
-import { getShortDate } from "@/lib/utils/fomatDate";
+import { getShortDate } from "@/shared/utils/fomatDate";
 import type { NotebookForCard } from "@/features/notebook/infrastructure/queries";
 import { cn } from "@/lib/utils";
 import { FilePreviewer } from "@/components/shared";

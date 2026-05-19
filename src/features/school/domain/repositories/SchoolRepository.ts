@@ -1,11 +1,11 @@
-import { CreateSchoolData, GetSchoolsInput, UpdateSchoolData } from "../../application/dto";
+import { CreateSchoolInput, UpdateSchoolInput } from "../../application/dto";
 import { SchoolForDetail } from "../../infrastructure/queries";
+import { SchoolReadRepository } from "./SchoolReadRepository";
 
 export interface SchoolRepository  {
-    getSchools(input?: GetSchoolsInput): Promise<SchoolForDetail[]>;
-    getSchoolById(id: string): Promise<SchoolForDetail | null>;
-    createSchool(input: CreateSchoolData): Promise<SchoolForDetail>;
-    updateSchool(input: UpdateSchoolData): Promise<SchoolForDetail>;
+    query: SchoolReadRepository;
+    createSchool(input: CreateSchoolInput): Promise<SchoolForDetail>;
+    updateSchool(input: UpdateSchoolInput): Promise<SchoolForDetail>;
     deleteSchool(id: string): Promise<void>;
     
 }

@@ -1,9 +1,8 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getVotesByNotebookId } from "@/actions/notebook/getVotesByNotebookId";
 import { useCallback } from "react";
-import { voteNotebookAction } from "@/actions/notebook";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
+import { getNotebookDetailAction, voteNotebookAction } from "@/actions/notebook";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { NotebookVote } from "../../infrastructure/queries/notebookQueries";
 import { useUser } from "@/app/providers";
@@ -18,12 +17,13 @@ export function useVotes(notebookId: string | null) {
             if(!notebookId){
                 throw new Error("notebookId is required to fetch votes.");
             }
-            const result = await getVotesByNotebookId(notebookId);
+            const result = await getNotebookDetailAction(notebookId);
+
             if(!result.success){
                 throw new ApplicationError(result.error);
             }
             queryClient.setQueryData(notebookKeys.votes(notebookId), result.data);
-            return result.data;
+            return result.data?.votes ?? [];
         },
         enabled: !!notebookId,
     });
@@ -37,7 +37,7 @@ export const useMakeVote = () => {
     const makeVoteMutation = useMutation({
         mutationKey: ["makeVote"],
         mutationFn: async ({notebookId, isUpvote}: {notebookId: string,deskId: string, isUpvote: boolean | null}) => {
-            const result = await voteNotebookAction({notebookId, isUpvote});
+            const result = await voteNotebookAction({notebookId, isUpvote, userId: user.id});
             if(!result.success){
                 throw new ApplicationError(result.error);
             }
@@ -85,7 +85,7 @@ export const useMakeVote = () => {
     const removeVoteMutation = useMutation({
         mutationFn: async ({notebookId}: {notebookId: string, deskId: string,}) => {
             
-            const result = await voteNotebookAction({notebookId, isUpvote: null});
+            const result = await voteNotebookAction({notebookId, isUpvote: null, userId: user.id});
             if(!result.success){
                 throw new ApplicationError(result.error);
             }

@@ -4,11 +4,10 @@ import { createContext, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CreateProfileModal } from "@/features/profile/presentation/components/modals";
 import { Dialog } from "@/components/ui";
 import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
-import { useUserProfile } from "@/features/profile/presentation/hooks";
+import { useProfileDetail } from "@/features/profile/presentation/hooks";
 import { ErrorState } from "@/components/states";
 import { useAuth } from "./";
 
@@ -27,26 +26,40 @@ export function UserProvider({
 }: UserProviderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthReady } = useAuth();
 
-  const {data: profile, error, isLoading: isLoadingProfile, refetch} = useUserProfile(user?.id ?? null);
-  if (!user && !pathname.includes("auth")) {
+  const { data: profile, error, isLoading: isLoadingProfile, refetch } = useProfileDetail(user?.id ?? null);
+
+  if (!isAuthReady && pathname.includes("auth")) {
+    return <>{children}</>;
+  }
+  if (!isAuthReady) {
     return (
       <div className="page-center">
         <Loader2 strokeWidth={2.5} size={40} className="animate-spin" />
       </div>
     );
   }
+  if(user && pathname.includes("auth") || !user && !pathname.includes("auth")){
+   return ( 
+      <div className="page-center">
+        <Loader2 strokeWidth={2.5} size={40} className="animate-spin" />
+      </div>
+    )
+  }
+  
   if (!user && pathname.includes("auth")) {
     return <>{children}</>;
   }
   if (!user) {
     return (
       <div className="page-center">
-        <p>You are not logged in. Please login to continue.</p>
-        <Button variant="outline" onClick={() => router.push("/auth/login")}>
-          Login
-        </Button>
+        <ErrorState 
+        title="Access Denied"
+        message="You are not logged in. Please login to continue."
+        onAction={() => router.push("/auth/login")}
+        actionLabel="Login"
+        />
       </div>
     );
   }

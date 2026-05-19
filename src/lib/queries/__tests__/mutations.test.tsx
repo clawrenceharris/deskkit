@@ -1,8 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-import { AppErrorCode, AuthenticationError } from "@/types";
+import { AppErrorCode } from "@/types";
 import { createMultiQueryOptimisticUpdate, useMutationError } from "../mutations";
+import { ApplicationError } from "@/shared/utils/errors";
 
 describe("createMultiQueryOptimisticUpdate", () => {
   it("updates all configured cached queries and rolls them back on error", async () => {
@@ -94,10 +95,10 @@ describe("useMutationError", () => {
 
   it("can show an already-normalized modal error", () => {
     const { result } = renderHook(() => useMutationError());
-    const error = new AuthenticationError(
-      AppErrorCode.AUTH_EMAIL_NOT_CONFIRMED,
-      "Confirm your email.",
-    );
+    const error = new ApplicationError({
+      code: AppErrorCode.AUTH_EMAIL_NOT_CONFIRMED,
+      message: "Confirm your email.",
+    });
 
     act(() => {
       result.current.showErrorModal(error, "Signup");

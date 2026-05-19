@@ -1,23 +1,24 @@
 "use server"
-import { ActionResultWithData } from "..";
-import { CreateProfileInput } from "@/features/profile/application/dto";
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+import { CreateProfileInput, CreateProfileResult } from "@/features/profile/application/dto";
+import { ApplicationError } from "@/shared/utils/errors";
 import { makeCreateProfileUseCase } from "@/composition/profile";
+import { ActionResult, toActionError } from "@/shared/action";
+import { fail, ok } from "@/shared/application";
 
 
 
-export async function createProfileAction(input: CreateProfileInput): Promise<ActionResultWithData<ProfileForDetail>> {
+export async function createProfileAction(input: CreateProfileInput): Promise<ActionResult<CreateProfileResult>> {
    
     try {  
         const useCase = await makeCreateProfileUseCase();
         const result = await useCase.execute(input);
         if(!result.success){
-            return { success: false as const, error: result.error.message };
+            return fail(result.error);
         }
-        return result
+        return ok(result.data);
 
     } catch (error) {  
-      return { success: false as const, error: getUserErrorMessage(error) };
+        const appError = ApplicationError.unexpected(error);
+        return fail(toActionError(appError));
     }
 }

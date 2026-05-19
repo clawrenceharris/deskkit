@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockUser } from "@/test/utils";
@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   refresh: vi.fn(),
   toastError: vi.fn(),
   onAuthStateChange: vi.fn(),
+  getSession: vi.fn(),
   unsubscribe: vi.fn(),
 }));
 
@@ -24,6 +25,7 @@ vi.mock("@/actions/auth", () => ({
 vi.mock("@/lib/supabase/client", () => ({
   supabase: {
     auth: {
+      getSession: mocks.getSession,
       onAuthStateChange: mocks.onAuthStateChange,
     },
   },
@@ -71,6 +73,7 @@ function AuthConsumer() {
 describe("AuthProvider", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getSession.mockResolvedValue({ data: { session: null } });
     mocks.onAuthStateChange.mockReturnValue({
       data: {
         subscription: {
@@ -101,6 +104,10 @@ describe("AuthProvider", () => {
     );
 
     expect(screen.getByText("Guest")).toBeInTheDocument();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     authCallback("SIGNED_IN", { user });
 

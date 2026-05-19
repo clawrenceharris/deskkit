@@ -15,9 +15,9 @@ import { Button, DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMe
 import { FilePreviewer, ProfileButton } from "@/components/shared";
 import { useDownload } from "@/hooks";
 import { toast } from "sonner";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { getUserErrorMessage } from "@/shared/utils/errors";
 import { useDeleteNotebook, useMakeVote, useVotes } from "../../hooks";
-import { AnimatedVoteCount } from "../ui";
+import { AnimatedValue } from "../ui";
 import { useDownloadNotebook } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
 import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
@@ -95,7 +95,7 @@ export function NotebookView({
   };
   const handleEdit = () => {
     if (!notebook) return;
-    updateNotebookModal.open(notebook.id);
+    updateNotebookModal.open(notebook.id, notebook.deskId);
   };
   const voteCount = useMemo(() => {
     return votes.reduce((acc, vote) => {
@@ -185,7 +185,7 @@ export function NotebookView({
                     <ChevronDown strokeWidth={3}/>
                   </Button>
                   <p className="text-sm font-medium tabular-nums">
-                    <AnimatedVoteCount className="text-black" value={voteCount} zeroLabel="Vote" />
+                    <AnimatedValue className="text-black" value={voteCount} zeroLabel="Vote" />
                   </p>
                   <Button
                     disabled={notebook.materials.length === 0}

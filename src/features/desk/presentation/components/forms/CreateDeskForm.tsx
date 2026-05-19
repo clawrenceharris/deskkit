@@ -1,20 +1,15 @@
 "use client";
 import { Form, InputField } from "@/components/form";
 import { CreateDeskFormValues } from "@/types";
-import { DeskForDetail } from "../../../infrastructure/queries";
 import { useCreateDeskForm } from "../../hooks";
 import {SearchSelect} from "@/components/shared";
 import { Switch } from "@/components/ui";
 import { useSchools } from "@/features/school/presentation/hooks";
+import { CreateDeskModalProps } from "@/lib/modals/types";
 
 
-type CreateDeskFormProps = {
-  userId: string;
-  onSuccess?: (desk: DeskForDetail) => void;
-  onError?: (error: string) => void;
-  onCancel?: () => void;
-}
-export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDeskFormProps) {
+
+export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDeskModalProps) {
   const {form, createDesk, isLoading} = useCreateDeskForm({userId, onSuccess, onError});
   const {control, setValue} = form;
   const {data: schools = [], isLoading: isLoadingSchools} = useSchools();  

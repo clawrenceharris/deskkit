@@ -1,7 +1,7 @@
 import { deleteNotebookAction } from "@/actions/notebook";
 import { useUser } from "@/app/providers";
 import { notebookKeys, deskKeys } from "@/lib/queries/keys";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";

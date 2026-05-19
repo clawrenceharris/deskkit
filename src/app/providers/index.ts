@@ -7,3 +7,4 @@ export * from "./ThemeProvider";
 export * from "./SchoolProvider";
 export * from "./HomeNavigationProvider";
 export * from "./AuthProvider";
+export * from "./ProfileProvider";

@@ -1,19 +1,17 @@
 import { NotebookRepository } from "../../domain/repositories";
 import { NotebookForDetail, notebookForDetailArgs, NotebookVote, notebookVoteArgs } from "../queries";
-import { Prisma, PrismaClientType } from "@/lib/db/prisma";
+import { Prisma, PrismaClient } from "@/lib/db/prisma";
 import { CreateNotebookData, UpdateNotebookData, VoteNotebookData, RemoveVoteData } from "./types";
-import { DownloadNotebookInput, GetNotebooksInput } from "../../application/dto";
+import { DownloadNotebookInput } from "../../application/dto";
+import { NotebookReadRepository } from "../../domain/repositories";
+import { PrismaNotebookReadRepository } from "./PrismaNotebookReadRepository";
 
 export class PrismaNotebookRepository implements NotebookRepository {
-    constructor(private readonly prisma: PrismaClientType) {}
-    async getAll(input?: GetNotebooksInput): Promise<NotebookForDetail[]> {
-        const where: Prisma.NotebookWhereInput = input?.where ?? {};
-        const notebooks = await this.prisma.notebook.findMany({
-            where,
-            ...notebookForDetailArgs,
-        });
-        return notebooks;
+    public readonly query: NotebookReadRepository;
+    constructor(private readonly prisma: PrismaClient) {
+        this.query = new PrismaNotebookReadRepository(prisma);
     }
+
     async create(input: CreateNotebookData): Promise<NotebookForDetail> {
         const data: Prisma.NotebookCreateInput = {
             title: input.title,
@@ -47,13 +45,7 @@ export class PrismaNotebookRepository implements NotebookRepository {
         });
         return updated;
     }
-    async getById(id: string): Promise<NotebookForDetail | null> {
-        const notebook = await this.prisma.notebook.findUnique({
-            where: { id },
-            ...notebookForDetailArgs,
-        });
-        return notebook;
-    }
+   
   
     async delete(id: string): Promise<NotebookForDetail> {
         const deleted = await this.prisma.notebook.delete({

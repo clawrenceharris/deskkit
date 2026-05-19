@@ -5,3 +5,6 @@ export * from "./ProfileButton";
 export * from "./FilePreviewer";
 export * from "./SearchBar";
 export * from "./GlobalSearch";
+export * from "./NavButton";
+export * from "./ConfirmationModal";
+export * from "./Icon";

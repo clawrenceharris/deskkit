@@ -1,5 +1,5 @@
 "use client";
-import { useDeskContext, useUser } from "@/app/providers";
+import { useDeskContext, useSchoolContext, useUser } from "@/app/providers";
 import { EmptyState, LoadingState } from "@/components/states";
 import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
 import { Plus } from "lucide-react";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui";
 import { useNotebooksByDeskId } from "@/features/notebook/presentation/hooks";
 import { useSearch } from "@/hooks";
 import { SearchBar } from "@/components/shared";
+import { useDeskPolicy } from "../../hooks";
 
 interface NotebooksViewProps extends ColumnProps {
   onNotebookClick: (notebook: NotebookForDetail) => void;
@@ -25,6 +26,7 @@ export function NotebooksView({
   const { modals: { "notebook:create": createNotebookModal }} = useModals();
   const { user } = useUser();
   const { currentNotebookId } = useDeskContext();
+  const { currentSchoolId } = useSchoolContext();
   function filterNotebooks(
     notebook: NotebookForDetail,
     search: string
@@ -41,6 +43,11 @@ export function NotebooksView({
     filter: (notebook, q) => filterNotebooks(notebook, q),
     data: notebooks,
   });
+  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId: desk.id, userId: user.id, schoolId: currentSchoolId, resourceType: "notebook"});
+  function handleCreateNotebook() {
+    if(!deskPolicy?.canPost) return;
+    createNotebookModal.open(desk.id);
+  }
   const headerRight = (
     <div className="flex items-center gap-2">
        <SearchBar
@@ -51,7 +58,7 @@ export function NotebooksView({
          
        />
       <Button
-         onClick={() => createNotebookModal.open(desk.id)}
+         onClick={handleCreateNotebook}
          size="icon"
          variant="primary"
        >
@@ -59,7 +66,7 @@ export function NotebooksView({
        </Button>
      </div>
   );
-  if(isLoadingNotebooks) {
+  if(isLoadingNotebooks || isLoadingDeskPolicy) {
     return (
       <Column 
         title="Notebooks" 
@@ -72,7 +79,7 @@ export function NotebooksView({
       </Column>
     );
   }
-  if (!desk.isPublic && desk.creatorId !== user.id) {
+  if (!deskPolicy?.canView) {
     return (
       <EmptyState
         message="This Desk is hidden. You don't have permission to view it."
@@ -94,7 +101,7 @@ export function NotebooksView({
             imageUrl="https://i.ibb.co/H87K7h0/desk.png"
             buttonVariant="tertiary"
             buttonIcon={<Plus strokeWidth={3}/>}
-            onAction={() => createNotebookModal.open(desk.id)}
+            onAction={handleCreateNotebook}
             actionLabel="Add a Notebook"
           />
         </div>

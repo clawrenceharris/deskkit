@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { User } from "@supabase/supabase-js";
 
 import { AuthProvider } from "../../domain/services/AuthProvider";
+import { mapSupabaseAuthError } from "../mappers/mapErrors";
 
 function appOrigin(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -18,9 +19,8 @@ export class SupabaseAuthProvider implements AuthProvider {
       data: { user },
       error,
     } = await this.client.auth.getUser();
-    if (error) return null;
-    if (!user) return null;
-    return user.id;
+    if (error) throw mapSupabaseAuthError(error);
+    return user?.id ?? null;
   }
   
   async getUser(): Promise<User | null> {
@@ -28,7 +28,7 @@ export class SupabaseAuthProvider implements AuthProvider {
       data: { user },
       error,
     } = await this.client.auth.getUser();
-    if (error) throw error;
+    if (error) throw mapSupabaseAuthError(error);
     
     return user;
   }
@@ -37,11 +37,11 @@ export class SupabaseAuthProvider implements AuthProvider {
       email,
       password,
     });
-    if (error) throw error
+    if (error) throw mapSupabaseAuthError(error);
     return data.user;
   }
 
-  async signUp(email: string, password: string): Promise<User> {
+  async signUp(email: string, password: string): Promise<User | null> {
     const {
       data: { user },
       error,
@@ -49,20 +49,20 @@ export class SupabaseAuthProvider implements AuthProvider {
       email,
       password
     });
-    if (error) throw error;
-    if (!user) throw new Error("User not found");
+    if (error) throw mapSupabaseAuthError(error);
     return user;
   }
 
   async signOut(): Promise<void> {
     const { error } = await this.client.auth.signOut();
-    if (error) throw error;
+    if (error) throw mapSupabaseAuthError(error);
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    await this.client.auth.resetPasswordForEmail(email, {
+    const { error } = await this.client.auth.resetPasswordForEmail(email, {
       redirectTo: `${appOrigin()}/auth/update-password`,
     });
+    if (error) throw mapSupabaseAuthError(error);
   }
 
   async resetPassword(newPassword: string, token: string): Promise<void> {
@@ -70,6 +70,10 @@ export class SupabaseAuthProvider implements AuthProvider {
     const { error } = await this.client.auth.updateUser({
       password: newPassword,
     });
-    if (error) throw new Error(error.message);
+    if (error) throw mapSupabaseAuthError(error);
   }
+  
+
 }
+
+

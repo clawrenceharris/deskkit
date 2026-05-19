@@ -1,8 +1,7 @@
 "use client";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { schoolKeys } from "@/lib/queries";
-import { ApplicationError } from "@/lib/utils/errors";
-import { getSchoolById } from "@/actions/school/getSchoolById";
+import { getSchoolDetailAction } from "@/actions/school";
 import { SchoolForDetail } from "../../infrastructure/queries";
 export function useSchool(schoolId: string | null): UseQueryResult<SchoolForDetail | null> {
     return useQuery({
@@ -11,9 +10,9 @@ export function useSchool(schoolId: string | null): UseQueryResult<SchoolForDeta
             if(!schoolId){
                 throw new Error("schoolId is required to fetch school.");
             } 
-            const result = await getSchoolById(schoolId);
+            const result = await getSchoolDetailAction(schoolId);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

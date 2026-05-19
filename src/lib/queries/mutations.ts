@@ -7,7 +7,7 @@ import {
    
   } from "@tanstack/react-query";
   import { useCallback, useState } from "react";
-  import { ApplicationError, normalizeError } from "@/lib/utils/errors";
+  import { ApplicationError, normalizeError } from "@/shared/utils/errors";
   
   /**
    * Configuration for a single query update in a multi-query optimistic update

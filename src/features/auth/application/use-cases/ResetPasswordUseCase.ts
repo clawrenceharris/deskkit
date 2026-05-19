@@ -1,18 +1,15 @@
-import { ApplicationError, ApplicationResult } from "@/shared/kernel";
+import { ApplicationError } from "@/shared/utils/errors";
 import { AuthProvider } from "../../domain/services/AuthProvider";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { ok, Result } from "@/shared/application";
 
+export type ResetPasswordUseCaseResult = Result<void, ApplicationError>;
 export class ResetPasswordUseCase {
   constructor(private readonly authProvider: AuthProvider) {}
 
-  async execute(newPassword: string, token: string): Promise<ApplicationResult> {
-    try{
+  async execute(newPassword: string, token: string): Promise<ResetPasswordUseCaseResult> {
       await this.authProvider.resetPassword(newPassword, token);
-      return {success: true as const}
-    }
-    catch(error){
-      return { success: false as const, error: new ApplicationError(getUserErrorMessage(error))}
-    }
+      return ok(undefined);
+    
     
   }
 }

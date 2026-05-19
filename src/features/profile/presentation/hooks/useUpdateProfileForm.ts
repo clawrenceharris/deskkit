@@ -1,20 +1,23 @@
 import { updateProfileSchema } from "@/lib/validation";
 import { UpdateProfileFormValues } from "@/types/profile";
-import { useMutation } from "@tanstack/react-query";
-import { ProfileForDetail } from "../../infrastructure/queries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Profile } from "../../infrastructure/queries";
 import { updateProfileAction } from "@/actions/profile";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { useChangeUsername } from "./useChangeUsername";
 import { useCallback } from "react";
+import { deskKeys, notebookKeys, profileKeys, schoolKeys } from "@/lib/queries";
+import { UpdateProfileResult } from "../../application/dto";
 
 type UseUpdateProfileFormProps = {
-    onSuccess?: (profile: ProfileForDetail) => void;
+    onSuccess?: (result: UpdateProfileResult) => void;
     onError?: (error: string) => void;
-    profile: ProfileForDetail;
+    profile: Profile;
 }
 export const useUpdateProfileForm = ({onSuccess, onError, profile}: UseUpdateProfileFormProps) => {
+    const queryClient = useQueryClient();
     const form = useForm<UpdateProfileFormValues>({
         resolver: zodResolver(updateProfileSchema),
         defaultValues: {
@@ -24,13 +27,13 @@ export const useUpdateProfileForm = ({onSuccess, onError, profile}: UseUpdatePro
             schoolId: profile.schoolId ?? "",
         },
     });
-    useChangeUsername({userId: profile.userId, form});
+    useChangeUsername({userId: profile.userId, profile, form});
 
     const updateProfileMutation = useMutation({
         mutationFn: async(data: UpdateProfileFormValues) => {
             const result = await updateProfileAction({
+                ...data,
                 userId: profile.userId,
-                data,
             });
             if(!result.success){
                 throw new ApplicationError(result.error);
@@ -39,20 +42,19 @@ export const useUpdateProfileForm = ({onSuccess, onError, profile}: UseUpdatePro
 
         },
         onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: profileKeys.all });
+            queryClient.invalidateQueries({ queryKey: schoolKeys.all });
+            queryClient.invalidateQueries({ queryKey: deskKeys.all });
+            queryClient.invalidateQueries({ queryKey: notebookKeys.all });
             onSuccess?.(data);
         },
         onError: (error) => {
-            form.setError("root", { message: getUserErrorMessage(error) });
             onError?.(getUserErrorMessage(error));
         },
     });
-    const updateProfile = useCallback((data: UpdateProfileFormValues) => {
-        if(!form.formState.isValid) return;
-        
-        return updateProfileMutation.mutate(data);
-        
-
-    }, [form.formState.isValid, updateProfileMutation]);
+    const updateProfile = useCallback(async(data: UpdateProfileFormValues) => {        
+        return await updateProfileMutation.mutateAsync(data);
+    }, [ updateProfileMutation]);
   return {
     form,
     isLoading: updateProfileMutation.isPending,

@@ -13,7 +13,6 @@ import {
   FieldLabel,
 } from "@/components/ui";
 import { CreateProfileFormValues } from "@/types/profile";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { Pencil, User as UserIcon } from "lucide-react";
 import {
   Control,
@@ -22,12 +21,13 @@ import {
 } from "react-hook-form";
 import { useEffect, useMemo } from "react";
 import { useCreateProfileForm } from "../../hooks";
-import { useUserProfile } from "../../hooks/useUserProfile";
+import { useProfile } from "../../hooks/useUserProfile";
 import { SearchSelect } from "@/components/shared";
 import { useSchools } from "@/features/school/presentation/hooks";
+import { CreateProfileResult } from "../../../application/dto";
 
 type CreateProfileFormProps = {
-  onSuccess?: (profile: ProfileForDetail) => void;
+  onSuccess?: (result: CreateProfileResult) => void;
   userId: string;
 };
 
@@ -41,7 +41,7 @@ function ProfileAvatarField({
   control: Control<CreateProfileFormValues>;
 }) {
   const file = useWatch({ control, name: "avatarFile" });
-  const {data: profile} = useUserProfile(userId);
+  const {data: profile} = useProfile(userId);
   const previewUrl = useMemo(() => {
     if (file instanceof File && file.size > 0) {
       return URL.createObjectURL(file);

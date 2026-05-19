@@ -1,4 +1,2 @@
-export * from "./GetSchoolsResult";
-export * from "./CreateSchoolData";
-export * from "./UpdateSchoolData";
-export * from "./GetSchoolsInput";
+export * from "./CreateSchoolInput";
+export * from "./UpdateSchoolInput";

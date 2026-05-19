@@ -1,32 +1,30 @@
 
-import { VoteNotebookInput } from "../dto";
 import { NotebookRepository } from "../../domain/repositories";
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { getCurrentUser } from "@/actions/auth/getCurrentUser";
-import { ApplicationError, ApplicationResult } from "@/shared/kernel";
+import { ApplicationError } from "@/shared/utils/errors";
+import { fail, ok, Result } from "@/shared/application";
+import { VoteNotebookInput } from "../dto";
 
 export class VoteNotebookUseCase {
     constructor(private readonly repository: NotebookRepository) {}
-    async execute(input: VoteNotebookInput): Promise<ApplicationResult> {
+    async execute(input: VoteNotebookInput): Promise<Result<void>> {
         try {
-            const user = await getCurrentUser();
-            if (!user) return { success: false, error: new ApplicationError("User not found") };
-            if(input.isUpvote === null){
+            const { userId, isUpvote, notebookId }  = input;
+            if(isUpvote === null){
                 await this.repository.removeVote({
-                    notebookId: input.notebookId,
-                    userId: user.id,
+                    notebookId,
+                    userId,
                 });
-                return { success: true, };
+                return ok(undefined);
             }
             await this.repository.vote({
-                notebookId: input.notebookId,
-                userId: user.id,
-                isUpvote: input.isUpvote,
+                notebookId,
+                userId,
+                isUpvote,
             });
-            return { success: true };
+            return ok(undefined);
         } catch (error) {
-            console.error("Error voting notebook", error);
-            return {success: false, error: new ApplicationError(getUserErrorMessage(error))};
+            const appError = ApplicationError.unexpected(error);
+            return fail(appError);
         }
     }
 }   

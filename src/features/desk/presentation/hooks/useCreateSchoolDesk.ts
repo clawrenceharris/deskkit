@@ -1,22 +1,35 @@
 "use client";
 import { useCallback } from "react";
-import { SchoolDeskForDetail } from "../../infrastructure/queries";
-import { useAsyncAction } from "@/hooks";
 import { createSchoolDeskAction } from "@/actions/desk";
 import { toast } from "sonner";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { deskKeys } from "@/lib/queries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateSchoolDesk() {
-    const { executeWithData: execute, error, isLoading} = useAsyncAction<SchoolDeskForDetail>();
-    const createSchoolDesk = useCallback(async(schoolId: string) => {
-        const result = await execute(() => createSchoolDeskAction(schoolId));
-        if(result.success){
+    const queryClient = useQueryClient();
+    
+    const createSchoolDeskMutation = useMutation({
+        mutationKey: ["createSchoolDesk"],
+        mutationFn: async ({schoolId}: {schoolId: string}) => {
+            const result = await createSchoolDeskAction(schoolId);
+            if(!result.success){
+                throw new ApplicationError(result.error);
+            }
             return result.data;
-        }
-        toast.error(result.error);
-        return null;
-
-    }, [execute]);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.listBySchoolId(variables.schoolId) });
+        },
+        onError: (error) => {
+            toast.error(getUserErrorMessage(error));
+        },
+    });
+    
+    const createSchoolDesk = useCallback(async(schoolId: string) => {
+        return await createSchoolDeskMutation.mutateAsync({schoolId});
+    }, [createSchoolDeskMutation]);
    
-    return { createSchoolDesk, error, isLoading};
+    return { createSchoolDesk, error: createSchoolDeskMutation.error, isLoading: createSchoolDeskMutation.isPending};
 
 }

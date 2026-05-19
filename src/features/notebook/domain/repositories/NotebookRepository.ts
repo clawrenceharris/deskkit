@@ -1,11 +1,11 @@
-import { GetNotebooksInput, DownloadNotebookInput } from "../../application/dto";
+import { DownloadNotebookInput } from "../../application/dto";
 import { NotebookForDetail, NotebookVote } from "../../infrastructure/queries";
 import { CreateNotebookData, RemoveVoteData, UpdateNotebookData, VoteNotebookData } from "../../infrastructure/repositories/types";
+import { NotebookReadRepository } from "./";
 
 export interface NotebookRepository {
-    getAll(input?: GetNotebooksInput): Promise<NotebookForDetail[]>;
+    query: NotebookReadRepository;
     create(data: CreateNotebookData): Promise<NotebookForDetail>;
-    getById(id: string): Promise<NotebookForDetail | null>;
     delete(id: string): Promise<NotebookForDetail>;
     vote(data: VoteNotebookData): Promise<void>;
     removeVote(data: RemoveVoteData): Promise<void>;

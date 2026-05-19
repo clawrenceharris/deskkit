@@ -1,22 +1,21 @@
-import { DeskRepository } from "../../domain/repositories";
-import { ApplicationError, ApplicationResultWithData } from "@/shared/kernel";
-import { DeskForDetail } from "../../infrastructure/queries";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { ProfileRepository } from "@/features/profile/domain/repositories";
+import { fail, ok, Result } from "@/shared/application";
+import { AppErrorCode } from "@/types/errors";
+import { CreateDeskResult } from "../dto";
+import { DeskRepository } from "../../domain/repositories";
 
+export type CreateMyDeskUseCaseResult = Result<CreateDeskResult>;
 export class CreateMyDeskUseCase {
     constructor(private readonly deskRepository: DeskRepository, private readonly profileRepository: ProfileRepository) {}
 
-    async execute(profileId: string): Promise<ApplicationResultWithData<DeskForDetail>> {
-       try{
-            const profile = await this.profileRepository.getByUserId(profileId);
-            if(!profile){
-                return { success: false as const, error: new ApplicationError("Profile not found") };
-            }
-            const myDesk = await this.deskRepository.createMyDesk(profile);
-            return { success: true as const, data: myDesk.desk };
-        } catch (error) {
-            return { success: false as const, error: new ApplicationError(getUserErrorMessage(error)) };
+    async execute(userId: string): Promise<CreateMyDeskUseCaseResult> {
+        const profile = await this.profileRepository.query.getProfile(userId);
+        if(!profile){
+            return fail(new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Profile not found"}));
         }
+        const myDesk = await this.deskRepository.createMyDesk(userId);
+        return ok({deskId: myDesk.id, creatorId: userId, deskName: myDesk.name });
+        
     }
 }

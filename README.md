@@ -1,10 +1,10 @@
-# DeskShare
+# deskkit
 
-DeskShare is a collaborative study platform where students can discover and join desks, share notebooks and materials, and engage with content through downloads and votes.
+deskkit is a collaborative study platform where students can discover and join desks, share notebooks and materials, and engage with content through downloads and votes.
 
 ## Purpose
 
-DeskShare helps users:
+deskkit helps users:
 
 - Create or join desks around classes, clubs, or topics
 - Upload and organize study materials inside notebooks

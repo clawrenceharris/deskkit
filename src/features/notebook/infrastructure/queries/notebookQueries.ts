@@ -85,6 +85,17 @@ export const notebookForCardArgs = {
       isUpvote: true,
     },
   } satisfies Prisma.VoteDefaultArgs;
+
+  export const notebookArgs = {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  } satisfies Prisma.NotebookDefaultArgs;
+  export type Notebook = Prisma.NotebookGetPayload<typeof notebookArgs>;  
   export type NotebookForDetail = Prisma.NotebookGetPayload<typeof notebookForDetailArgs>;
   export type NotebookForCard = Prisma.NotebookGetPayload<typeof notebookForCardArgs>;
   export type NotebookVote = Prisma.VoteGetPayload<typeof notebookVoteArgs>;

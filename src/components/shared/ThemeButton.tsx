@@ -8,7 +8,9 @@ type ThemeButtonProps = {
 }
 export function ThemeButton({ className }: ThemeButtonProps) {
   const { theme, setTheme } = useTheme();
-  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)", {
+    initializeWithValue: false,
+  });
   const isDark = theme === "dark" || theme === "system" && prefersDark;
   return (
     <button

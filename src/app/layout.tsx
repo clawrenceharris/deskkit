@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import { prefetchAuthenticatedAppData } from "@/lib/queries/prefetchAuthenticatedAppData";
 import "./globals.css";
-import { AuthProvider, ModalProvider, QueryProvider, ThemeProvider, UserProvider } from "./providers";
+import { AuthProvider, QueryProvider, ThemeProvider, UserProvider } from "./providers";
 
 export const metadata: Metadata = {
-  title: "DeskShare",
-  description: "Your own virtual desk for sharing your school notes and materials",
+  title: "deskkit",
+  description: "Share and manage your study materials in one shared desk space.",
 };
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -25,7 +27,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+  const queryClient = new QueryClient();
+  try {
+    await prefetchAuthenticatedAppData(queryClient);
+  } catch (error) {
+    console.error("[RootLayout] prefetchAuthenticatedAppData failed:", error);
+  }
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html
       lang="en"
@@ -34,20 +43,20 @@ export default async function RootLayout({
     >
       <body>
         
-        <QueryProvider>
+        <QueryProvider dehydratedState={dehydratedState}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange={false}
           >
-            <ModalProvider>
+            
               <AuthProvider>
-              <UserProvider>              
-                {children}
-              </UserProvider>
+                <UserProvider>  
+                  {children}
+                </UserProvider>
               </AuthProvider>
-            </ModalProvider>
+           
             <Toaster />
 
           </ThemeProvider>

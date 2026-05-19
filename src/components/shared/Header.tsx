@@ -3,13 +3,16 @@ import { ProfileButton,ThemeButton } from ".";
 import { GlobalSearch } from "./GlobalSearch";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useUserProfile } from "@/features/profile/presentation/hooks";
-import { useAuth } from "@/app/providers";
 import { useDesk } from "@/features/desk/presentation/hooks";
 import { useNotebook } from "@/features/notebook/presentation/hooks";
-export function Header() {
-  const { user } = useAuth();
-  const { data: profile } = useUserProfile(user?.id ?? null);
+import Link from "next/link";
+import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+
+type HeaderProps = {
+  searchEnabled?: boolean;
+  profile: ProfileForDetail | null;
+}
+export function Header({searchEnabled = false, profile}: HeaderProps) {
   const pathname = usePathname();
   const [, root, deskId, section, notebookId] = pathname.split("/");
   const currentDeskId = root === "desks" ? deskId ?? null : null;
@@ -29,13 +32,15 @@ export function Header() {
           <ThemeButton /> 
         </div>
         
-        <GlobalSearch
-          currentDeskName={currentDesk?.name}
-          currentNotebookTitle={currentNotebook?.title}
-        />
-        <div className="flex items-center gap-2 justify-center bg-white/80 backdrop-blur-sm rounded-full size-[50px]">
+        {searchEnabled && ( 
+          <GlobalSearch
+            currentDeskName={currentDesk?.name}
+            currentNotebookTitle={currentNotebook?.title}
+          />
+        )}
+        <Link href="/" className="flex items-center gap-2 justify-center bg-white shadow-md rounded-full size-[50px]">
           <Image src="/images/logo-secondary-2.png" alt="Desk Share Logo" width={40} height={40}/>
-        </div>
+        </Link>
       </header>
   );
 }

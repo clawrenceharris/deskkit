@@ -1,9 +1,8 @@
 import { deskKeys, schoolKeys } from "@/lib/queries/keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {  JoinOrLeaveDeskInput } from "../../application/dto";
-import { ApplicationError } from "@/shared/kernel";
 import { toast } from "sonner";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { getUserErrorMessage } from "@/shared/utils/errors";
 import { joinOrLeaveDeskAction } from "@/actions/desk";
 import { useCallback, useState } from "react";
 import { useSchoolContext } from "@/app/providers";
@@ -18,14 +17,15 @@ export function useJoinOrLeaveDesk() {
         mutationFn: async (input:  JoinOrLeaveDeskInput) => {
             const result = await joinOrLeaveDeskAction(input);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
-            
+            return result.data;
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: deskKeys.members(variables.deskId) });
-            queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId) });
+            queryClient.invalidateQueries({ queryKey: deskKeys.members(variables.deskId), });
+            queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId, "detail") });
             queryClient.invalidateQueries({ queryKey: schoolKeys.detail(currentSchoolId ?? "") });
+            queryClient.invalidateQueries({ queryKey: deskKeys.policy(variables.deskId) });
         },
         onError: (error) => {
             toast.error(getUserErrorMessage(error));

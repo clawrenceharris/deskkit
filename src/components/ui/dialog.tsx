@@ -52,6 +52,7 @@ function DialogContent({
   showCloseButton = true,
   title,
   description,
+  showsHeader = true,
   showsDescription = true,
   ...props
 }:  React.ComponentProps<typeof DialogPrimitive.Content> & {
@@ -59,37 +60,41 @@ function DialogContent({
   showsDescription?: boolean;
   description?: string;
   title?: string;
+  showsHeader?: boolean;
 }) {
   return (
     <DialogPortal>
       <DialogOverlay  />
       <DialogPrimitive.Content
+        {...props}
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-4xl bg-popover p-6 text-sm text-popover-foreground ring-1 ring-foreground/5 duration-100 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
-        {...props}
+        
       >
+        {showsHeader && (
         <DialogHeader >
-        <DialogTitle>{title}</DialogTitle>
-          {description && (
-            <DialogDescription className={!showsDescription ? "sr-only" : ""}>
-              {description}
-            </DialogDescription>
+          {title && <DialogTitle>{title}</DialogTitle>}
+            {description && (
+              <DialogDescription className={!showsDescription ? "sr-only" : ""}>
+                {description}
+              </DialogDescription>
+            )}
+            {showCloseButton && (
+            <DialogPrimitive.Close data-slot="dialog-close" asChild className="absolute top-0 right-0">
+              <Button
+                variant="ghost"
+                size="icon"
+              >
+                <X className="size-6" strokeWidth={3} />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DialogPrimitive.Close>
           )}
-           {showCloseButton && (
-          <DialogPrimitive.Close data-slot="dialog-close" asChild className="absolute top-0 right-0">
-            <Button
-              variant="ghost"
-              size="icon"
-            >
-              <X className="size-6" strokeWidth={3} />
-              <span className="sr-only">Close</span>
-            </Button>
-          </DialogPrimitive.Close>
-        )}
         </DialogHeader>
+        )}
         {children}
        
       </DialogPrimitive.Content>

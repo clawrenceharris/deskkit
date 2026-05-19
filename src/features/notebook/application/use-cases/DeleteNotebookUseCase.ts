@@ -1,17 +1,24 @@
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { NotebookRepository } from "../../domain/repositories";
-import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
-import { ApplicationError, ApplicationResultWithData } from "@/shared/kernel";
 
+import { NotebookRepository } from "../../domain/repositories";
+import { ApplicationError } from "@/shared/utils/errors";
+import { fail, ok, Result } from "@/shared/application";
+import { DeleteNotebookResult } from "../dto";
+
+type DeleteNotebookUseCaseResult = Result<DeleteNotebookResult>;
 export class DeleteNotebookUseCase {
     constructor(private readonly repository: NotebookRepository) {}
-    async execute(id: string): Promise<ApplicationResultWithData<NotebookForDetail>> {
+    async execute(id: string): Promise<DeleteNotebookUseCaseResult> {
         try {
             const deleted =await this.repository.delete(id);
-            return { success: true as const, data: deleted };
+            return ok({
+                notebookId: deleted.id,
+                name: deleted.title,
+                creatorId: deleted.creatorId,
+                deskId: deleted.deskId,
+            });
         } catch (error) {
             console.error("Error deleting notebook", error);
-            return { success: false as const, error: new ApplicationError(getUserErrorMessage(error)) };
+            return fail(ApplicationError.unexpected(error));
         }
     }
 }

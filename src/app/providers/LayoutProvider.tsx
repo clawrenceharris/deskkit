@@ -1,5 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useMediaQuery } from "@/hooks";
+import { useSearchParams } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 export type ColumnType = "left" | "center" | "right";
 export type RightPanelMode = "notebook" | "profile";
@@ -15,14 +17,14 @@ interface LayoutContextType {
   closeColumn: (columnType: ColumnType) => void;
   openColumns: ColumnType[];
   rightMode: RightPanelMode;
+  isLeftLayout: boolean;
+  isRightLayout: boolean;
+  isExpandedMode: boolean;
+
   setRightMode: (mode: RightPanelMode) => void;
-  selectDeskLayout: (expanded: boolean) => void;
-  selectSectionLayout: () => void;
   openExpandedLayout: () => void;
-  selectNotebookLayout: () => void;
   closeRightLayout: () => void;
   openLeftLayout: () => void;
-  normalizeLayout: (hasDesk: boolean, hasRightPanel: boolean) => void;
 }
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 const useLayout = () => {
@@ -36,6 +38,7 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
   const isMobile = useMediaQuery("(max-width: 768px)", {
     initializeWithValue: false,
   });
+  const searchParams = useSearchParams();
   const [openColumns, setOpenColumns] = useState<ColumnType[]>(
     initialColumns ?? ["left", "center"],
   );
@@ -52,13 +55,24 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
         return [first] as ColumnType[];
       }
       const deduped = unique(columns);
+      if(isExpandedMode && deduped.length === 0) return ["center"] as ColumnType[];
       if(deduped.length === 0) return ["left", "center"] as ColumnType[];
       if(deduped.length === 1) return [deduped[0], "center"] as ColumnType[];
       return unique(deduped) as ColumnType[];
     },
-    [unique],
+    [unique, isExpandedMode],
   );
+  useEffect(() => {
+    const expanded = searchParams.get("expanded") === "true";
+    if(expanded) {
+      setIsExpandedMode(true);
+    }
+    else {
+      setIsExpandedMode(false);
+    }
+  }, [searchParams]);
 
+ 
   const commitColumns = useCallback(
     (columns: ColumnType[]) => {
       setOpenColumns(normalize(columns, isMobile));
@@ -70,29 +84,7 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
     commitColumns(["left"]);
     setIsExpandedMode(false);
   }, [commitColumns]);
-
-  /**
-   * Selects the desk layout.
-   * @param expanded - Whether to expand the layout (left layout closed, center layout open).
-   */
-  const selectDeskLayout = useCallback((expanded: boolean = false) => {
-    if(expanded) {
-      commitColumns(["center"]);
-    }
-    else {
-      commitColumns(["left"]);
-    }
-  }, [commitColumns]);
-
-  const selectNotebookLayout = useCallback(() => {
-    setRightMode("notebook");
-    commitColumns(["right"]);
-  }, [commitColumns]);
-  const selectSectionLayout = useCallback(() => {
-    console.log("selectSectionLayout");
-    commitColumns([isMobile ? "center" : "left"]);
-
-  }, [commitColumns, isMobile]);
+  
   const openRightLayout = useCallback(() => {
     commitColumns(["right"]);
   }, [commitColumns]);
@@ -117,36 +109,28 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
   const openColumn = useCallback(
     (columnType: ColumnType) => {
       if (columnType === "left") {
-        openLeftLayout();
+        commitColumns(["left"]);
         return;
       }
       if (columnType === "center") {
-        selectDeskLayout();
+        commitColumns(["center"]);
         return;
       }
-      setRightMode((mode) => mode ?? "notebook");
-      openRightLayout()
+      commitColumns(["right"]);
     },
-    [openLeftLayout, openRightLayout, selectDeskLayout],
+    [commitColumns],
   );
 
   const closeColumn = useCallback(
     (columnType: ColumnType) => {
       if (columnType === "right") {
-        
-        closeRightLayout();
-        
-      }
-      else if (columnType === "center") {
-        openLeftLayout()
-        
+        commitColumns(["left"]);
       }
       else if(columnType === "left"){
-        openExpandedLayout();
-        
+        commitColumns(["center"]); 
       }
     },
-    [closeRightLayout, openLeftLayout, openExpandedLayout],
+    [commitColumns],
   );
 
   const isColumnOpen = useCallback(
@@ -154,28 +138,9 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
     [openColumns],
   );
 
-  const normalizeLayout = useCallback(
-    (hasDesk: boolean, hasRightPanel: boolean) => {
-      if (hasRightPanel) {
-        commitColumns(isMobile ? ["right"] : ["center", "right"]);
-        return;
-      }
-      
-      if (hasDesk && !isExpandedMode) {
-        commitColumns(isMobile ? ["center"] : ["left", "center"]);
-        return;
-      }
-      if(isExpandedMode){
-        commitColumns(["center"]);
-        return;
-      }
-      commitColumns(["left"]);
-    },
-    [commitColumns, isMobile, isExpandedMode],
-  );
+  
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpenColumns((prev) => normalize(prev, isMobile));
   }, [isMobile, normalize]);
 
@@ -184,19 +149,18 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
       isColumnOpen,
       openColumn,
       closeColumn,
-      selectSectionLayout,
+      isRightLayout: isColumnOpen("right"),
+      isLeftLayout: isColumnOpen("left"),
+      isExpandedMode,
       openColumns,
       rightMode,
       setRightMode,
-      selectDeskLayout,
-      selectNotebookLayout,
       closeRightLayout,
       openExpandedLayout,
       openRightLayout,
       openLeftLayout,
-      normalizeLayout,
     }),
-    [closeColumn,selectSectionLayout,openExpandedLayout, closeRightLayout, isColumnOpen, normalizeLayout, openColumn, openColumns, openLeftLayout, openRightLayout, rightMode, selectNotebookLayout, selectDeskLayout],
+    [closeColumn, closeRightLayout, isColumnOpen, isExpandedMode, openColumn, openColumns, openExpandedLayout, openLeftLayout, openRightLayout, rightMode],
   );
 
   return (

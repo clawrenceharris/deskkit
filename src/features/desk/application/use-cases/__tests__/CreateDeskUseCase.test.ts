@@ -3,13 +3,14 @@ import { CreateDeskUseCase } from "../CreateDeskUseCase";
 
 import { DeskRepository } from "../../../domain/repositories";
 import { DeskStorage } from "../../../domain/services";
-import { DeskForDetail } from "../../../infrastructure/queries";
-import { ApplicationError } from "@/lib/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
+import { Desk } from "@/lib/db/prisma";
+import { AppErrorCode } from "@/types";
 
 // Helper to create a mock DeskRepository
 function makeRepository(overrides: Partial<DeskRepository> = {}): DeskRepository {
   return {
-    getAll: vi.fn(),
+    getDesks: vi.fn(),
     getById: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
@@ -48,7 +49,7 @@ describe("CreateDeskUseCase", () => {
         imageUrl: "test.png",
         imagePath: "test.png",
         description: null,
-      } as DeskForDetail),
+      } as Desk),
       update: vi.fn().mockResolvedValue({
         id: "1",
         name: "Test Desk",
@@ -58,7 +59,7 @@ describe("CreateDeskUseCase", () => {
         imageUrl: "test.png",
         imagePath: "test.png",
         description: null,
-      } as DeskForDetail),
+      } as Desk),
     });
     storage = makeStorage();
   });
@@ -106,7 +107,7 @@ describe("CreateDeskUseCase", () => {
         imageUrl: "test.png",
         imagePath: "test.png",
         description: null,
-      } as DeskForDetail,
+      } as Desk,
     });
   });
 
@@ -126,7 +127,7 @@ describe("CreateDeskUseCase", () => {
     });
     expect(desk).toEqual({
       success: false,
-      error: new ApplicationError("Something went wrong. Please try again later."),
+      error: new ApplicationError({code: AppErrorCode.DATABASE_ERROR, message: "Failed to create desk"}),
     });
   });
 
@@ -146,7 +147,7 @@ describe("CreateDeskUseCase", () => {
     });
     expect(desk).toEqual({
       success: false,
-      error: new ApplicationError("Something went wrong. Please try again later."),
+      error: new ApplicationError({code: AppErrorCode.EXTERNAL_SERVICE_ERROR, message: "Failed to upload image"}),
     });
   });
 
@@ -162,7 +163,7 @@ describe("CreateDeskUseCase", () => {
         imageUrl: null,
         imagePath: null,
         description: null,
-      } as DeskForDetail),
+      } as Desk),
     });
     // uploadImage resolves, but update rejects, triggering cleanup (remove)
     storage = makeStorage({

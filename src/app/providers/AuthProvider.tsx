@@ -1,7 +1,6 @@
 "use client";
 import { loginAction, signOutAction, signupAction } from "@/actions/auth";
 import { supabase } from "@/lib/supabase/client";
-import { ApplicationError } from "@/shared/kernel";
 import { LoginFormValues, SignUpFormValues } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -10,6 +9,8 @@ import { toast } from "sonner";
 
 type AuthContextType = {
     user: User | null;
+    /** False until the first `getSession()` finishes — avoids treating a cold-start null user as “logged out”. */
+    isAuthReady: boolean;
     signup: (data: SignUpFormValues) => Promise<void>;
     login: (data: LoginFormValues) => Promise<void>;
     signOut: () => Promise<void>;
@@ -20,20 +21,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     
     useEffect(() => {
-        const subscription = supabase.auth.onAuthStateChange((_, session) => {
-        if(session?.user){
-            setUser(session.user);
-        }
-        else{
-            setUser(null);
-        }
-    });
-    return () => subscription.data.subscription.unsubscribe();
-            
+        let cancelled = false;
+
+        void supabase.auth.getSession().then(({ data: { session } }) => {
+            if (cancelled) return;
+            setUser(session?.user ?? null);
+            setIsAuthReady(true);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => {
+            cancelled = true;
+            subscription.unsubscribe();
+        };
     },[]);
 
 
@@ -46,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         const result = await signupAction(data);
         if(!result.success) {
-            throw new ApplicationError(result.error);
+            throw result.error;
         }
         setUser(result.data);
         router.replace("/");
@@ -62,12 +70,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         const result = await loginAction(data);
         if(!result.success) {
-            throw new ApplicationError(result.error);
+            throw result.error;
         }
         setUser(result.data);
+        setIsLoading(false)
         router.replace("/");
         router.refresh();
-        setIsLoading(false);
     }, [router]);
 
     /**
@@ -77,17 +85,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         const result = await signOutAction();
         if(!result.success) {
-            toast.error(result.error);
+            toast.error(result.error.message);
         }
 
         setUser(null);
+        setIsLoading(false)
+
         router.replace("/auth/login");
         router.refresh();
-        setIsLoading(false);
     }, [router]);
 
     const value = {
         user,
+        isAuthReady,
         signup,
         login,
         signOut,

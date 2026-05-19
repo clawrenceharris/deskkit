@@ -69,16 +69,7 @@ export function EmptyState({
   isLoadingAction,
   isLoadingSecondaryAction,
   }: EmptyStateProps) {
-  const renderActions = () => {
-    if (!onAction && !onSecondaryAction) return null;
-
-    return (
-      <>
-       
-        
-      </>
-    );
-  };
+ 
   const renderPage = () => (
     <div className="flex-1 h-full flex justify-center gradient-background w-full items-center">
       {renderCard()}
@@ -118,7 +109,7 @@ export function EmptyState({
   const renderCard = () => (
     <Card
       className={cn(
-      "p-3  max-w-sm w-full rounded-3xl shadow-none flex flex-col justify-center text-center",
+      "p-3 bg-transparent border border-muted max-w-sm w-full rounded-3xl shadow-md flex flex-col justify-center text-center",
         className,
       )}
     >
@@ -142,9 +133,9 @@ export function EmptyState({
       </CardContent>
       <CardFooter className="flex justify-center gap-4">
       {onSecondaryAction && secondaryActionLabel && (
-        <CardAction> 
+        <CardAction className="flex-1 w-full"> 
           <Button 
-            className="flex-1" 
+            className="w-full"
             onClick={onSecondaryAction} 
             variant={secondaryButtonVariant} 
             disabled={isLoadingSecondaryAction}
@@ -153,9 +144,9 @@ export function EmptyState({
           </Button>
         </CardAction>
       )}
-        <CardAction>
+        <CardAction className="flex-1">
          {onAction && actionLabel && (
-            <Button  className="flex-1" variant={buttonVariant} onClick={onAction} disabled={isLoadingAction}>
+            <Button className="w-full" variant={buttonVariant} onClick={onAction} disabled={isLoadingAction}>
                 { isLoadingAction ? (<Loader2 className="w-4 h-4 animate-spin" />)
                 : (<>{buttonIcon}{actionLabel}</>)}
               </Button>
@@ -165,20 +156,7 @@ export function EmptyState({
     </Card>
   );
 
-  const renderDefault = () => (
-    <div className={cn("flex flex-col text-center", className)}>
-      <div>
-        {icon && <div className="mb-3">{icon}</div>}
-        <h2 className="text-xl font-semibold text-foreground mb-2">{title}</h2>
-        {message && (
-          <p className="text-muted-foreground mb-6 max-w-md">{message}</p>
-        )}
-        
-      </div>
-      <div className="flex justify-center">{renderActions()}</div>
-    </div>
-  );
-
+  
   const renderVariant = () => {
     switch (variant) {
       case "card":
@@ -190,7 +168,7 @@ export function EmptyState({
         return renderItem();
       case "default":
       default:
-        return renderDefault();
+        return renderCard();
     }
   };
 

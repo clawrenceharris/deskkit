@@ -1,42 +1,61 @@
 "use client";
 import { Column, type ColumnProps } from "./Column";
-import { useDeskContext, useSchoolContext, useUser } from "@/app/providers";
+import { DeskSection, useDeskContext, useHomeNavigation, useLayout, useSchoolContext, useUser } from "@/app/providers";
 import { Button, Card, CardDescription, CardTitle } from "@/components/ui";
-import { Loader2, Plus } from "lucide-react";
+import { ChevronRight, Loader2, Plus } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
-import { useSearch } from "@/hooks";
-import { DeskListItem } from "../ui";
-import type { DeskForCard, SchoolDeskForDetail, MyDeskForDetail } from "@/features/desk/infrastructure/queries";
-import { useUserDesks } from "../../hooks/useUserDesks";
-import { useCreateMyDesk, useCreateSchoolDesk, useDesk } from "../../hooks";
+import { useMediaQuery, useSearch } from "@/hooks";
+import { DeskListItem, DeskNavbar } from "../ui";
+import type { DeskForCard } from "@/features/desk/infrastructure/queries";
+import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
-import { SearchBar } from "@/components/shared";
+import {  SearchBar } from "@/components/shared";
 import { useSchool } from "@/features/school/presentation/hooks";
-import { useUserProfile } from "@/features/profile/presentation/hooks";
 import { DeskDashboardColumn } from "./DeskDashboardColumn";
 import { motion } from "motion/react";
+import { Desk } from "@/lib/db/prisma";
 
-interface DesksColumnProps extends ColumnProps {
+type DesksColumnProps = ColumnProps & {
   onDeskClick: (desk: DeskForCard) => void;
 }
 
+
+/**
+ * @description A column that displays a list of desks for a user
+ * @param onDeskClick - A function that is called when a desk is clicked
+ * @param props - The props for the column
+ * @returns A column that displays a list of desks for a user
+ */
 export function DesksColumn ({
   onDeskClick,
   ...props
 }: DesksColumnProps) {
   const { user } = useUser();
   const { currentDeskId } = useDeskContext();
-  const { data: desks = [], isLoading: isLoadingDesks, error } = useUserDesks(user.id);
+  const { data: desks = [], isLoading: isLoadingDesks, error } = useCreatorDeskCards(user.id);
+
   const { query, search: searchDesks, clearResults, results: filteredDesks, isLoading: isFilteredDesksLoading } = useSearch({
     data: desks,
     filter: (desk, q) => desk.name.toLowerCase().includes(q.toLowerCase()),
   });
+  const isMobile = useMediaQuery("(max-width: 768px)", {
+    initializeWithValue: false,
+  });
+  // const sortedDesks = useMemo(() => desks.sort((a, b) => b.members.find(member => member.profile.userId === user.id)?.me.getTime() - a.members.find(member => member.profile.userId === user.id)?.createdAt.getTime()), [desks]);
   const { data: currentDesk, isLoading: isLoadingCurrentDesk } = useDesk(currentDeskId);
-  const { data: profile } = useUserProfile(user.id);
-  const { modals: { "desk:create": createDeskModal }} = useModals();
-  const { currentSchoolId } = useSchoolContext();
-  const { data: school, isLoading: isLoadingSchool } = useSchool(currentSchoolId);
-  const isMyDesk = currentDeskId === profile?.myDesk?.desk.id;
+  const { modals: { "desk:create": createDeskModal, "desk:update": updateDeskModal, "desk:delete": deleteDeskModal }} = useModals();
+  const { openLeftLayout, isExpandedMode } = useLayout();
+  const { handleSectionClick } = useHomeNavigation();
+  async function handleEditDesk(desk: Desk) {
+    updateDeskModal.open(desk.id, user.id);
+  }
+  async function handleDeleteDesk(desk: Desk) {
+   
+      deleteDeskModal.open(desk.name);
+  }
+  function handleManageDesk(desk: Desk) {
+    console.log(desk);
+  }
   const headerRight = (
     <div className="flex items-center gap-2">
       <SearchBar
@@ -46,7 +65,7 @@ export function DesksColumn ({
         value={query}
       />
       <Button
-        onClick={createDeskModal.open}
+        onClick={() => createDeskModal.open(user.id)}
         size="icon"
         variant="primary"
       >
@@ -66,7 +85,7 @@ export function DesksColumn ({
   }
  
  
-  if (isLoadingDesks || isLoadingSchool || isLoadingCurrentDesk) {
+  if (isLoadingDesks || isLoadingCurrentDesk) {
     return (
       <Column {...props}>
         <div className="centered">
@@ -87,72 +106,99 @@ export function DesksColumn ({
   
   return (
     <Column 
-      title={currentDeskId ? isMyDesk ? "Your Desk" : currentDesk?.name: "Desks"} 
-      headerRight={currentDeskId ? null : headerRight}
       {...props}
-    >
-       
-       
-       <motion.div
-          className="absolute top-20 inset-x-0 flex min-h-0 flex-col overflow-hidden"
-          initial={false}
-          animate={{ x: !currentDeskId ? "0%" : "-100%" }}
-          transition={{
-            duration: 0.35,
-            ease: [0.32, 0.72, 0, 1] as const,
-          }}
-        >
-       
-      {query && filteredDesks.length === 0 ? ( 
-        <div className="centered">
-          <EmptyState 
-            title="No desks found" 
-            message="Your search didn't match any desks." 
-            onAction={clearResults} 
-            actionLabel="Clear search" 
-            buttonVariant="outline"
-
-          /> 
+      title={!currentDesk ? "Your Desks" : currentDesk.name}
+      showsHeader={!currentDesk || isExpandedMode}
+      headerRight={headerRight}
+      contentContainerClassName="flex relative flex-col overflow-hidden"
+      hideContentOnCollapse={false}
+    >  
+      {isExpandedMode ? (
+         <div className="flex flex-col gap-4 max-h-[500px] my-auto h-full items-center justify-center p-4">
+         
+        
+        <DeskNavbar
+          className="flex-1 h-full border-0"
+          sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members, DeskSection.settings]}
+          showsLabels={false}
+          onNavigate={handleSectionClick}
+          orientation="vertical"
+        />
         </div>
-      ) : ( 
-        <div className="flex flex-col gap-4 overflow-y-auto pb-20 pt-8 px-3">
-          {(!profile?.myDesk || !school?.schoolDesk) && (
-            <PlaceholderDesks/>
-          )}
-          <SystemDesks 
-            myDesk={profile?.myDesk} 
-            schoolDesk={school?.schoolDesk} 
-            onDeskClick={onDeskClick}
-          />
-          {(query ? filteredDesks : desks.filter(desk => desk.id !== profile?.myDesk?.desk.id && desk.id !== school?.schoolDesk?.desk.id)).map((desk) => (
+      ) : (
+       <> 
+      <motion.div
+        initial={false}
+        className="absolute inset-0 flex flex-col overflow-hidden"
 
-              <DeskListItem
-                onClick={onDeskClick}
-                selected={desk.id === currentDeskId}
-                key={desk.id}
-                desk={desk}
-              />
+        animate={{ x: !currentDeskId ? "0%" : "-100%" }}
+        transition={{
+          duration: 0.35,
+          ease: [0.32, 0.72, 0, 1] as const,
+        }}
+      >
+       
+        {query && filteredDesks.length === 0 ? ( 
+          <div className="centered">
+            <EmptyState 
+              title="No desks found" 
+              message="Your search didn't match any desks." 
+              onAction={clearResults} 
+              actionLabel="Clear search" 
+              buttonVariant="outline"
 
-          ))}
-        </div>
-      )}
-    </motion.div>
+            /> 
+          </div>
+        ) : ( 
+          <div className="flex flex-col gap-4 h-full  overflow-y-auto p-4">
+            <PlaceholderDesks />
+            {(query ? filteredDesks : desks).map((desk) => (
+
+                <DeskListItem
+                  onEditClick={() => handleEditDesk(desk)}
+                  onDeleteClick={() => handleDeleteDesk(desk)}
+                  onManageClick={() => handleManageDesk(desk)}
+                  onClick={onDeskClick}
+                  selected={desk.id === currentDeskId}
+                  key={desk.id}
+                  desk={desk}
+                />
+
+            ))}
+          </div>
+        )}
+      </motion.div>
      
       
-     <motion.div
-          className=" inset-0 flex min-h-0 h-full flex-col overflow-hidden"
-          initial={false}
-          animate={{ x: currentDeskId ? "0%" : "100%" }}
-          transition={{
-            duration: 0.35,
-            ease: [0.32, 0.72, 0, 1] as const,
-          }}
-        >
-      <DeskDashboardColumn
-      deskId={currentDeskId}
-    />
-    </motion.div>
-
+      <motion.div
+        className="absolute inset-0 flex flex-col overflow-hidden"
+        initial={false}
+        animate={{ x: currentDeskId ? "0%" : "100%" }}
+        transition={{
+          duration: 0.35,
+          ease: [0.32, 0.72, 0, 1] as const,
+        }}
+      >
+       {currentDesk ? <DeskDashboardColumn
+          deskId={currentDesk.id}
+        />
+       :
+       isMobile ? <EmptyState
+        title="No desk selected" 
+        variant="card"
+        message="Select a desk to view its dashboard."
+        onAction={openLeftLayout}
+        actionLabel="Go to desks"
+        buttonVariant="outline"
+        buttonIcon={<ChevronRight strokeWidth={3}/>}
+       />
+       : null
+      
+      }
+      </motion.div>
+        
+        </>
+      )}
     </Column>
   );
 }
@@ -163,54 +209,28 @@ type DeskPlaceholderProps = {
   description: string;
   isLoading: boolean;
 }
-type SystemDeskListProps = {
-  myDesk?: MyDeskForDetail | null;
-  schoolDesk?: SchoolDeskForDetail | null;
-  onDeskClick: (desk: DeskForCard) => void;
-}
-function SystemDesks({myDesk, schoolDesk, onDeskClick}: SystemDeskListProps){
-  const { currentDeskId } = useDeskContext();
-  return (
-    <>
-      {myDesk && (
-        <DeskListItem 
-          desk={myDesk.desk} 
-          onClick={onDeskClick} 
-          selected={myDesk.desk.id === currentDeskId}
-        />
-      )}
-      {schoolDesk && (
-        <DeskListItem 
-          desk={schoolDesk.desk} 
-          onClick={onDeskClick} 
-          selected={schoolDesk.desk.id === currentDeskId}
 
-        />
-      )}
-    </>
-  )
-}
+
 function PlaceholderDesks(){
   const { currentSchoolId } = useSchoolContext();
   const { user } = useUser();
-  const { data: school, refetch: refetchSchool } = useSchool(currentSchoolId);
-  const { data: profile, refetch: refetchProfile } = useUserProfile(user.id);
+  const { data: school, isLoading: isLoadingSchool } = useSchool(currentSchoolId);
   const { createSchoolDesk, isLoading: isCreateSchoolDeskLoading } = useCreateSchoolDesk();
   const { createMyDesk, isLoading: isCreateMyDeskLoading } = useCreateMyDesk();
+  const { data: myDesk, isLoading: isLoadingMyDesk }  = useMyDesk(user.id)
+  
   function handleCreateSchoolDesk() {
     if(!school) return;
     createSchoolDesk(school.id);
-    refetchSchool();
   }
   function handleCreateMyDesk() {
     createMyDesk(user.id);
-    refetchProfile();
   }
   
   return (
 
     <>
-      {!school?.schoolDesk && (
+      {!school?.schoolDesk && !isLoadingSchool && (
         <DeskPlaceholder 
           title="My School Desk" 
           description={`A Desk for ${school?.name ?? "this school"} has not been created yet. Create one to share resources with students in the same school.`} 
@@ -220,7 +240,7 @@ function PlaceholderDesks(){
         /> 
       )}
 
-      {!profile?.myDesk && (
+      {!myDesk && !isLoadingMyDesk && (
       
         <DeskPlaceholder 
           title="My Desk" 

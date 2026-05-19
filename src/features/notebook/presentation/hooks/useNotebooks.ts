@@ -1,17 +1,16 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getNotebooks } from "@/actions/notebook/getNotebooks";
 import { NotebookForDetail } from "../../infrastructure/queries";
-import { ApplicationError } from "@/lib/utils/errors";
 import { notebookKeys } from "@/lib/queries";
+import { getDetailedNotebooksAction, getDetailedNotebooksByDeskAction, getDetailedNotebooksByCreatorAction } from "@/actions/notebook";
 
 export function useNotebooks(select?: (data: NotebookForDetail[]) => NotebookForDetail[]) {
     return useQuery({
         queryKey: notebookKeys.lists(),
         queryFn: async () => {
-            const result = await getNotebooks();
+            const result = await getDetailedNotebooksAction();
             if(!result.success){
-                throw new Error(result.error);
+                throw result.error;
             }
             return result.data;
         },
@@ -27,9 +26,9 @@ export function useNotebooksByUserId(userId: string | null, select?: (data: Note
             if (!userId) {
                 throw new Error("userId is required to fetch notebooks by userId.");
             }
-            const result = await getNotebooks({ where: { creatorId: userId } });
+            const result = await getDetailedNotebooksByCreatorAction(userId);
             if (!result.success) {
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             queryClient.setQueryData(notebookKeys.listByUserId(userId), result.data);
             return result.data;
@@ -48,9 +47,9 @@ export function useNotebooksByDeskId(deskId: string | null, select?: (data: Note
             if(!deskId){
                 throw new Error("deskId is required to fetch notebooks by deskId.");
             }
-            const result = await getNotebooks({where: {deskId}});
+            const result = await getDetailedNotebooksByDeskAction(deskId);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             queryClient.setQueryData(notebookKeys.listByDeskId(deskId), result.data);
             return result.data;

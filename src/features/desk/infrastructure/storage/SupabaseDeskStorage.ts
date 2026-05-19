@@ -15,9 +15,9 @@ export class SupabaseDeskStorage implements DeskStorage {
     }
 
     async uploadImage(input: {userId:string, deskId: string, file: File}): Promise<{ path: string; url: string }> {
-        const { deskId, file,userId } = input;
+        const { deskId, file } = input;
         const extension = this.toSafeFileKeySegment(file.name.split(".").pop()?.toLowerCase() ?? "jpg");
-        const path = `${deskId}/${userId}/image-${Date.now()}.${extension}`;
+        const path = `${deskId}/image-${Date.now()}.${extension}`;
         const { data, error } = await this.supabase.storage.from('desk').upload(path, file);
         if (error) {
             throw error;

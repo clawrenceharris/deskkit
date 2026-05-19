@@ -1,7 +1,7 @@
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
-import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
-import { DeskForDetail } from "@/features/desk/infrastructure/queries";
-
+import { CreateProfileResult, UpdateProfileResult } from "@/features/profile/application/dto";
+import { CreateDeskResult, DeleteDeskResult, UpdateDeskResult } from "@/features/desk/application/dto";
+import { CreateNotebookResult, UpdateNotebookResult } from "@/features/notebook/application/dto";
+  
 /**
  * Base interface for all modal props
  */
@@ -9,6 +9,7 @@ export interface ModalProps {
   [key: string]: unknown;
   onError?: (error: string) => void;
   onCancel?: () => void;
+  isAlert?: boolean;
 }
 
 /**
@@ -16,6 +17,7 @@ export interface ModalProps {
  */
 export type ModalType =
   | "profile:create"
+  | "profile:view"
   | "profile:delete"
   | "profile:update"
   | "desk:create"
@@ -24,7 +26,7 @@ export type ModalType =
   | "notebook:create"
   | "notebook:update"
   | "notebook:delete"
-
+  | "confirmation"
 /**
  * State interface for ModalProvider
  */
@@ -38,14 +40,17 @@ export interface ModalState {
 // ============================================================================
 
 export interface CreateProfileModalProps extends ModalProps {
-  onSuccess?: (profile: ProfileForDetail) => void;
+  onSuccess?: (result: CreateProfileResult) => void;
   userId: string;
 }
 
 export interface UpdateProfileModalProps extends ModalProps {
-  profile: ProfileForDetail;
-  onSuccess?: (profile: ProfileForDetail) => void;
-  onCancel?: () => void;
+  userId: string;
+  onSuccess?: (result: UpdateProfileResult) => void;
+}
+
+export interface ViewProfileModalProps extends ModalProps {
+  userId: string;
 }
 
 // ============================================================================
@@ -54,15 +59,19 @@ export interface UpdateProfileModalProps extends ModalProps {
 
 export interface CreateDeskModalProps extends ModalProps {
   userId: string;
-  onSuccess?: (desk: DeskForDetail) => void;
+  onSuccess?: (result: CreateDeskResult) => void;
   
 }
 export interface UpdateDeskModalProps extends ModalProps {
   deskId: string;
-  onSuccess?: (desk: DeskForDetail) => void;
-  onCancel?: () => void;
+  userId: string;
+  onSuccess?: (result: UpdateDeskResult) => void;
 }
 
+export interface DeleteDeskModalProps extends ModalProps {
+  deskName: string;
+  onSuccess?: (result: DeleteDeskResult) => void;
+}
 
 // ============================================================================
 // Notebook Modal Props
@@ -70,12 +79,19 @@ export interface UpdateDeskModalProps extends ModalProps {
 
 export interface CreateNotebookModalProps extends ModalProps {
   deskId: string;
-  onSuccess?: (notebook: NotebookForDetail) => void;
+  onSuccess?: (result: CreateNotebookResult) => void;
   
 }
 
 export interface UpdateNotebookModalProps extends ModalProps {
   notebookId: string;
-  onSuccess?: (notebook: NotebookForDetail) => void;
- 
+  deskId: string;
+  onSuccess?: (result: UpdateNotebookResult) => void;
+}
+
+
+export interface ConfirmationModalProps extends ModalProps {
+  title: string;
+  description: string;
+  onConfirm: () => void;
 }

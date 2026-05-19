@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export interface ColumnProps extends MotionProps {
   title?: string | ReactNode;
   openWidth?: string | number;
-
+  secondaryTitle?: string | ReactNode;
   closedWidth?: string | number;
   style?: React.CSSProperties;
   containerStyle?: React.CSSProperties;
@@ -27,6 +27,7 @@ export interface ColumnProps extends MotionProps {
   showsHeader?: boolean;
   children?: React.ReactNode;
   contentContainerClassName?: string;
+  hideContentOnCollapse?: boolean;
 }
 export function Column ({
   title: titleProp,
@@ -35,6 +36,7 @@ export function Column ({
   toggle,
   toggleIcon,
   style,
+  hideContentOnCollapse = true,
   className,
   headerRight,
   contentContainerClassName,
@@ -85,10 +87,10 @@ export function Column ({
       }}
       
     >
-      {isOpen && (
+      
         <div className="flex flex-col h-full">
-            {showsHeader && (
-            <div className="column-header" style={headerStyle}>
+            {showsHeader && isOpen && (
+            <div className={"column-header"} style={headerStyle}>
               <div className="flex items-center gap-3 w-full">
                 {collapsable && !toggle && (
                   <Button
@@ -101,10 +103,11 @@ export function Column ({
                 )}
                 {toggle && toggle}
                 {typeof title === "string" ? (
+
                   <h2 title={title}>
-                    {title}
+                    {title} 
                   </h2>
-                ) : (
+                  ) : (
                   title
                 )}
               </div>
@@ -112,11 +115,12 @@ export function Column ({
             </div>
           )}
           
-          <div className={cn("h-full flex-1 overflow-y-hidden flex flex-col", contentContainerClassName)}>
+          <div className={cn("h-full flex-1 overflow-y-hidden flex flex-col", contentContainerClassName, 
+            hideContentOnCollapse && !isOpen ? "hidden" : "" )}>
             {children}
           </div>
         </div>
-      )}
+        
       
       {!isOpen && collapsable && (
         <div className="column-header justify-center">

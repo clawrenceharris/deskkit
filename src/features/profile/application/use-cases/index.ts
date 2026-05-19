@@ -1,5 +1,3 @@
-export * from "./GetUserProfileUseCase";
 export * from "./UpdateProfileUseCase";
-export * from "./GetCurrentProfileUseCase";
-export * from "./CheckUsernameAvailabilityUseCase"
+export * from "./CheckUsernameUseCase"
 export * from "./CreateProfileUseCase"

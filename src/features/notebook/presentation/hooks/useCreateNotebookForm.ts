@@ -5,17 +5,18 @@ import { CreateNotebookFormValues } from "@/types";
 import { createNotebookSchema } from "@/lib/validation";
 import { useCallback } from "react";
 import { createNotebookAction } from "@/actions/notebook";
-import { NotebookForDetail } from "../../infrastructure/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { notebookKeys } from "@/lib/queries";
+import { CreateNotebookResult } from "@/features/notebook/application/dto";
 
 type UseCreateNotebookFormProps = {
     deskId: string;
-    onSuccess?: (notebook: NotebookForDetail) => void;
+    userId: string | null;
+    onSuccess?: (result: CreateNotebookResult) => void;
     onError?: (error: string) => void;
 }
-export function useCreateNotebookForm({deskId, onSuccess, onError}: UseCreateNotebookFormProps) {
+export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseCreateNotebookFormProps) {
     const queryClient = useQueryClient();
     const form = useForm<CreateNotebookFormValues>({
         resolver: zodResolver(createNotebookSchema),
@@ -29,16 +30,19 @@ export function useCreateNotebookForm({deskId, onSuccess, onError}: UseCreateNot
 
     const createNotebookMutation = useMutation({
         mutationFn: async(data: CreateNotebookFormValues) => {
+            if(!userId) {
+                throw new Error("User ID is required");
+            }
             const result = await createNotebookAction({
                 deskId,
-                data: { 
+                userId,
                     title: data.title,
                     description: data.description,
                     materials: data.materials.map(material => ({
                         type: material.type ?? "OTHER",
                         file: material.file,
                     }))
-                },
+                
             });
             if(!result.success){
                 throw new ApplicationError(result.error);

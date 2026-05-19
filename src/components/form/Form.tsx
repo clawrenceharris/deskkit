@@ -11,7 +11,7 @@ import { Button, DialogFooter, Field, FieldDescription, FieldError, FieldGroup }
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BeforeUnload } from "@/components/form";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { getUserErrorMessage } from "@/shared/utils/errors";
 
 export interface FormProps<T extends FieldValues>{
   children?: ((methods: UseFormReturn<T>) => ReactNode) | ReactNode;
@@ -21,6 +21,7 @@ export interface FormProps<T extends FieldValues>{
   cancelText?: string;
   onSubmit: (data: T) => any | Promise<any>;
   onCancel?: () => void;
+  disabled?: boolean;
   description?: string;
   descriptionClassName?: string;
   enableBeforeUnloadProtection?: boolean;
@@ -92,11 +93,13 @@ export function Form<T extends FieldValues>({
   form,
   isLoading,
   isDialog,
+  ...props
 }: FormProps<T>) {
  
-  const {formState: {disabled, isSubmitting}} = form;
+  const {clearErrors, formState: { disabled, isSubmitting, isDirty }} = form;
   const handleSubmit = async (data: T) => {
     try{
+      clearErrors();
       return await onSubmit(data);
     }
     catch(error){
@@ -125,7 +128,7 @@ export function Form<T extends FieldValues>({
           {/* General Error */}
 
           {form.formState.errors.root &&  
-                <FieldError className="text-destructive">{form.formState.errors.root.message}</FieldError>
+            <FieldError className="text-destructive">{form.formState.errors.root.message}</FieldError>
           }
 
           {isDialog ?
@@ -139,18 +142,20 @@ export function Form<T extends FieldValues>({
             showsSubmitButton={showsSubmitButton} 
             submitButtonClassName={submitButtonClassName} 
             isLoading={isLoading || isSubmitting} 
-            disabled={disabled || isLoading || isSubmitting} />
+            disabled={props.disabled || disabled || isLoading || isSubmitting || !isDirty} 
+            />
           </DialogFooter>
           :
           <FormFooter 
-          showsCancelButton={showsCancelButton} 
-          submitText={submitText} 
-          onCancel={onCancel} 
-          cancelText={cancelText} 
-          showsSubmitButton={showsSubmitButton} 
-          submitButtonClassName={submitButtonClassName} 
-          isLoading={isLoading || isSubmitting} 
-          disabled={disabled || isLoading || isSubmitting} />
+            showsCancelButton={showsCancelButton} 
+            submitText={submitText} 
+            onCancel={onCancel} 
+            cancelText={cancelText} 
+            showsSubmitButton={showsSubmitButton} 
+            submitButtonClassName={submitButtonClassName} 
+            isLoading={isLoading || isSubmitting} 
+            disabled={props.disabled || disabled || isLoading || isSubmitting || !isDirty} 
+            />
           }
 
         </FieldGroup>

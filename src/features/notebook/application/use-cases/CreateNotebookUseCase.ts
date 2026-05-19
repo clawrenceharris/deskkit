@@ -1,32 +1,23 @@
 import { DeskStorage } from "@/features/desk/domain/services";
 import { NotebookRepository } from "../../domain/repositories";
 import type { CreateNotebookInput } from "../dto";
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { getCurrentUser } from "@/actions/auth/getCurrentUser";
-import { ApplicationError, ApplicationResultWithData } from "@/shared/kernel";
-import { NotebookForDetail } from "../../infrastructure/queries";
+import { CreateNotebookResult } from "../dto";
+import { ok, Result } from "@/shared/application";
 
-
+type CreateNotebookUseCaseResult = Result<CreateNotebookResult>
 export class CreateNotebookUseCase {
     constructor(private readonly repository: NotebookRepository, private readonly storage: DeskStorage) {}
-    async execute(input: CreateNotebookInput): Promise<ApplicationResultWithData<NotebookForDetail>> {
-        let uploads: { path: string; url: string }[] = [];
+    async execute(input: CreateNotebookInput): Promise<CreateNotebookUseCaseResult> {
+      const { userId, deskId, materials, title, description } = input;
+      let uploads: { path: string; url: string }[] = [];
       try {
-        //1. Get creator id from session
-        const user = await getCurrentUser();
-        if (!user) {
-          return {
-            success: false as const,
-            error: new ApplicationError("User not found"),
-          };
-        }
         // 1. Upload files
         const uploadedMaterials = await Promise.all(
-          input.data.materials.map(async (m) => {
+          materials.map(async (m) => {
             const uploaded = await this.storage.uploadFile({
               file: m.file,
-              userId: user.id,
-              deskId: input.deskId,
+              userId,
+              deskId,
             });
     
             return {
@@ -36,17 +27,17 @@ export class CreateNotebookUseCase {
               fileName: m.file.name,
               title: m.file.name,
               mimeType: m.file.type,
-              authorId: user.id,
+              authorId: userId,
             };
           })
         );
         uploads = uploadedMaterials.map((u) => ({ path: u.path, url: u.url }));
         // 2. Save to DB
         const notebook = await this.repository.create({
-          deskId: input.deskId,
-          creatorId: user.id,
-          title: input.data.title,
-          description: input.data.description ?? null,
+          deskId,
+          creatorId: userId,
+          title: title,
+          description: description ?? null,
           materials: uploadedMaterials.map((u) => ({
             type: u.type ?? "OTHER",
             url: u.url,
@@ -57,10 +48,12 @@ export class CreateNotebookUseCase {
           })),
         });
     
-        return {
-          success: true as const,
-          data: notebook,
-        };
+        return ok({
+          notebookId: notebook.id,
+          title: notebook.title,
+          deskId: notebook.deskId,
+          creatorId: notebook.creatorId,
+        });
       } catch (error) {
         console.error("Error creating notebook", error);
         try{
@@ -71,11 +64,10 @@ export class CreateNotebookUseCase {
           }
         } catch (error) {
           console.error("Error removing uploaded materials", error);
+          throw error;
         }
-        return {
-          success: false as const,
-          error: new ApplicationError(getUserErrorMessage(error)),
-        };
+        throw error;
+
       }
     }
 }   

@@ -2,10 +2,10 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CheckCircle, Info, TriangleAlert, CircleAlert } from "lucide-react"
+import { CheckCircle, Info, TriangleAlert, X } from "lucide-react"
 import { Loader2 } from "lucide-react"
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme } = useTheme()
 
   return (
     <Sonner
@@ -22,7 +22,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           <TriangleAlert strokeWidth={2} className="size-6 text-yellow-500" />
         ),
         error: (
-          <CircleAlert strokeWidth={2} className="size-6 text-red-500" />
+          <X strokeWidth={3} className="size-6 text-destructive" />
         ),
         loading: (
           <Loader2 strokeWidth={2} className="size-6 text-primary animate-spin" />
@@ -38,7 +38,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          toast: "cn-toast flex items-center gap-4",
         },
       }}
       {...props}

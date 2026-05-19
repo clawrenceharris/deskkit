@@ -4,16 +4,16 @@ import { CreateProfileFormValues } from "@/types/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useCallback } from "react";
-import { ProfileForDetail } from "../../infrastructure/queries";
 import { useChangeUsername } from "./";
 import { createProfileAction } from "@/actions/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { deskKeys, profileKeys } from "@/lib/queries";
 import { useAuth } from "@/app/providers";
+import { CreateProfileResult } from "../../application/dto";
 
 type UseCreateProfileFormProps = {
-    onSuccess?: (profile: ProfileForDetail) => void;
+    onSuccess?: (result: CreateProfileResult) => void;
     onError?: (error: string) => void;
     userId: string;
 }
@@ -56,7 +56,7 @@ export function useCreateProfileForm({userId, onSuccess, onError}: UseCreateProf
             onError?.(getUserErrorMessage(error));
         },
     })
-    const { checkUsername } = useChangeUsername({userId: user?.id ?? null, form});
+    const { checkUsername } = useChangeUsername({userId, form});
     const createProfile = useCallback(async(data: CreateProfileFormValues) => {
         const isUsernameAvailable = await checkUsername();
         if(!isUsernameAvailable) return;

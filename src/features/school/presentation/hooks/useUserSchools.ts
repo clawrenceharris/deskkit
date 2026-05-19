@@ -1,7 +1,6 @@
 import { schoolKeys } from "@/lib/queries";
 import { useQuery } from "@tanstack/react-query";
-import { getUserSchools } from "@/actions/school/getUserSchools";
-import { ApplicationError } from "@/lib/utils/errors";
+import { getDetailedSchoolsByUserAction } from "@/actions/school";
 import { SchoolForDetail } from "../../infrastructure/queries";
 
 export function useUserSchools(userId: string, select?: (data: SchoolForDetail[]) => SchoolForDetail[]){
@@ -9,9 +8,9 @@ export function useUserSchools(userId: string, select?: (data: SchoolForDetail[]
         queryKey: schoolKeys.listByUserId(userId),
         queryFn: async() => {
             
-            const result = await getUserSchools(userId);
+            const result = await getDetailedSchoolsByUserAction(userId);
             if(!result.success){
-               throw new ApplicationError(result.error);
+               throw result.error;
             }
             return result.data;
         },

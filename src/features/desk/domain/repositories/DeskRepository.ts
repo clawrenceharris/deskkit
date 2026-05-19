@@ -1,17 +1,16 @@
-import { SchoolForDetail } from "@/features/school/infrastructure/queries";
-import type { CreateDeskData, GetDesksInput, JoinOrLeaveDeskInput } from "../../application/dto";
-import type { DeskForDetail, MyDeskForDetail, SchoolDeskForDetail } from "../../infrastructure/queries";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+import type { CreateSchoolDeskInput, JoinOrLeaveDeskInput } from "../../application/dto";
+import type { DeskForDetail } from "../../infrastructure/queries";
+import { CreateDeskData, UpdateDeskData } from "../../infrastructure/types";
+import { Desk } from "@/lib/db/prisma";
+import { DeskReadRepository } from "./DeskReadRepository";
 
 export interface DeskRepository {
-  getAll(input?: GetDesksInput): Promise<DeskForDetail[]>;
-  getById(id: string): Promise<DeskForDetail | null>;
-  create(input: CreateDeskData): Promise<DeskForDetail>;
-  update(id: string, input: Partial<CreateDeskData>): Promise<DeskForDetail>;
+  query: DeskReadRepository;
+  create(input: CreateDeskData): Promise<Desk>;
+  update(input: UpdateDeskData): Promise<Desk>;
   delete(id: string): Promise<void>;
   join(input: JoinOrLeaveDeskInput): Promise<void>;
   leave(input: JoinOrLeaveDeskInput): Promise<void>;
-  createSchoolDesk(school: SchoolForDetail): Promise<SchoolDeskForDetail>;
-  createMyDesk(profile: ProfileForDetail): Promise<MyDeskForDetail>;
-  getSchoolDesk(schoolId: string): Promise<SchoolDeskForDetail | null>;
+  createSchoolDesk(input: CreateSchoolDeskInput): Promise<DeskForDetail>;
+  createMyDesk(userId: string): Promise<DeskForDetail>;
 }

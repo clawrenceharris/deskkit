@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSchools } from "@/actions/school/getSchools";
+import { getDetailedSchoolsAction } from "@/actions/school";
 import { SchoolForDetail } from "../../infrastructure/queries";
 import { schoolKeys } from "@/lib/queries";
-import { ApplicationError } from "@/lib/utils/errors";
 
 export function useSchools(select?: (data: SchoolForDetail[]) => SchoolForDetail[]) {
   return useQuery({
     queryKey: schoolKeys.all,
     queryFn: async () => {
-      const result = await getSchools();
+      const result = await getDetailedSchoolsAction();
       if(!result.success){
-        throw new ApplicationError(result.error);
+        throw result.error;
       }
       return result.data;
     },

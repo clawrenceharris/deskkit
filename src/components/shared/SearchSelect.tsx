@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from 'react'
 
-import { CheckIcon, ChevronsUpDownIcon, Plus } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, Loader2, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -28,6 +28,8 @@ interface SearchSelectProps extends Omit<React.ComponentProps<"input">, "value" 
   searchPlaceholder?: string
   /** Label for the “add custom” row (search text is appended) */
   newItemLabel?: string
+  /** When true, the search input is disabled */
+  isLoading?: boolean
 }
 
 export function SearchSelect({
@@ -38,7 +40,7 @@ export function SearchSelect({
   placeholder = 'Select…',
   searchPlaceholder = 'Search…',
   newItemLabel = 'New',
-  
+  isLoading,
   ...props
 
 }: SearchSelectProps) {
@@ -64,7 +66,7 @@ export function SearchSelect({
   const showNewOption = canCreateNew && searchTrim.length > 0 && !hasExactMatch
 
   const displayLabel =
-    value != null && value !== '' && !props.disabled
+    value != null && value !== '' && !isLoading
       ? (items.find((item) => item.value === value)?.label ?? value)
       : null
 
@@ -78,6 +80,7 @@ export function SearchSelect({
       >
         <PopoverTrigger asChild>
           <Button
+            disabled={props.disabled || isLoading}
             id={id}
             variant="outline"
             role="combobox"
@@ -104,6 +107,7 @@ export function SearchSelect({
           <Command shouldFilter={false}>
             <CommandInput
               {...props}
+              disabled={props.disabled}
               placeholder={searchPlaceholder}
               value={search}
               onValueChange={setSearch}
@@ -112,7 +116,12 @@ export function SearchSelect({
             />
             <CommandList>
               <CommandGroup>
-                {filteredItems.map((item) => (
+                {isLoading ? (
+                  <CommandItem>
+                    <Loader2 className="animate-spin" />
+                  </CommandItem>
+                ) : (
+                  filteredItems.map((item) => (
                   <CommandItem
                     className="flex justify-between w-full relative"
                     key={item.value}
@@ -131,7 +140,7 @@ export function SearchSelect({
                       <CheckIcon size={16} className="ml-auto absolute right-3" />
                     )}
                   </CommandItem>
-                ))}
+                )))}
               </CommandGroup>
               {showNewOption ? (
                 <>

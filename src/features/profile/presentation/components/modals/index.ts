@@ -1,8 +1,8 @@
 export { CreateProfileModal } from "./CreateProfileModal";
 
+
 import { modalRegistry, ModalType } from "@/lib/modals";
 import { CreateProfileModal } from "./CreateProfileModal";
-import { UpdateProfileModal } from "./UpdateProfileModal";
 
 /**
  * Modal type constants for profile modals
@@ -18,5 +18,4 @@ export const PROFILE_MODAL_TYPES = {
  */
 export function registerProfileModals() {
   modalRegistry.register(PROFILE_MODAL_TYPES.CREATE, CreateProfileModal);
-  modalRegistry.register(PROFILE_MODAL_TYPES.UPDATE, UpdateProfileModal);
 }

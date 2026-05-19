@@ -1,12 +1,13 @@
-import { ActionResult, ActionResultWithData } from "@/actions";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { ActionResult, toActionError } from "@/shared/action";
+import { fail } from "@/shared/application";
+import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
 import { useCallback, useState } from "react";
 
 export function useAsyncAction<TData>() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
     
-    const executeWithData = useCallback(async (fn: () => Promise<ActionResultWithData<TData>>): Promise<ActionResultWithData<TData>> => {
+    const execute = useCallback(async (fn: () => Promise<ActionResult<TData>>): Promise<ActionResult<TData>> => {
     
         try {
             setIsLoading(true);
@@ -18,24 +19,11 @@ export function useAsyncAction<TData>() {
         } catch (error) {
             const errorMessage = getUserErrorMessage(error)
             setError(errorMessage);
-            return {success: false, error: errorMessage};
+            return fail(toActionError(ApplicationError.unexpected(error)));
         } finally {
             setIsLoading(false);
         }
       },[]);
-    const execute = useCallback(async (fn: () => Promise<ActionResult>): Promise<ActionResult> => {
-        try {
-            setIsLoading(true);
-            const result = await fn();
-            return result;
-        }
-        catch (error) {
-            const errorMessage = getUserErrorMessage(error)
-            setError(errorMessage);
-            return {success: false, error: errorMessage};
-        } finally {
-            setIsLoading(false);
-        }
-    },[]);
-    return {isLoading, error,executeWithData, execute};
+    
+    return {isLoading, error, execute};
 }

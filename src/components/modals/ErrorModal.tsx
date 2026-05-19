@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@/components/ui";
 
-import { ApplicationError } from "@/lib/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { Copy, Check } from "lucide-react";
 
 interface ErrorDetailModalProps {

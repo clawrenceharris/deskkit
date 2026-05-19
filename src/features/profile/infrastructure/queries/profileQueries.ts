@@ -2,53 +2,91 @@ import { deskForDetailArgs } from "@/features/desk/infrastructure/queries";
 import { Prisma } from "@/lib/db/prisma";
 
 export const profileForDetailArgs = {
-    include: {
-        school: {
-            select: {
-                id: true,
-                name: true,
+include: {
+    school: {
+        select: {
+            id: true,
+            name: true,
+        },
+    },
+    createdDesks: {
+        ...deskForDetailArgs,
+    },
+    memberships: {
+        select: {
+            role: true,
+            desk: {
+                ...deskForDetailArgs,
             },
         },
-        createdDesks: {
-            ...deskForDetailArgs,
+    },
+    notebooks: {
+        select: {
+            id: true,
+            title: true,
+            votes: true,
+            materials: true,
+        },
+    },
+    myDesk: {
+        select:{
+            desk:{
+                ...deskForDetailArgs,
+            }
+        }
+            
+            
+    },
+},
+
+} satisfies Prisma.ProfileDefaultArgs;
+
+export const profileForButtonArgs = {
+select: {
+    userId: true,
+    username: true,
+    displayName: true,
+    avatarUrl: true,
+},
+} satisfies Prisma.ProfileDefaultArgs;
+
+export const profileArgs = {
+select: {
+    userId: true,
+    username: true,
+    displayName: true,
+    avatarUrl: true,
+    schoolId: true,
+},
+
+
+} satisfies Prisma.ProfileDefaultArgs;
+
+
+export const profileForPolicyArgs = {
+    include: {
+        myDesk: {
+            select: {
+                deskId: true
+            }
         },
         memberships: {
             select: {
-                id: true,
+                role: true,
                 desk: {
-                    ...deskForDetailArgs,
+                    select:{
+                        id: true,
+                        isPublic: true,
+                        creatorId: true
+                        
+                    }
                 },
             },
         },
-        notebooks: {
-            select: {
-                id: true,
-                title: true,
-                votes: true,
-                materials: true,
-            },
-        },
-        myDesk: {
-            select:{
-                desk:{
-                    ...deskForDetailArgs,
-                }
-            }
-                
-                
-        },
     },
-    
-  } satisfies Prisma.ProfileDefaultArgs;
+} satisfies Prisma.ProfileDefaultArgs;
 
-  export const profileForButtonArgs = {
-    select: {
-      userId: true,
-      username: true,
-      displayName: true,
-      avatarUrl: true,
-    },
-  } satisfies Prisma.ProfileDefaultArgs;
-  export type ProfileForDetail = Prisma.ProfileGetPayload<typeof profileForDetailArgs>;
-  export type ProfileForButton = Prisma.ProfileGetPayload<typeof profileForButtonArgs>;
-  
+export type Profile = Prisma.ProfileGetPayload<typeof profileArgs>;
+export type ProfileForDetail = Prisma.ProfileGetPayload<typeof profileForDetailArgs>;
+export type ProfileForButton = Prisma.ProfileGetPayload<typeof profileForButtonArgs>;
+export type ProfileForPolicy = Prisma.ProfileGetPayload<typeof profileForPolicyArgs>;

@@ -1,1 +1,1 @@
-export * from "./AnimatedVoteCount";
+export * from "./AnimatedValue";

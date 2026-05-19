@@ -1,6 +1,9 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { useAsyncAction } from "../useAsyncAction";
+import { ApplicationError } from "@/shared/utils/errors";
+import { AppErrorCode } from "@/types";
+import { fail } from "@/shared/application";
 
 describe("useAsyncAction", () => {
   it("returns successful data and toggles loading", async () => {
@@ -9,7 +12,7 @@ describe("useAsyncAction", () => {
     let promise: Promise<unknown>;
 
     act(() => {
-      promise = result.current.executeWithData(async () => ({
+      promise = result.current.execute(async () => ({
         success: true,
         data: { id: "desk-1" },
       }));
@@ -29,7 +32,7 @@ describe("useAsyncAction", () => {
     const { result } = renderHook(() => useAsyncAction<{ id: string }>());
 
     await act(async () => {
-      const actionResult = await result.current.executeWithData(async () => {
+      const actionResult = await result.current.execute(async () => {
         throw new Error("internal details");
       });
 
@@ -47,13 +50,10 @@ describe("useAsyncAction", () => {
     const { result } = renderHook(() => useAsyncAction());
 
     await expect(
-      result.current.execute(async () => ({
-        success: false,
-        error: "Could not create desk",
-      })),
+      result.current.execute(async () => fail(new ApplicationError({code: AppErrorCode.DATABASE_ERROR, message: "Could not create desk"}))),  
     ).resolves.toEqual({
       success: false,
-      error: "Could not create desk",
+      error: new ApplicationError({code: AppErrorCode.DATABASE_ERROR, message: "Could not create desk"}),
     });
 
     expect(result.current.error).toBeNull();

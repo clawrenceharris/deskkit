@@ -1,6 +1,6 @@
 import { PrismaDeskRepository } from "@/features/desk/infrastructure/repositories/PrismaDeskRepository";
 import { prisma } from "@/lib/db/prisma";
-import { CreateDeskUseCase } from "@/features/desk/application/use-cases/CreateDeskUseCase";
+import { CreateDeskUseCase } from "@/features/desk/application/use-cases";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SupabaseDeskStorage } from "@/features/desk/infrastructure/storage";
 

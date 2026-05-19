@@ -1,11 +1,9 @@
 import { ProfileRepository } from "../../domain/repositories";
 import { AvatarStorage } from "../../domain/services";
-import { ApplicationError, getUserErrorMessage } from "@/lib/utils/errors";
-import { CreateProfileInput } from "../dto";
+import { CreateProfileInput, CreateProfileResult } from "../dto";
 import { SchoolRepository } from "@/features/school/domain/repositories";
-import { ApplicationResultWithData } from "@/shared/kernel/Result";
-import { ProfileForDetail } from "../../infrastructure/queries";
 import { DeskRepository } from "@/features/desk/domain/repositories";
+import { ok, Result } from "@/shared/application";
 
 export class CreateProfileUseCase {
     constructor(
@@ -15,7 +13,7 @@ export class CreateProfileUseCase {
       private readonly deskRepository: DeskRepository
     ) {}
   
-    async execute(input: CreateProfileInput): Promise<ApplicationResultWithData<ProfileForDetail>> {
+    async execute(input: CreateProfileInput): Promise<Result<CreateProfileResult>> {
       const { userId, username, displayName, avatarFile , schoolId } = input;
       let uploadedAvatar: { path: string; url: string | null } | null = null;
   
@@ -33,18 +31,11 @@ export class CreateProfileUseCase {
         let resolvedSchoolId: string | null = null;
 
         if (normalizedSchoolInput.length > 0) {
-          const existingById = await this.schoolRepository.getSchoolById(normalizedSchoolInput);
+          const existingById = await this.schoolRepository.query.getSchool(normalizedSchoolInput);
           if (existingById) {
             resolvedSchoolId = existingById.id;
           } else {
-            const existingByName = await this.schoolRepository.getSchools({
-              where: {
-                name: {
-                  equals: normalizedSchoolInput,
-                  mode: "insensitive",
-                },
-              },
-            });
+            const existingByName = await this.schoolRepository.query.getSchoolsByName(normalizedSchoolInput);
 
             if (existingByName[0]) {
               resolvedSchoolId = existingByName[0].id;
@@ -75,16 +66,21 @@ export class CreateProfileUseCase {
 
         // join school desk
         if(resolvedSchoolId){
-          const schoolDesk = await this.deskRepository.getSchoolDesk(resolvedSchoolId);
+          const schoolDesk = await this.deskRepository.query.getSchoolDesk(resolvedSchoolId);
           if(schoolDesk){
             await this.deskRepository.join({
-              deskId: schoolDesk.desk.id,
+              deskId: schoolDesk.id,
               userId: userId,
               role: "CONTRIBUTOR"
             });
           }
         }
-        return { success: true as const, data: profile };
+        return ok({ 
+          userId: profile.userId, 
+          username: profile.username, 
+          displayName: profile.displayName, 
+          schoolId: profile.schoolId 
+        });
       } catch (error) {
         console.error("Error creating or updating profile", error);
         if (uploadedAvatar?.path) {
@@ -94,7 +90,7 @@ export class CreateProfileUseCase {
             console.error("Error removing avatar", error);
           }
         }
-        return { success: false as const, error: new ApplicationError(getUserErrorMessage(error)) };
+        throw error;
         
       }
   }

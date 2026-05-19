@@ -23,5 +23,20 @@ export const schoolForDetailArgs = {
         desks: true,
     },
 } satisfies Prisma.SchoolDefaultArgs;
+export const schoolForPolicyArgs = {
+    include: {
+        
+        schoolDesk: true,
+    },
+} satisfies Prisma.SchoolDefaultArgs;
 
+export const schoolArgs = {
+    select: {
+        id: true,
+        name: true,
+    },
+} satisfies Prisma.SchoolDefaultArgs;
+export type School = Prisma.SchoolGetPayload<typeof schoolArgs>;
+export type SchoolForDetailArgs = typeof schoolForDetailArgs;
 export type SchoolForDetail = Prisma.SchoolGetPayload<typeof schoolForDetailArgs>;
+export type SchoolForPolicy = Prisma.SchoolGetPayload<typeof schoolForPolicyArgs>;

@@ -4,8 +4,10 @@ export const deskKeys = {
     listByUserId: (userId: string) => [...deskKeys.lists(), "user", userId] as const,
     listBySchoolId: (schoolId: string) => [...deskKeys.lists(), "school", schoolId] as const,
     details: () => [...deskKeys.all, "detail"] as const,
-    detail: (deskId: string) => [...deskKeys.details(), deskId] as const,
+    detail: (deskId: string, shape: "base" | "detail" | "card" = "base") => [...deskKeys.details(), deskId, shape] as const,
     members: (deskId: string) => [...deskKeys.all, "members", deskId] as const,
+    policy: (deskId: string) => [...deskKeys.all, "policy", deskId] as const,
+    myDesk: (userId: string, shape: "base" | "detail" = "base") => [...deskKeys.all, "myDesk", userId, shape] as const,
 }
 
 export const notebookKeys = {
@@ -30,5 +32,5 @@ export const schoolKeys = {
 export const profileKeys = {
     all: ["profiles"] as const,
     details: () => [...profileKeys.all, "detail"] as const,
-    detail: (userId: string) => [...profileKeys.details(), userId] as const,
+    detail: (userId: string, shape: "base" | "detail" = "base") => [...profileKeys.details(), userId, shape] as const,
 }

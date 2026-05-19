@@ -1,21 +1,34 @@
 "use server"
-import { ActionResultWithData } from "..";
-import { UpdateProfileInput } from "@/features/profile/application/dto";
-import { getUserErrorMessage } from "@/lib/utils/errors";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+import { UpdateProfileInput, UpdateProfileResult } from "@/features/profile/application/dto";
+import { ApplicationError } from "@/shared/utils/errors";
 import { makeUpdateProfileUseCase } from "@/composition/profile";
+import { fail, ok } from "@/shared/application";
+import { toActionError, ActionResult   } from "@/shared/action";
+import { AppErrorCode } from "@/types/errors";
+import { getCurrentUser } from "../auth";
 
-export async function updateProfileAction(input: UpdateProfileInput): Promise<ActionResultWithData<ProfileForDetail>> {
+export async function updateProfileAction(input: UpdateProfileInput): Promise<ActionResult<UpdateProfileResult>> {
 
     try {   
-      const useCase = await makeUpdateProfileUseCase();
+      const userResult = await getCurrentUser();
+        if(!userResult.success){
+          return fail(userResult.error);
+        }
+        if(userResult.data?.id !== input.userId){
+          return fail(new ApplicationError({ code: AppErrorCode.PERMISSION_DENIED }));
+        }
+      
+        const useCase = await makeUpdateProfileUseCase();
+
       const result = await useCase.execute(input);
+
       if(!result.success){
-        return { success: false as const, error: result.error.message };
+        return fail(result.error);
       }
-      return result;
+      return ok(result.data);
 
     } catch (error) {  
-      return { success: false as const, error: getUserErrorMessage(error) };
+      const appError = ApplicationError.unexpected(error);    
+      return fail(toActionError(appError));
     }
 }

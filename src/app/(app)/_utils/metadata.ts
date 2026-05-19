@@ -1,18 +1,18 @@
-import { getDeskById } from "@/actions/desk/getDeskById";
+import { getDeskAction } from "@/actions/desk/queries/getDeskAction";
 
 /** Page metadata helper for desk-scoped routes (extend for notebook titles when needed). */
-export async function getCurrentDeskOrNotebookTitle(currentDeskId: string) {
-  const currentDesk = await getDeskById(currentDeskId);
+export async function getCurrentDeskOrNotebookTitle(deskId: string) {
+  const currentDesk = await getDeskAction(deskId);
   if (!currentDesk.success) {
     return {
-      title: "DeskShare",
-      description: "Your own virtual desk for sharing your school notes and materials",
+      title: "deskkit",
+      description: "Share and manage your study materials in one shared desk space.",
     };
   }
   const deskTitle = `${currentDesk.data?.name ?? "Desk"}`;
 
   return {
     title: deskTitle,
-    description: "Your own virtual desk for sharing your school notes and materials",
+    description: "Share and manage your study materials in one shared desk space.",
   };
 }

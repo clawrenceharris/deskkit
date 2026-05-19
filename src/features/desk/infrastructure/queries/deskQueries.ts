@@ -1,5 +1,20 @@
 import { notebookForDetailArgs } from "@/features/notebook/infrastructure/queries";
 import { Prisma } from "@/lib/db/prisma";
+export const memberForDetailArgs = {
+  select: {
+    role: true,
+    profile: {
+      select: {
+        userId: true,
+        username: true,
+        displayName: true,
+        avatarUrl: true,
+      },
+    },
+  },
+} satisfies Prisma.MemberDefaultArgs;
+export type MemberForDetail = Prisma.MemberGetPayload<typeof memberForDetailArgs>;
+
 
 export const deskForDetailArgs = {
     include: {
@@ -14,15 +29,18 @@ export const deskForDetailArgs = {
      
       members: {
         select: {
-          profile: {
-            select: {
-              userId: true,
-              username: true,
-              displayName: true,
-              avatarUrl: true,
+          role: true,
+            profile: {
+              select: {
+                userId: true,
+                username: true,
+                displayName: true,
+                avatarUrl: true,
+              },
             },
-          },
-        },
+          
+          
+        }
       },
       notebooks: {
         ...notebookForDetailArgs,
@@ -92,8 +110,23 @@ export const deskForDetailArgs = {
     },
   } satisfies Prisma.UserDeskDefaultArgs;
 
-  
-  export type DeskForDetail = Prisma.DeskGetPayload<typeof deskForDetailArgs>;
-  export type SchoolDeskForDetail = Prisma.SchoolDeskGetPayload<typeof schoolDeskForDetailArgs>;
-  export type DeskForCard = Prisma.DeskGetPayload<typeof deskForCardArgs>;
-  export type MyDeskForDetail = Prisma.UserDeskGetPayload<typeof myDeskForDetailArgs>;
+  export const deskArgs = {
+    select: {
+      id: true,
+      creatorId: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true,
+      schoolId: true,
+      description: true,
+      imageUrl: true,
+      imagePath: true,
+      isPublic: true,
+    },
+  } satisfies Prisma.DeskDefaultArgs;
+
+export type Desk = Prisma.DeskGetPayload<typeof deskArgs>;
+export type DeskForDetail = Prisma.DeskGetPayload<typeof deskForDetailArgs>;
+export type SchoolDeskForDetail = Prisma.SchoolDeskGetPayload<typeof schoolDeskForDetailArgs>;
+export type DeskForCard = Prisma.DeskGetPayload<typeof deskForCardArgs>;
+export type MyDeskForDetail = Prisma.UserDeskGetPayload<typeof myDeskForDetailArgs>;

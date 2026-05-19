@@ -1,19 +1,22 @@
 "use server"
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { makeSignOutUserUseCase } from "@/composition/auth";
-import { ActionResult } from "..";
+import { ActionResult, toActionError } from "@/shared/action";
+import { fail, ok } from "@/shared/application";
 
 
-export async function signOutAction(): Promise<ActionResult> {
+export async function signOutAction(): Promise<ActionResult<void>> {
     try {
 
         const useCase = await makeSignOutUserUseCase();
         const result = await useCase.execute();
-        if(!result.success){
-            return { success: false as const, error: result.error.message }
+        if (!result.success) {
+            return fail(toActionError(result.error));
         }
-        return { success: true };
+        return ok(undefined);
     } catch (error) {
-        return { success: false as const, error: getUserErrorMessage(error) };
+        console.error("Unexpected sign out action error:", error);
+        const appError = ApplicationError.unexpected(error);
+        return fail(toActionError(appError));
     }
 }

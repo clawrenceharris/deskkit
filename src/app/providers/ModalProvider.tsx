@@ -8,16 +8,15 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import { createPortal } from 'react-dom';
-import { Dialog } from '@/components/ui';
+import { AlertDialog, Dialog } from '@/components/ui';
 import { ModalProps, modalRegistry, ModalState, ModalType } from '@/lib/modals';
 import { registerProfileModals } from '@/features/profile/presentation/components/modals';
-import { registerDeskModals } from '@/features/desk/presentation/components/modals';
+import { registerDeskModals } from "@/features/desk/presentation/components/modals";
 import { registerNotebookModals } from '@/features/notebook/presentation/components/modals';
+import { ConfirmationModal } from '@/components/shared';
 
 interface ModalContextType {
   openModal: <T extends ModalProps>(type: ModalType, props: T) => void;
-  updateModalProps: <T extends ModalProps>(updates: Partial<T>) => void;
   closeModal: () => void;
   isOpen: boolean;
   currentModalType: ModalType | null;
@@ -39,24 +38,12 @@ export function ModalProvider({ children }: ModalProviderProps) {
     setModalState({ type: null, props: null });
   }, []);
 
-  const updateModalProps = useCallback(
-    <T extends ModalProps>(updates: Partial<T>) => {
-      setModalState((prev) => {
-        if (!prev.type || !prev.props) return prev;
-        const newProps = { ...prev.props, ...updates } as ModalProps;
-        return {
-          ...prev,
-          props: newProps,
-        };
-      });
-    },
-    []
-  );
+ 
 
   const openModal = useCallback(
-    <T extends ModalProps>(type: ModalType, props: T) => {
+    <T extends ModalProps>(type: ModalType,  props: T) => {
+      console.log("Opening modal:", type);
       if (!modalRegistry.has(type)) {
-        console.error(`Modal type "${type}" is not registered.`);
         return;
       }
 
@@ -65,16 +52,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
     []
   );
 
-  const value = useMemo<ModalContextType>(
-    () => ({
-      openModal,
-      updateModalProps,
-      closeModal,
-      isOpen: modalState.type !== null,
-      currentModalType: modalState.type,
-    }),
-    [openModal, updateModalProps, closeModal, modalState.type]
-  );
+  
 
   // Render the modal component
   const modalContent =
@@ -90,22 +68,38 @@ export function ModalProvider({ children }: ModalProviderProps) {
           // Modal components render DialogContent which includes DialogPortal,
           // so we need to wrap in Dialog root
           return (
-            <Dialog open={true} onOpenChange={closeModal}>
+            modalState.props.isAlert ? 
+              
+              <AlertDialog open={true} onOpenChange={closeModal}>
+               <Component {...modalState.props} />
+              </AlertDialog> 
+              :
+              
+              <Dialog open={true} onOpenChange={closeModal}>
               <Component {...modalState.props} />
             </Dialog>
           );
         })()
       : null;
 
-  const modalPortal =
+  const modal =
     modalState.type && modalContent
-      ? createPortal(modalContent, document.body)
+      ? modalContent
       : null;
-
+      const value = useMemo<ModalContextType>(
+        () => ({
+          openModal,
+          closeModal,
+          modal,
+          isOpen: modalState.type !== null,
+          currentModalType: modalState.type,
+        }),
+        [openModal, closeModal, modal, modalState.type]
+      );
   return (
     <ModalContext.Provider value={value}>
       {children}
-      {modalPortal}
+      {modal}
       <ModalRegistration/>
     </ModalContext.Provider>
   );
@@ -119,7 +113,6 @@ export function useModal() {
   return context;
 }
 
-
 /**
  * Component that registers all modals on mount
  * Should be placed inside ModalProvider
@@ -129,6 +122,8 @@ export function ModalRegistration() {
     registerProfileModals();
     registerDeskModals();
     registerNotebookModals();
+    modalRegistry.register("confirmation", ConfirmationModal);
+
   }, []);
 
   return null;

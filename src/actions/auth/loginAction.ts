@@ -2,30 +2,31 @@
 
 import { makeLoginUserUseCase } from "@/composition/auth";
 import { loginSchema } from "@/lib/validation";
-import { LoginFormValues } from "@/types";
-import { ActionResultWithData } from "..";
+import { AppErrorCode, LoginFormValues } from "@/types";
 import { User } from "@supabase/supabase-js";
-import { getUserErrorMessage } from "@/lib/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
+import { ActionResult, toActionError } from "@/shared/action";
+import { fail, ok } from "@/shared/application";
 
-export async function loginAction(rawInput: LoginFormValues): Promise<ActionResultWithData<User>> {
-    const {data, success, error} = loginSchema.safeParse(rawInput);
+export async function loginAction(input: LoginFormValues): Promise<ActionResult<User>> {
+    const {data, success, error} = loginSchema.safeParse(input);
   
     if (!success) {
-      return {
-        success: false as const,
-        error: error.issues[0].message,
-      };
+      const appError = new ApplicationError({ code: AppErrorCode.VALIDATION_FAILED, message: error.issues[0].message });
+      return fail(toActionError(appError));
     }
   
     try {
       const { email, password } = data;
       const useCase = await makeLoginUserUseCase();
-      const result =  await useCase.execute(email, password);
-      if(!result.success){
-        return { success: false, error: result.error.message };
+      const result = await useCase.execute(email, password);
+      if (!result.success) {
+        return fail(toActionError(result.error));
       }
-      return result;
+      return ok(result.data);
     } catch (error) {
-      return { success: false as const, error: getUserErrorMessage(error) };
+      console.error("Unexpected login action error:", error);
+      const appError = ApplicationError.unexpected(error);
+      return fail(toActionError(appError));
     }
   }

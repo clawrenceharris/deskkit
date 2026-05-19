@@ -1,4 +1,5 @@
-import { LayoutProvider, DeskProvider, SchoolProvider, HomeNavigationProvider } from "../providers";
+import { LayoutProvider, DeskProvider, SchoolProvider, HomeNavigationProvider, ModalProvider } from "../providers";
+import { ProfileProvider } from "../providers";
 import { HomePageClient } from "./HomePageClient";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -7,10 +8,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SchoolProvider>
                 <DeskProvider>
                     <HomeNavigationProvider>
+                        <ModalProvider>   
+                            <ProfileProvider>
+            
+                                <HomePageClient />
+                                <div hidden>{children}</div>
+                            </ProfileProvider>
+                        </ModalProvider>
                         
-                        <HomePageClient />
-                        <div hidden>{children}</div>
                     </HomeNavigationProvider>
+                    
                 </DeskProvider>
             </SchoolProvider>
         </LayoutProvider>   

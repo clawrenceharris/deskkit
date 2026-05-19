@@ -1,14 +1,16 @@
+"use client";
 import { useQuery } from "@tanstack/react-query";
 import { notebookKeys } from "@/lib/queries";
-import { ApplicationError } from "@/lib/utils/errors";
-import { getNotebookById } from "@/actions/notebook/getNotebookById";
+import { ApplicationError } from "@/shared/utils/errors";
+import { getNotebookDetailAction } from "@/actions/notebook";
+import { AppErrorCode } from "@/types/errors";
 
 const DESK_ITEM_QUERY_TIMEOUT_MS = 20_000;
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
     return await new Promise<T>((resolve, reject) => {
         const timeoutId = setTimeout(() => {
-            reject(new ApplicationError(timeoutMessage));
+            reject(new ApplicationError({code: AppErrorCode.NOTEBOOK_TIMEOUT, message: timeoutMessage}));
         }, timeoutMs);
         promise
             .then((value) => {
@@ -30,12 +32,12 @@ export function useNotebook(notebookId: string | null) {
                 throw new Error("notebookId is required to fetch a notebook.");
             }
             const result = await withTimeout(
-                getNotebookById(notebookId),
+                getNotebookDetailAction(notebookId),
                 DESK_ITEM_QUERY_TIMEOUT_MS,
                 "Loading this notebook is taking longer than expected. Please try again."
             );
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

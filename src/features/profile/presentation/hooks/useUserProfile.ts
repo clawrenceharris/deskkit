@@ -1,29 +1,45 @@
 "use client";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { getProfile } from "@/actions/profile/getProfile";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProfileAction, getProfileDetailAction } from "@/actions/profile";
 import { profileKeys } from "@/lib/queries/keys";
-import { ApplicationError } from "@/lib/utils/errors";
-import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
-import { withTimeout } from "@/lib/utils/withTimeout";
-const PROFILE_QUERY_TIMEOUT_MS = 10_000;
+import { ProfileForDetail } from "../../infrastructure/queries";
     
-export function useUserProfile(userId: string | null): UseQueryResult<ProfileForDetail | null> {
+export function useProfile(userId: string | null) {
    return  useQuery({
-        queryKey: profileKeys.detail(userId ?? ""),
+        queryKey: profileKeys.detail(userId ?? "", "base"),
         
         queryFn: async () =>{
             if(!userId){
                 throw new Error("userId is required to fetch profile.");
             }
-            const result = await withTimeout(getProfile(userId), 
-            PROFILE_QUERY_TIMEOUT_MS, 
-            "Loading profile timed out. Please try again.");
+            const result = await getProfileAction(userId);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },
-        
+        enabled: !!userId,
+    });
+}
+
+export function useProfileDetail(userId: string | null) {
+    const queryClient = useQueryClient();
+    return useQuery({
+        queryKey: profileKeys.detail(userId ?? "", "detail"),
+        initialData: queryClient.getQueryData<ProfileForDetail>(profileKeys.detail(userId ?? "", "detail")),
+        queryFn: async () => {
+            if(!userId){
+                throw new Error("userId is required to fetch profile.");
+            }
+            const result = await getProfileDetailAction(userId);
+            if(!result.success){
+                throw result.error;
+            }
+            if(result.data){
+                queryClient.setQueryData<ProfileForDetail>(profileKeys.detail(userId ?? "", "detail"), result.data);
+            }
+            return result.data;
+        },
         enabled: !!userId,
     });
 }
