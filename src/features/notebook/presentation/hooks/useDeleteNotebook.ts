@@ -18,15 +18,50 @@ export const useDeleteNotebook = () => {
             }  
             return result.data;   
         },
+        onMutate: async (variables: {notebookId: string; deskId: string}) => {
+            const { notebookId, deskId } = variables;
+            await queryClient.cancelQueries({ queryKey: deskKeys.detail(deskId, "detail") });
+            await queryClient.cancelQueries({ queryKey: deskKeys.listByUserId(user.id, "detail") });
+
+            const previousDesk = queryClient.getQueryData<any>(deskKeys.detail(deskId, "detail"));
+            const previousUserDesks = queryClient.getQueryData<any>(deskKeys.listByUserId(user.id, "detail"));
+
+            if (previousDesk) {
+                queryClient.setQueryData(deskKeys.detail(deskId, "detail"), {
+                    ...previousDesk,
+                    notebooks: (previousDesk.notebooks ?? []).filter((nb: any) => nb.id !== notebookId),
+                });
+            }
+
+            if (previousUserDesks) {
+                queryClient.setQueryData(deskKeys.listByUserId(user.id, "detail"), (old: any) =>
+                    (old ?? []).map((desk: any) =>
+                        desk.id === deskId ? { ...desk, notebooks: (desk.notebooks ?? []).filter((nb: any) => nb.id !== notebookId) } : desk,
+                    ),
+                );
+            }
+
+            return { previousDesk, previousUserDesks };
+        },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: notebookKeys.lists() });
             queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId) });
-            queryClient.invalidateQueries({queryKey: notebookKeys.votes(variables.notebookId)});
-            queryClient.invalidateQueries({queryKey: deskKeys.listByUserId(user.id)});
-
+            queryClient.invalidateQueries({ queryKey: notebookKeys.votes(variables.notebookId) });
+            // Ensure the user's joined/desks detail list (used by global search) is refreshed
+            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(user.id, "detail") });
         },
-        onError: (error) => {
+        onError: (error, _variables, context: any) => {
             toast.error(getUserErrorMessage(error));
+            if (context?.previousDesk) {
+                queryClient.setQueryData(deskKeys.detail(context.previousDesk.id, "detail"), context.previousDesk);
+            }
+            if (context?.previousUserDesks) {
+                queryClient.setQueryData(deskKeys.listByUserId(user.id, "detail"), context.previousUserDesks);
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.detail });
+            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(user.id, "detail") });
         },
     });
     const deleteNotebook = useCallback(async(input: {notebookId: string, deskId: string}) => {

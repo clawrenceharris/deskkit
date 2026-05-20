@@ -81,16 +81,50 @@ export function useUpdateNotebookForm({notebookId, onSuccess, onError}: UseUpdat
             }
             return result.data;
         },
+        onMutate: async (data: UpdateNotebookFormValues) => {
+            const previousDesk = queryClient.getQueryData<any>(deskKeys.detail(notebook?.deskId ?? "", "detail"));
+            const previousUserDesks = queryClient.getQueryData<any>(deskKeys.listByUserId(notebook?.creator?.userId ?? "", "detail"));
+
+            // Optimistically update notebook title in cached desk detail and user's desks
+            if (previousDesk) {
+                queryClient.setQueryData(deskKeys.detail(previousDesk.id, "detail"), (old: any) => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        notebooks: (old.notebooks ?? []).map((nb: any) => (nb.id === notebookId ? { ...nb, title: data.title } : nb)),
+                    };
+                });
+            }
+
+            if (previousUserDesks) {
+                queryClient.setQueryData(deskKeys.listByUserId(notebook?.creator?.userId ?? "", "detail"), (old: any) =>
+                    (old ?? []).map((desk: any) =>
+                        desk.notebooks ? { ...desk, notebooks: desk.notebooks.map((nb: any) => (nb.id === notebookId ? { ...nb, title: data.title } : nb)) } : desk,
+                    ),
+                );
+            }
+
+            return { previousDesk, previousUserDesks };
+        },
         onSuccess: (result) => {
             onSuccess?.(result);
             queryClient.invalidateQueries({ queryKey: notebookKeys.detail(result.notebookId) });
             queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(result.deskId) });
             queryClient.invalidateQueries({ queryKey: notebookKeys.listByUserId(result.creatorId) });
+            // Also refresh desk detail and the user's joined desks detail (used by global search)
+            queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId, "detail") });
+            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId, "detail") });
         },
-        onError: (error) => {
+        onError: (error, _variables, context: any) => {
             const message = getUserErrorMessage(error);
             form.setError("root", { message });
             onError?.(message);
+            if (context?.previousDesk) {
+                queryClient.setQueryData(deskKeys.detail(notebook?.deskId ?? "", "detail"), context.previousDesk);
+            }
+            if (context?.previousUserDesks) {
+                queryClient.setQueryData(deskKeys.listByUserId(notebook?.creator?.userId ?? "", "detail"), context.previousUserDesks);
+            }
         },
     });
 

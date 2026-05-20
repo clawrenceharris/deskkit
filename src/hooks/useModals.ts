@@ -17,14 +17,14 @@ export function useModals() {
     const {setCurrentDeskId, setCurrentNotebookId} = useDeskContext();
     
     function handleCreateDesk (result: CreateDeskResult) {
-        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId) });
-        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId) });
+        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId, "detail") });
+        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId, "detail") });
         setCurrentDeskId(result.deskId);
         closeModal();
     }
     function handleUpdateDesk (result: UpdateDeskResult) {
-        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId) });
-        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId) });
+        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId, "detail") });
+        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId, "detail") });
         toast.success("Desk updated successfully");
         closeModal();
     }
@@ -37,7 +37,9 @@ export function useModals() {
     function handleCreateNotebook (result: CreateNotebookResult) {
         queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(result.deskId) });
         queryClient.invalidateQueries({ queryKey: notebookKeys.listByUserId(result.creatorId) });
-        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId) });
+        // Keep desk & user joined-desks detail up to date for global search
+        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId, "detail") });
+        queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId, "detail") });
 
         setCurrentNotebookId(result.notebookId);
         setCurrentDeskId(result.deskId);

@@ -48,7 +48,7 @@ export function useCreateProfileForm({userId, onSuccess, onError}: UseCreateProf
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: profileKeys.detail(userId) });
-            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(userId) });
+            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(userId, "detail") });
             onSuccess?.(data);
         },
         onError: (error) => {
