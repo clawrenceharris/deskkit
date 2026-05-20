@@ -1,4 +1,5 @@
 import { getJoinedDesksAction, getJoinedDesksCardAction, getJoinedDesksDetailAction } from "@/actions/desk";
+import { useDeskContext } from "@/app/providers";
 import { deskKeys } from "@/lib/queries";
 import { useQuery } from "@tanstack/react-query";
 
@@ -37,6 +38,7 @@ export function useJoinedDesksDetail(userId: string | null) {
 }
 
 export function useJoinedDesksCard(userId: string | null) {
+    const {currentDeskId} = useDeskContext();
     return useQuery({
         queryKey: deskKeys.listByUserId(userId ?? "", "card"),
         queryFn: async () => {
@@ -49,6 +51,6 @@ export function useJoinedDesksCard(userId: string | null) {
             }
             return result.data;
         },
-        enabled: !!userId,
+        enabled: !!userId && !currentDeskId, // Only fetch joined desks cards if not in a desk
     });
 }

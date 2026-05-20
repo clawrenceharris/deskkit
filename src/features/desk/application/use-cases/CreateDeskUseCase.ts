@@ -13,7 +13,7 @@ export class CreateDeskUseCase {
   
       try {
         
-        const desk = await this.deskRepository.create({
+        const desk = await this.deskRepository.createDesk({
           creatorId,
           name,
           schoolId,
@@ -28,7 +28,7 @@ export class CreateDeskUseCase {
             file: imageFile,
           });
         }
-        await this.deskRepository.update({
+        await this.deskRepository.updateDesk({
           deskId: desk.id, 
           imageUrl: uploadedImage?.url ?? null,
           imagePath: uploadedImage?.path ?? null,

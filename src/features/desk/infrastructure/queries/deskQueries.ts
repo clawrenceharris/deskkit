@@ -1,4 +1,4 @@
-import { notebookForDetailArgs } from "@/features/notebook/infrastructure/queries";
+import { notebookForCardArgs, notebookForDetailArgs } from "@/features/notebook/infrastructure/queries";
 import { Prisma } from "@/lib/db/prisma";
 export const memberForDetailArgs = {
   select: {
@@ -17,7 +17,15 @@ export type MemberForDetail = Prisma.MemberGetPayload<typeof memberForDetailArgs
 
 
 export const deskForDetailArgs = {
-    include: {
+    select: {
+      id: true,
+      name: true,
+      createdAt: true,
+      schoolId: true,
+      creatorId: true,
+      description: true,
+      imageUrl: true,
+      isPublic: true,
       creator: {
         select: {
           userId: true,
@@ -44,8 +52,13 @@ export const deskForDetailArgs = {
         }
       },
       notebooks: {
-        ...notebookForDetailArgs,
-        },
+      take: 6,
+      orderBy: {
+        createdAt: "desc",
+      },
+       ...notebookForCardArgs,
+       
+      },
         
         
 
@@ -53,25 +66,21 @@ export const deskForDetailArgs = {
   } satisfies Prisma.DeskDefaultArgs;
   
   export const deskForCardArgs = {
-    include: {
-      notebooks: {
-        take: 99,
+    select: {
+      id: true,
+      imageUrl: true,
+      isPublic: true,
+      schoolId: true,
+      creatorId: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true,
+      creator: {
         select: {
-          id: true,
-          title: true,
-          createdAt: true,
-          creator:{
-            select: {
-              userId: true,
-              username: true,
-              displayName: true,
-              avatarUrl: true,
-            },
-          }
-          
-        },
-        orderBy: {
-          createdAt: "desc",
+          userId: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
         },
       },
       members: {
@@ -85,15 +94,11 @@ export const deskForDetailArgs = {
             },
           },
         },
+      },  
+      notebooks: {
+        ...notebookForCardArgs,
       },
-      creator: {
-        select: {
-          userId: true,
-          username: true,
-          displayName: true,
-          avatarUrl: true,
-        },
-      },
+      
     },
   } satisfies Prisma.DeskDefaultArgs;
   export const schoolDeskForDetailArgs = {
@@ -119,9 +124,7 @@ export const deskForDetailArgs = {
       createdAt: true,
       updatedAt: true,
       schoolId: true,
-      description: true,
       imageUrl: true,
-      imagePath: true,
       isPublic: true,
     },
   } satisfies Prisma.DeskDefaultArgs;

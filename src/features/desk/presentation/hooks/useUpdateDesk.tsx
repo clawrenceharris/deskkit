@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {  updateDeskAction } from "@/actions/desk";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { deskKeys } from "@/lib/queries/keys";
 import { UpdateDeskFormValues } from "@/types";
 import { UpdateDeskResult } from "../../application/dto";
+import { ActionError } from "@/shared/action";
 
 type UseUpdateDeskProps = {
     onSuccess?: (result: UpdateDeskResult) => void;
@@ -15,7 +16,7 @@ type UseUpdateDeskProps = {
 
 export function useUpdateDesk({ deskId, onSuccess, onError}: UseUpdateDeskProps) {
     const queryClient = useQueryClient();
-   const updateDeskMutation = useMutation({
+    const updateDeskMutation = useMutation<UpdateDeskResult, ActionError, {id: string, data: UpdateDeskFormValues}>({
         mutationKey: ["updateDesk"],
         mutationFn: async ({id, data} : {id: string, data: UpdateDeskFormValues}) => {
             const result = await updateDeskAction({
@@ -23,7 +24,7 @@ export function useUpdateDesk({ deskId, onSuccess, onError}: UseUpdateDeskProps)
                 deskId: id
             });
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },
@@ -32,7 +33,6 @@ export function useUpdateDesk({ deskId, onSuccess, onError}: UseUpdateDeskProps)
             queryClient.invalidateQueries({ queryKey: deskKeys.lists() });
         },
         onError: (error) => {
-            toast.error(getUserErrorMessage(error));
             onError?.(error.message);
         },
     });

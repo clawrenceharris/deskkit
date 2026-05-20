@@ -15,10 +15,10 @@ export class JoinOrLeaveDeskUseCase {
                 return fail(new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Desk not found"}));
             }
             if(desk.members.some(member => member.profile.userId === input.userId)){
-                return fail(new ApplicationError({code: AppErrorCode.DATABASE_CONFLICT, message: "You are already a member of this desk"}));
+                return fail(new ApplicationError({code: AppErrorCode.RESOURCE_ALREADY_EXISTS, message: "You are already a member of this desk"}));
             }
            
-            await this.deskRepository.join(input);
+            await this.deskRepository.joinDesk(input);
         } else {
             const desk = await this.deskRepository.query.getDeskDetail(input.deskId);
             if(!desk){
@@ -27,7 +27,7 @@ export class JoinOrLeaveDeskUseCase {
             if(!desk.members.some(member => member.profile.userId === input.userId)){
                 return fail(new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "You are not a member of this desk"}));
             }
-            await this.deskRepository.leave(input);
+            await this.deskRepository.leaveDesk(input);
         }
         return ok(undefined);
     }

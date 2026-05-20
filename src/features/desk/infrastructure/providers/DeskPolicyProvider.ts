@@ -3,11 +3,12 @@ import { MemberRole, PrismaClient } from "@/lib/db/prisma";
 import { ProfileRepository } from "@/features/profile/domain/repositories";
 import { SchoolRepository } from "@/features/school/domain/repositories";
 import { DeskRepository } from "../../domain/repositories";
-import { getUserErrorMessage } from "@/shared/utils/errors";
 import { GetDeskPolicyData } from "../types";
 import { DeskPolicyService, MyDeskPolicy, SchoolDeskPolicy } from "../../domain/services";
 import { DeskPolicyProviderInterface } from "../../domain/interfaces";
 import { DeskContent } from "../../domain/entities";
+import { ApplicationError } from "@/shared/utils/errors";
+import { AppErrorCode } from "@/types";
 
 export class DeskPolicyProvider implements DeskPolicyProviderInterface {
     async getDeskPolicy(data: GetDeskPolicyData): Promise<GetDeskPolicyResult> {
@@ -22,7 +23,7 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
                 canJoin: permission.canJoin(),
             };
         } catch (error) {
-            throw new Error(getUserErrorMessage(error));
+            throw ApplicationError.unexpected(error);
         }
     }
     constructor(private readonly profileRepository: ProfileRepository, private readonly schoolRepository: SchoolRepository, private readonly deskRepository: DeskRepository, private readonly prisma: PrismaClient)
@@ -41,7 +42,7 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
         const desk = await this.deskRepository.query.getDeskDetail(data.deskId);
 
         if(!desk || !user){
-            throw new Error("Desk or user not found");
+            throw new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Desk or user not found"});
         }
        
         // If the desk is the user's my desk

@@ -12,11 +12,11 @@ function makeRepository(overrides: Partial<DeskRepository> = {}): DeskRepository
   return {
     getDesks: vi.fn(),
     getById: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    join: vi.fn(),
-    leave: vi.fn(),
+    createDesk: vi.fn(),
+    updateDesk: vi.fn(),
+    deleteDesk: vi.fn(),
+    joinDesk: vi.fn(),
+    leaveDesk: vi.fn(),
     createSchoolDesk: vi.fn(),
     createMyDesk: vi.fn(),
     getSchoolDesk: vi.fn(),
@@ -40,7 +40,7 @@ describe("CreateDeskUseCase", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     deskRepository = makeRepository({
-      create: vi.fn().mockResolvedValue({
+      createDesk: vi.fn().mockResolvedValue({
         id: "1",
         name: "Test Desk",
         schoolId: "1",
@@ -50,7 +50,7 @@ describe("CreateDeskUseCase", () => {
         imagePath: "test.png",
         description: null,
       } as Desk),
-      update: vi.fn().mockResolvedValue({
+      updateDesk: vi.fn().mockResolvedValue({
         id: "1",
         name: "Test Desk",
         schoolId: "1",
@@ -80,7 +80,7 @@ describe("CreateDeskUseCase", () => {
       imageFile: new File([], "test.png"),
     });
 
-    expect(deskRepository.create).toHaveBeenCalledWith({
+    expect(deskRepository.createDesk).toHaveBeenCalledWith({
       creatorId: "1",
       name: "Test Desk",
       schoolId: "1",
@@ -95,7 +95,7 @@ describe("CreateDeskUseCase", () => {
       userId: "1",
     });
 
-    expect(deskRepository.update).toHaveBeenCalledWith("1", { imageUrl: "test.png", imagePath: "test.png" });
+    expect(deskRepository.updateDesk).toHaveBeenCalledWith("1", { imageUrl: "test.png", imagePath: "test.png" });
     expect(desk).toEqual({
       success: true,
       data: {
@@ -114,7 +114,7 @@ describe("CreateDeskUseCase", () => {
   it("should return an error if the desk creation fails", async () => {
     // Overwrite the create method to reject
     deskRepository = makeRepository({
-      create: vi.fn().mockRejectedValue(new Error("Failed to create desk")),
+      createDesk: vi.fn().mockRejectedValue(new Error("Failed to create desk")),
     });
     storage = makeStorage();
     const createDeskUseCase = new CreateDeskUseCase(deskRepository, storage);
@@ -154,7 +154,7 @@ describe("CreateDeskUseCase", () => {
   it("should call remove on DeskStorage if uploadImage fails after creating and uploading", async () => {
     // This tests mocking the DeskStorage.remove method
     deskRepository = makeRepository({
-      create: vi.fn().mockResolvedValue({
+      createDesk: vi.fn().mockResolvedValue({
         id: "1",
         name: "Test Desk",
         schoolId: "1",
@@ -172,7 +172,7 @@ describe("CreateDeskUseCase", () => {
     });
 
     // Make update fail
-    deskRepository.update = vi.fn().mockRejectedValue(new Error("Update failed"));
+    deskRepository.updateDesk = vi.fn().mockRejectedValue(new Error("Update failed"));
 
     const createDeskUseCase = new CreateDeskUseCase(deskRepository, storage);
 

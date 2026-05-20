@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UpdateNotebookFormValues } from "@/types";
 import { useNotebook } from "./useNotebook";
 import { useForm } from "react-hook-form";
@@ -5,9 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { updateNotebookSchema } from "@/lib/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateNotebookAction } from "@/actions/notebook";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { useCallback, useState, useEffect } from "react";
-import { notebookKeys } from "@/lib/queries";
+import { deskKeys, notebookKeys } from "@/lib/queries";
 import { withTimeout } from "@/shared/utils/withTimeout";
 import { UpdateNotebookResult } from "@/features/notebook/application/dto";
 const UPDATE_DESK_ITEM_TIMEOUT_MS = 60_000;
@@ -116,9 +117,8 @@ export function useUpdateNotebookForm({notebookId, onSuccess, onError}: UseUpdat
             queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(result.creatorId, "detail") });
         },
         onError: (error, _variables, context: any) => {
-            const message = getUserErrorMessage(error);
-            form.setError("root", { message });
-            onError?.(message);
+            form.setError("root", { message: error.message });
+            onError?.(error.message);
             if (context?.previousDesk) {
                 queryClient.setQueryData(deskKeys.detail(notebook?.deskId ?? "", "detail"), context.previousDesk);
             }

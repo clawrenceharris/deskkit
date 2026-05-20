@@ -2,7 +2,7 @@
 import { useCallback } from "react";
 import { createSchoolDeskAction } from "@/actions/desk";
 import { toast } from "sonner";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys } from "@/lib/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -23,7 +23,7 @@ export function useCreateSchoolDesk() {
             toast.success(`School Desk created successfully`);
         },
         onError: (error) => {
-            toast.error(getUserErrorMessage(error));
+            toast.error(error.message);
         },
     });
     

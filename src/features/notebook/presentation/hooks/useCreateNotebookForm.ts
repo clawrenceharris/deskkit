@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -6,9 +7,10 @@ import { createNotebookSchema } from "@/lib/validation";
 import { useCallback } from "react";
 import { createNotebookAction } from "@/actions/notebook";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
-import { notebookKeys } from "@/lib/queries";
+import { ApplicationError } from "@/shared/utils/errors";
+import { deskKeys, notebookKeys } from "@/lib/queries";
 import { CreateNotebookResult } from "@/features/notebook/application/dto";
+import { DeskForDetail } from "@/features/desk/infrastructure/queries";
 
 type UseCreateNotebookFormProps = {
     deskId: string;
@@ -53,22 +55,30 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
             await queryClient.cancelQueries({ queryKey: deskKeys.detail(deskId, "detail") });
             await queryClient.cancelQueries({ queryKey: deskKeys.listByUserId(userId ?? "", "detail") });
 
-            const previousDesk = queryClient.getQueryData<any>(deskKeys.detail(deskId, "detail"));
-            const previousUserDesks = queryClient.getQueryData<any>(deskKeys.listByUserId(userId ?? "", "detail"));
+            const previousDesk = queryClient.getQueryData<DeskForDetail>(deskKeys.detail(deskId, "detail"));
+            const previousUserDesks = queryClient.getQueryData<DeskForDetail>(deskKeys.listByUserId(userId ?? "", "detail"));
 
             const tempId = `temp:${Date.now()}`;
             const optimisticNotebook = {
                 id: tempId,
                 title: data.title,
                 deskId,
-                creator: { userId: userId },
+                creator: { 
+                    userId: userId ?? "", 
+                    username: "", 
+                    displayName: null, 
+                    avatarUrl: null 
+                },
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 votes: [],
                 downloads: [],
                 materials: [],
+                
             };
 
             if (previousDesk) {
-                queryClient.setQueryData(deskKeys.detail(deskId, "detail"), {
+                queryClient.setQueryData<DeskForDetail>(deskKeys.detail(deskId, "detail"), {
                     ...previousDesk,
                     notebooks: [optimisticNotebook, ...(previousDesk.notebooks ?? [])],
                 });
@@ -84,7 +94,7 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
 
             return { previousDesk, previousUserDesks, tempId };
         },
-        onSuccess: (data, _variables, context: any) => {
+        onSuccess: (data, _variables, _context: any) => {
             onSuccess?.(data);
             queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(deskId) });
 
@@ -118,8 +128,8 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
             }
         },
         onError: (error, _variables, context: any) => {
-            form.setError("root", { message: getUserErrorMessage(error) });
-            onError?.(getUserErrorMessage(error));
+            form.setError("root", { message: error.message });
+            onError?.(error.message);
             // rollback
             if (context?.previousDesk) {
                 queryClient.setQueryData(deskKeys.detail(deskId, "detail"), context.previousDesk);

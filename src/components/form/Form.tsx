@@ -11,15 +11,16 @@ import { Button, DialogFooter, Field, FieldDescription, FieldError, FieldGroup }
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BeforeUnload } from "@/components/form";
-import { getUserErrorMessage } from "@/shared/utils/errors";
+import { getUserErrorMessage } from "@/shared/utils";
 
 export interface FormProps<T extends FieldValues>{
   children?: ((methods: UseFormReturn<T>) => ReactNode) | ReactNode;
+  error?: {message: string};
   showsSubmitButton?: boolean;
   showsCancelButton?: boolean;
   submitText?: string;
   cancelText?: string;
-  onSubmit: (data: T) => any | Promise<any>;
+  onSubmit: (data: T) => Promise<any> | any;
   onCancel?: () => void;
   disabled?: boolean;
   description?: string;
@@ -77,6 +78,7 @@ function FormFooter({showsCancelButton,submitText, onCancel, cancelText, showsSu
 
 export function Form<T extends FieldValues>({
   children,
+  error,
   showsSubmitButton = true,
   showsCancelButton = false,
   submitText = "Done",
@@ -98,11 +100,10 @@ export function Form<T extends FieldValues>({
  
   const {clearErrors, formState: { disabled, isSubmitting, isDirty }} = form;
   const handleSubmit = async (data: T) => {
-    try{
+    try {
       clearErrors();
       return await onSubmit(data);
-    }
-    catch(error){
+    } catch (error) {
       form.setError("root", { message: getUserErrorMessage(error) });
     }
   };

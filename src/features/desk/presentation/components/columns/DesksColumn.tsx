@@ -6,18 +6,18 @@ import { ChevronRight, Loader2, Plus } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
-import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards, useSchoolDesk, useSchoolDeskDetail } from "../../hooks";
+import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards, useSchoolDesk, useSchoolDeskDetail, useDeskCard } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
 import {  Icon, SearchBar } from "@/components/shared";
 import { useSchool } from "@/features/school/presentation/hooks";
 import { DeskDashboardColumn } from "./DeskDashboardColumn";
 import { motion } from "motion/react";
-import { Desk } from "@/lib/db/prisma";
 import { useJoinedDesksCard } from "../../hooks/useJoinedDesks";
 import { useJoinOrLeaveDesk } from "../../hooks/useJoinOrLeaveDesk";
 import { useQueryClient } from "@tanstack/react-query";
 import { deskKeys } from "@/lib/queries";
 import deskIcon from "@/assets/desk-icon.png";
+import { Desk, DeskForCard } from "@/features/desk/infrastructure/queries";
 type DesksColumnProps = ColumnProps & {
   onDeskClick: (desk: Desk) => void;
 }
@@ -51,17 +51,17 @@ export function DesksColumn ({
   const { handleSectionClick } = useHomeNavigation();
   const { leaveDesk } = useJoinOrLeaveDesk();
   const { data: myDesk, isLoading: isLoadingMyDesk } = useDesk(profile.myDesk?.desk.id ?? null);
-  async function handleLeaveDesk(desk: Desk) {
+  async function handleLeaveDesk(desk: DeskForCard) {
     leaveDesk({deskId: desk.id, userId: user.id});
   }
-  async function handleEditDesk(desk: Desk) {
+  async function handleEditDesk(desk: DeskForCard) {
     updateDeskModal.open(desk.id, user.id);
   }
-  async function handleDeleteDesk(desk: Desk) {
+  async function handleDeleteDesk(desk: DeskForCard) {
    
       deleteDeskModal.open(desk.name);
   }
-  function handleManageDesk(desk: Desk) {
+  function handleManageDesk(desk: DeskForCard) {
   }
   const headerRight = (
     <div className="flex items-center gap-2">

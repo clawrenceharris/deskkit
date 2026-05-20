@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createDeskAction } from "@/actions/desk";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { deskKeys } from "@/lib/queries/keys";
@@ -29,7 +29,7 @@ export function useCreateDesk({userId, onSuccess, onError}: UseCreateDeskProps) 
             queryClient.invalidateQueries({ queryKey: deskKeys.lists() });
         },
         onError: (error) => {
-            toast.error(getUserErrorMessage(error));
+            toast.error(error.message);
             onError?.(error.message);
         },
     });

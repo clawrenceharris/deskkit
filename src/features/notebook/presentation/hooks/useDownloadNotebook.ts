@@ -14,7 +14,7 @@ export const useDownloadNotebook =  () => {
         mutationFn: async(input: DownloadNotebookInput) => {
             const result = await downloadNotebookAction(input);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
         },
         onMutate: (variables) => {

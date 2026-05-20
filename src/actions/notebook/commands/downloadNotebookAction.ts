@@ -12,7 +12,7 @@ export async function downloadNotebookAction(input: DownloadNotebookInput):Promi
     const useCase = await makeDownloadNotebookUseCase();
     const result = await useCase.execute(input);
     if(!result.success){
-      return fail(result.error);
+      return fail(toActionError(result.error));
     }
     return ok(undefined);
   }

@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { getNotebookDetailAction, voteNotebookAction } from "@/actions/notebook";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { NotebookVote } from "../../infrastructure/queries/notebookQueries";
 import { useUser } from "@/app/providers";
@@ -78,7 +78,7 @@ export const useMakeVote = () => {
             queryClient.invalidateQueries({queryKey: notebookKeys.votes(variables.notebookId)});
             queryClient.invalidateQueries({queryKey: notebookKeys.listByUserId(user.id)});
             queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId)});
-            toast.error(getUserErrorMessage(error));
+            toast.error(error.message);
         },
     });
     
@@ -101,7 +101,7 @@ export const useMakeVote = () => {
             queryClient.invalidateQueries({queryKey: notebookKeys.votes(variables.notebookId)});
             queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId)});
             queryClient.invalidateQueries({queryKey: notebookKeys.listByUserId(user.id)});
-            toast.error(getUserErrorMessage(error));
+            toast.error(error.message);
         },
         onMutate: (variables) => {
             

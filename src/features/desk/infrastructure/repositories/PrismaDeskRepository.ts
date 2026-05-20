@@ -1,4 +1,4 @@
-import { type Desk, deskArgs, type DeskForDetail, myDeskForDetailArgs, schoolDeskForDetailArgs } from "../queries";
+import { type Desk, deskArgs, DeskForCard, type DeskForDetail, myDeskForDetailArgs, schoolDeskForDetailArgs } from "../queries";
 import { CreateSchoolDeskInput, JoinOrLeaveDeskInput, UpdateDeskInput } from "../../application/dto";
 import {  MemberRole, Prisma, PrismaClient } from "@/lib/db/prisma";
 import { DeskReadRepository, DeskRepository } from "../../domain/repositories";
@@ -13,7 +13,7 @@ export class PrismaDeskRepository implements DeskRepository {
     this.query = new PrismaDeskReadRepository(prisma);
     this.prisma = prisma;
   }
-  async create({name, schoolId, creatorId, isPublic, imageUrl, imagePath, description}: CreateDeskData): Promise<Desk> {
+  async createDesk({name, schoolId, creatorId, isPublic, imageUrl, imagePath, description}: CreateDeskData): Promise<Desk> {
    const data: Prisma.DeskCreateInput = {
     name,
     school: { connect: { id: schoolId } },
@@ -31,13 +31,13 @@ export class PrismaDeskRepository implements DeskRepository {
   }
 
 
-  async delete(id: string): Promise<void> {
+  async deleteDesk(id: string): Promise<void> {
     await this.prisma.desk.delete({
       where: { id },
     });
   }
   
-  async update(input: UpdateDeskInput): Promise<Prisma.DeskGetPayload<typeof deskArgs>> {
+  async updateDesk(input: UpdateDeskInput): Promise<Desk> {
     const { deskId, ...data } = input;
     const updatedDesk = await this.prisma.desk.update({
       where: { id: deskId },
@@ -46,7 +46,7 @@ export class PrismaDeskRepository implements DeskRepository {
     return updatedDesk;
   } 
 
-  async join(input: JoinOrLeaveDeskInput): Promise<void> {
+  async joinDesk(input: JoinOrLeaveDeskInput): Promise<void> {
     if(input?.isJoining){
       const data: Prisma.MemberCreateInput = {
         profile: { connect: { userId: input.userId } },
@@ -57,7 +57,7 @@ export class PrismaDeskRepository implements DeskRepository {
 
     }
   }
-  async leave(input: JoinOrLeaveDeskInput): Promise<void> {
+  async leaveDesk(input: JoinOrLeaveDeskInput): Promise<void> {
     await this.prisma.member.delete({
       where: { userId_deskId: { userId: input.userId, deskId: input.deskId } },
     });

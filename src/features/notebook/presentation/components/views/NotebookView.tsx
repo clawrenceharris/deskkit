@@ -15,12 +15,12 @@ import { Button, DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMe
 import { FilePreviewer, ProfileButton } from "@/components/shared";
 import { useDownload } from "@/hooks";
 import { toast } from "sonner";
-import { getUserErrorMessage } from "@/shared/utils/errors";
 import { useDeleteNotebook, useMakeVote, useVotes } from "../../hooks";
 import { AnimatedValue } from "../ui";
 import { useDownloadNotebook } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
 import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { getUserErrorMessage } from "@/shared/utils";
 
 interface NotebookColumnProps {
   onProfileClick: (profileId: string) => void;
@@ -59,15 +59,16 @@ export function NotebookView({
   
   const handleDownload = async () => {
     if (!notebook || downloading) return;
-    try {
+      try{
       await download(notebook.materials.map((material) => material.url) ?? []);
-      if(notebook.downloads.some((download) => download.profile?.userId === user.id)) {
-        return;
-      }
-      await downloadNotebook({notebookId: notebook.id, userId: user.id, deskId: notebook.deskId});
-    } catch (error) {
+      downloadNotebook({notebookId: notebook.id, userId: user.id, deskId: notebook.deskId});
+  
+    }
+    catch(error){
       toast.error(getUserErrorMessage(error));
     }
+
+    
   };
   const handleUpVote = () => {
     if (!notebook) return;

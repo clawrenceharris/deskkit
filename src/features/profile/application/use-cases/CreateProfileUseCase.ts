@@ -68,7 +68,7 @@ export class CreateProfileUseCase {
         if(resolvedSchoolId){
           const schoolDesk = await this.deskRepository.query.getSchoolDesk(resolvedSchoolId);
           if(schoolDesk){
-            await this.deskRepository.join({
+            await this.deskRepository.joinDesk({
               deskId: schoolDesk.id,
               userId: userId,
               role: "CONTRIBUTOR"

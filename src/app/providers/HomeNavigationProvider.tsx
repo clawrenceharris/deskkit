@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDeskContext, useLayout } from "@/app/providers";
-import type { DeskForCard } from "@/features/desk/infrastructure/queries";
+import type { Desk } from "@/lib/db/prisma";
 import type { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
 
 export const APP_ROUTES = {
@@ -50,7 +50,7 @@ type HomeNavigationContextType = {
   materialIndex: number;
   setMaterialIndex: (index: number) => void;
   handleNotebookClick: (notebook: NotebookForDetail) => void;
-  handleDeskClick: (desk: DeskForCard) => void;
+  handleDeskClick: (deskId: string) => void;
   handleDesksOpen: () => void;
   handleDeskExit: () => void;
   handleSectionClick: (section: DeskSection) => void;
@@ -214,12 +214,12 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
     navigateTo(APP_ROUTES.notebook(notebook.deskId, notebook.id));
   }, [navigateTo]);
 
-  const handleDeskClick = useCallback((desk: DeskForCard) => {
+  const handleDeskClick = useCallback((deskId: string) => {
     setMaterialIndex(0);
-    setCurrentDeskId(desk.id);
+    setCurrentDeskId(deskId);
     setCurrentNotebookId(null);
     openLeftLayout(); 
-    navigateTo(APP_ROUTES.desk(desk.id));
+    navigateTo(APP_ROUTES.desk(deskId));
   }, [navigateTo, openLeftLayout, setCurrentDeskId, setCurrentNotebookId]);
 
   const handleDesksOpen = useCallback(() => {

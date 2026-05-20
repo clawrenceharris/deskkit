@@ -15,7 +15,7 @@ export class CreateMyDeskUseCase {
             return fail(new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Profile not found"}));
         }
         if(profile.myDesk){
-            return fail(new ApplicationError({code: AppErrorCode.DATABASE_CONFLICT, message: "My Desk already exists"}));
+            return fail(new ApplicationError({code: AppErrorCode.RESOURCE_ALREADY_EXISTS, message: "My Desk already exists"}));
         }
         const myDesk = await this.deskRepository.createMyDesk(userId);
         return ok({deskId: myDesk.id, creatorId: userId, deskName: myDesk.name });

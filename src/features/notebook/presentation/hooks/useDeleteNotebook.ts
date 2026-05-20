@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { deleteNotebookAction } from "@/actions/notebook";
 import { useUser } from "@/app/providers";
 import { notebookKeys, deskKeys } from "@/lib/queries/keys";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ export const useDeleteNotebook = () => {
             queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(user.id, "detail") });
         },
         onError: (error, _variables, context: any) => {
-            toast.error(getUserErrorMessage(error));
+            toast.error(error.message);
             if (context?.previousDesk) {
                 queryClient.setQueryData(deskKeys.detail(context.previousDesk.id, "detail"), context.previousDesk);
             }
@@ -59,8 +60,8 @@ export const useDeleteNotebook = () => {
                 queryClient.setQueryData(deskKeys.listByUserId(user.id, "detail"), context.previousUserDesks);
             }
         },
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: deskKeys.detail });
+        onSettled: (_data, _error, variables) => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId, "detail") });
             queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(user.id, "detail") });
         },
     });

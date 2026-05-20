@@ -9,19 +9,19 @@ export class UpdateDeskUseCase {
     constructor(private readonly deskRepository: DeskRepository, private readonly storage: DeskStorage) {}
 
     async execute(input: UpdateDeskInput): Promise<UpdateDeskUseCaseResult> {
-        const {deskId,  name, schoolId, imageFile, isPublic } = input;
+        const {deskId,  name, schoolId, imageFile, isPublic, description } = input;
     let uploadedImage: { path: string; url: string | null } | null = null;
   
       try {
         
-        const desk = await this.deskRepository.update({
+        const desk = await this.deskRepository.updateDesk({
           deskId,
           name,
           schoolId,
           imageUrl:  null,
           imagePath: null,
           isPublic: isPublic ?? true,
-          description: null,
+          description: description ?? null,
         });
         if (imageFile) {
           uploadedImage = await this.storage.uploadImage({
@@ -29,7 +29,7 @@ export class UpdateDeskUseCase {
             file: imageFile,
           });
         }
-        await this.deskRepository.update({
+        await this.deskRepository.updateDesk({
           deskId: desk.id,
           imageUrl: uploadedImage?.url ?? null,
           imagePath: uploadedImage?.path ?? null,

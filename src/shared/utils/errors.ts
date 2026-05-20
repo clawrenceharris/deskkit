@@ -63,7 +63,7 @@ export class ApplicationError extends Error {
 
     // Database
     [AppErrorCode.DATABASE_ERROR]: "Something went wrong on our side. Please try again in a moment.",
-    [AppErrorCode.DATABASE_CONFLICT]: "That item already exists or can’t be updated right now.",
+    [AppErrorCode.RESOURCE_ALREADY_EXISTS]: "That item already exists or can’t be updated right now.",
     [AppErrorCode.RESOURCE_NOT_FOUND]: "We couldn’t find what you were looking for.",
 
     // External
@@ -108,7 +108,7 @@ export class ApplicationError extends Error {
     const normalizedMessage = error.message?.toLowerCase() ?? "";
 
     if (error.code === "P2002") {
-      return new ApplicationError({ code: AppErrorCode.DATABASE_CONFLICT });
+      return new ApplicationError({ code: AppErrorCode.RESOURCE_ALREADY_EXISTS });
     }
 
     if (error.code === "P2025") {
@@ -124,7 +124,7 @@ export class ApplicationError extends Error {
     }
 
     if (normalizedMessage.includes("unique constraint") || normalizedMessage.includes("duplicate")) {
-      return new ApplicationError({code: AppErrorCode.DATABASE_CONFLICT});
+      return new ApplicationError({code: AppErrorCode.RESOURCE_ALREADY_EXISTS});
     }
 
     return new ApplicationError({code: AppErrorCode.DATABASE_ERROR});

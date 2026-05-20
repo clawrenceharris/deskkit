@@ -45,7 +45,7 @@ export enum ErrorSeverity {
   
     // Database Errors
     DATABASE_ERROR = "database_error",
-    DATABASE_CONFLICT = "database_conflict",
+    RESOURCE_ALREADY_EXISTS = "resource_already_exists",
     RESOURCE_NOT_FOUND = "resource_not_found",
   
     // External Errors

@@ -64,7 +64,7 @@ export function HomePageClient() {
           closedWidth={0}
           onCollapse={handleDesksCollapse}
           onOpen={handleDesksOpen}
-          onDeskClick={handleDeskClick}
+          onDeskClick={(desk) => handleDeskClick(desk.id)}
           columnType={"left"}
         /> }
       {!isMobile && 
@@ -77,7 +77,7 @@ export function HomePageClient() {
           collapsable={false}
           onOpen={handleDesksOpen}
           onCollapse={handleDesksCollapse}
-          onDeskClick={handleDeskClick}
+          onDeskClick={(desk) => handleDeskClick(desk.id)}
           columnType={"left"}
         /> }
       </AnimatePresence>
@@ -90,7 +90,7 @@ export function HomePageClient() {
           onCollapse={handleDeskCollapse}
           onNotebookClick={handleNotebookClick}
           columnType={"center"}
-          onDeskClick={handleDeskClick}
+          onDeskClick={(desk) => handleDeskClick(desk.id)}
         />
       </AnimatePresence>
       <AnimatePresence mode="popLayout">

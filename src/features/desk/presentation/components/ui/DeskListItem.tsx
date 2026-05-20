@@ -2,7 +2,7 @@
 import { MotionProps } from "motion/react";
 import { getShortDate } from "@/shared/utils";
 import { AvatarGroup, Card, CardFooter, CardHeader, AvatarGroupCount, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui";
-import { DeskForCard } from "@/features/desk/infrastructure/queries";
+import { Desk, DeskForCard } from "@/features/desk/infrastructure/queries";
 import { ProfileButton } from "@/components/shared";
 import { LogOut, Pencil, Settings, Trash2 } from "lucide-react";
 import { useDeskPolicy } from "../../hooks";
@@ -29,7 +29,6 @@ export function DeskListItem ({
   onManageClick,
   onLeaveClick
 }: DeskListItemProps) {
-  const lastItem = desk.notebooks[desk.notebooks.length - 1];
   const { user } = useAuth();
   const { currentSchoolId } = useSchoolContext();
   const { data: policy } = useDeskPolicy({
@@ -37,6 +36,8 @@ export function DeskListItem ({
     userId: user?.id ?? null, 
     schoolId: currentSchoolId, 
   });
+  const lastItem = desk.notebooks[desk.notebooks.length - 1];
+
   function handleEditClick() {
     if(policy?.canUpdate) {
       onEditClick?.();

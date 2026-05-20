@@ -5,7 +5,7 @@ import { Profile } from "../../infrastructure/queries";
 import { updateProfileAction } from "@/actions/profile";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { useChangeUsername } from "./useChangeUsername";
 import { useCallback } from "react";
 import { deskKeys, notebookKeys, profileKeys, schoolKeys } from "@/lib/queries";
@@ -49,7 +49,7 @@ export const useUpdateProfileForm = ({onSuccess, onError, profile}: UseUpdatePro
             onSuccess?.(data);
         },
         onError: (error) => {
-            onError?.(getUserErrorMessage(error));
+            onError?.(error.message);
         },
     });
     const updateProfile = useCallback(async(data: UpdateProfileFormValues) => {        

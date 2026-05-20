@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { getUserErrorMessage } from "@/shared/utils/errors";
-import { useCallback, useEffect } from "react";
+  import { useCallback, useEffect } from "react";
 import {  UseFormReturn, useWatch    } from "react-hook-form";
 import { Profile } from "../../infrastructure/queries";
 import { checkUsernameAction } from "@/actions/profile";
@@ -31,7 +30,7 @@ export const useChangeUsername = ({profile, userId, form}: UseChangeUsernameProp
         return true;
     }
     else{
-        form.setError("username", {message: getUserErrorMessage(result.error)});
+        form.setError("username", {message: result.error.message});
         return false;
     }
    

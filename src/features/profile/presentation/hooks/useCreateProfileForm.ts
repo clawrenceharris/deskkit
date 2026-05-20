@@ -7,7 +7,7 @@ import { useCallback } from "react";
 import { useChangeUsername } from "./";
 import { createProfileAction } from "@/actions/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError, getUserErrorMessage } from "@/shared/utils/errors";
+import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys, profileKeys } from "@/lib/queries";
 import { useAuth } from "@/app/providers";
 import { CreateProfileResult } from "../../application/dto";
@@ -52,8 +52,8 @@ export function useCreateProfileForm({userId, onSuccess, onError}: UseCreateProf
             onSuccess?.(data);
         },
         onError: (error) => {
-            form.setError("root", { message: getUserErrorMessage(error) });
-            onError?.(getUserErrorMessage(error));
+            form.setError("root", { message: error.message });
+            onError?.(error.message);
         },
     })
     const { checkUsername } = useChangeUsername({userId, form});

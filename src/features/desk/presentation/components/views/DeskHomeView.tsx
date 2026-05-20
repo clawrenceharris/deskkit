@@ -25,16 +25,18 @@ import { Icon } from "@/components/shared";
 import notebookIcon from "@/assets/notebook-icon.png";
 import users from "@/assets/users.png";
 import chatBubble from "@/assets/chat-bubble.png";
+import { useNotebooksByDeskId } from "@/features/notebook/presentation/hooks";
 type DeskHomeViewProps = ColumnProps & {
   desk: DeskForDetail;
 }
 
 export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
   // Calculate desk statistics
+  const {data: notebooks = []} = useNotebooksByDeskId(desk.id);
   const stats = useMemo(() => {
-    const totalNotebooks = desk.notebooks.length;
+    const totalNotebooks = notebooks.length;
     const totalMembers = desk.members.length;
-    const totalDownloads = desk.notebooks.reduce((acc, notebook) =>
+    const totalDownloads = notebooks.reduce((acc, notebook) =>
       acc + notebook.downloads.length, 0
     );
     const totalVotes = desk.notebooks.reduce((acc, notebook) => {
@@ -48,7 +50,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
 
   // Get featured content (most recent and popular)
   const featuredContent = useMemo(() => {
-    return desk.notebooks
+    return notebooks
       .sort((a, b) => {
         // Sort by recency and popularity
         const aScore = new Date(a.createdAt).getTime() + (a.votes.filter(v => v.isUpvote).length * 1000);
@@ -56,14 +58,14 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
         return bScore - aScore;
       })
       .slice(0, 3);
-  }, [desk.notebooks]);
+  }, [notebooks]);
 
   // Get recent activity
   const recentActivity = useMemo(() => {
-    return desk.notebooks
+    return notebooks
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
-  }, [desk.notebooks]);
+  }, [notebooks]);
 
   return (
     <Column
@@ -72,7 +74,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
     >
       <div className="flex flex-col gap-6 p-6">
         {/* Welcome Section */}
-         <DeskHeader notebooks={desk.notebooks}/>
+         <DeskHeader notebooks={notebooks}/>
 
 
         {/* Featured Content Section */}

@@ -5,7 +5,7 @@ import { EmptyState, LoadingState } from "@/components/states";
 import { DeskSection, useDeskContext, useUser } from "@/app/providers";
 import type { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
 import { useDeskDetail, useDeskPolicy } from "../../hooks";
-import { DeskForCard, DeskForDetail } from "@/features/desk/infrastructure/queries";
+import { Desk, DeskForCard, DeskForDetail } from "@/features/desk/infrastructure/queries";
 import { useJoinOrLeaveDesk } from "../../hooks/useJoinOrLeaveDesk";
 import { ChalkboardsView, ComingSoonView, DeskHomeView, NotebooksView } from "../views";
 import { Icon } from "@/components/shared";
@@ -15,7 +15,7 @@ import notebookIcon from "@/assets/notebook-icon.png";
 import { StaticImageData } from "next/image";
 interface DeskColumnProps extends ColumnProps {
   onNotebookClick: (notebook: NotebookForDetail) => void;
-  onDeskClick: (desk: DeskForCard) => void;
+  onDeskClick: (desk: Desk) => void;
 }
 
 export function DeskColumn ({

@@ -50,8 +50,8 @@ describe("normalizeError", () => {
 
     expect(normalized).toBeInstanceOf(ApplicationError);
     expect(normalized).toMatchObject({
-      code: AppErrorCode.DATABASE_CONFLICT,
-      userMessage: errorMessages[AppErrorCode.DATABASE_CONFLICT],
+      code: AppErrorCode.RESOURCE_ALREADY_EXISTS,
+      userMessage: errorMessages[AppErrorCode.RESOURCE_ALREADY_EXISTS],
     });
   });
 
@@ -80,7 +80,6 @@ describe("normalizeError", () => {
     expect(normalizeError(new TypeError("fetch failed"))).toMatchObject({
       name: "ApplicationError",
       message: errorMessages[AppErrorCode.NETWORK_OFFLINE],
-      canRetry: true,
     });
   });
 

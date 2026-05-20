@@ -1,4 +1,4 @@
-import { deskForDetailArgs } from "@/features/desk/infrastructure/queries";
+import { deskForCardArgs, deskForDetailArgs } from "@/features/desk/infrastructure/queries";
 import { Prisma } from "@/lib/db/prisma";
 
 export const profileForDetailArgs = {
@@ -10,13 +10,13 @@ include: {
         },
     },
     createdDesks: {
-        ...deskForDetailArgs,
+        ...deskForCardArgs,
     },
     memberships: {
         select: {
             role: true,
             desk: {
-                ...deskForDetailArgs,
+               ...deskForCardArgs
             },
         },
     },

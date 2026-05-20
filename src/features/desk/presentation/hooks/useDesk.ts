@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { getDeskAction } from "@/actions/desk/queries/getDeskAction";
+import { getDeskAction, getDeskCardAction } from "@/actions/desk/queries/getDeskAction";
 import { deskKeys, schoolKeys } from "@/lib/queries";
 import { getMyDeskAction, getDeskDetailAction, getMyDeskDetailAction, getSchoolDeskAction, getSchoolDeskDetailAction, getSchoolDeskCardAction } from "@/actions/desk";
 
@@ -37,6 +37,23 @@ export function useDeskDetail(deskId: string | null) {
     },
     enabled: !!deskId,
   });
+}
+
+export function useDeskCard(deskId: string | null) {
+    return useQuery({
+        queryKey: deskKeys.detail(deskId ?? "", "card"),
+        queryFn: async () => {
+            if(!deskId){
+                throw new Error("deskId is required to fetch desk card.");
+            }
+            const result = await getDeskCardAction(deskId);
+            if(!result.success){
+                throw result.error;
+            }
+            return result.data;
+        },
+        enabled: !!deskId,
+    });
 }
 
 export function useMyDesk(userId: string) {

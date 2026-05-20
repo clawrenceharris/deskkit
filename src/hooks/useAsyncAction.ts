@@ -19,7 +19,7 @@ export function useAsyncAction<TData>() {
         } catch (error) {
             const errorMessage = getUserErrorMessage(error)
             setError(errorMessage);
-            return fail(toActionError(ApplicationError.unexpected(error)));
+            return fail(ApplicationError.unexpected(error));
         } finally {
             setIsLoading(false);
         }

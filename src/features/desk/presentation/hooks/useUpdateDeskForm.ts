@@ -12,7 +12,7 @@ type UseUpdateDeskFormProps = {
     onError?: (error: string) => void;
 }
 export function useUpdateDeskForm ({deskId, onSuccess, onError}: UseUpdateDeskFormProps) {
-    const { updateDesk, isLoading } = useUpdateDesk({deskId, onSuccess, onError});
+    const {updateDesk, isLoading, error} = useUpdateDesk({deskId, onSuccess, onError});
     const { data: desk } = useDesk(deskId);
     const form = useForm<UpdateDeskFormValues>({
         resolver: zodResolver(updateDeskSchema),
@@ -21,10 +21,9 @@ export function useUpdateDeskForm ({deskId, onSuccess, onError}: UseUpdateDeskFo
             schoolId: desk?.schoolId ?? "",
             imageFile: null,
             isPublic: desk?.isPublic ?? true,
-            description: desk?.description ?? "",
         },
     });
 
     
-    return {form, updateDesk, isLoading};
+    return {form, updateDesk, error, isLoading};
 }
