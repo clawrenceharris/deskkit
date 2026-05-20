@@ -182,8 +182,11 @@ export class ApplicationError extends Error {
   }
   
   export function normalizeError(error: unknown): ApplicationError {
-    if (error instanceof ApplicationError) {
-      return error;
+    if (error && typeof error === "object" && "code" in error && "message" in error) {
+      if(AppErrorCode[error.code as keyof typeof AppErrorCode]){
+        return new ApplicationError({code: error.code as AppErrorCode, message: error.message as string});
+
+      }
     }
 
     if (isPrismaKnownRequestError(error)) {

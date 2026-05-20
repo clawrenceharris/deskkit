@@ -14,8 +14,10 @@ export function Icon({ src, alt, className }: IconProps) {
         width={16}
         height={16}
         draggable={false}
-        className={cn("object-contain select-none dark:invert", className)}
+        className={cn("object-contain select-none", className)}
         sizes="96px"
+        loading="eager"
+        priority
     />
   );
 }

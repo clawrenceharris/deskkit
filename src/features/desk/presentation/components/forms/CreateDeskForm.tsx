@@ -15,7 +15,6 @@ export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDesk
   const {data: schools = [], isLoading: isLoadingSchools} = useSchools();  
   
   const handleSchoolChange = (value: string) => {
-    console.log(value);
     if(value.startsWith("__new__:")) {
       const newSchoolName = value.split("__new__:")[1];
       console.log(newSchoolName);

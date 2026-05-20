@@ -22,7 +22,6 @@ export function DeskDashboardColumn({deskId}: DeskDetailsColumnProps) {
   const { handleDeskExit } = useHomeNavigation();
   const { handleSectionClick } = useHomeNavigation();
   const { currentSection } = useDeskContext();
-  console.log("desk", desk);
   function handleNavigate(section: DeskSection) {
     if(!deskPolicy?.canView) return;
     handleSectionClick(section);

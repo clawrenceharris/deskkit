@@ -20,7 +20,11 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { getShortDate } from "@/shared/utils/fomatDate";
-
+import { DeskHeader } from "../ui";
+import { Icon } from "@/components/shared";
+import notebookIcon from "@/assets/notebook-icon.png";
+import users from "@/assets/users.png";
+import chatBubble from "@/assets/chat-bubble.png";
 type DeskHomeViewProps = ColumnProps & {
   desk: DeskForDetail;
 }
@@ -68,66 +72,8 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
     >
       <div className="flex flex-col gap-6 p-6">
         {/* Welcome Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            {desk.imageUrl && (
-              <Avatar className="w-16 h-16">
-                <AvatarImage src={desk.imageUrl} alt={desk.name} />
-                <AvatarFallback>{desk.name.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-            )}
-            <div className="flex-1">
-              <h1 className="text-2xl font-heading font-medium text-foreground">
-                Welcome to {desk.name}
-              </h1>
-              {desk.description && (
-                <p className="text-muted-foreground mt-1">{desk.description}</p>
-              )}
-            </div>
-          </div>
+         <DeskHeader notebooks={desk.notebooks}/>
 
-          {/* Desk Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <BookOpen className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalNotebooks}</p>
-                  <p className="text-sm text-muted-foreground">Notebooks</p>
-                </div>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5 text-secondary" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalMembers}</p>
-                  <p className="text-sm text-muted-foreground">Members</p>
-                </div>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <Download className="w-5 h-5 text-success" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalDownloads}</p>
-                  <p className="text-sm text-muted-foreground">Downloads</p>
-                </div>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <Heart className="w-5 h-5 text-accent" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalVotes}</p>
-                  <p className="text-sm text-muted-foreground">Votes</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        <Separator />
 
         {/* Featured Content Section */}
         <div className="space-y-4">
@@ -187,7 +133,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
             </div>
           ) : (
             <Card className="p-8 text-center">
-              <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <Icon src={notebookIcon} alt="No content" className="w-12 h-12 opacity-50 mx-auto mb-4" />
               <h3 className="font-medium mb-2">No content yet</h3>
               <p className="text-muted-foreground text-sm">
                 Be the first to share your notes and materials!
@@ -257,7 +203,6 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
         {/* Quick Navigation Section */}
         <div className="space-y-4">
           <h2 className="text-xl font-heading font-medium flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-secondary" />
             Quick Navigation
           </h2>
 
@@ -265,7 +210,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
             <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-primary" />
+                  <Icon src={notebookIcon} alt="No content" className="w-5 h-5 opacity-50" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">Browse Notebooks</h3>
@@ -278,7 +223,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
             <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-secondary" />
+                  <Icon src={users} alt="No content" className="w-5 h-5 opacity-50" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">Members</h3>
@@ -319,15 +264,13 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
         {/* Announcements Section */}
         <div className="space-y-4">
           <h2 className="text-xl font-heading font-medium flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-tertiary" />
+            <Icon src={chatBubble} alt="Announcements" className="size-10" />
             Announcements
           </h2>
 
           <Card className="p-6">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center shrink-0">
-                <MessageSquare className="w-5 h-5 text-tertiary" />
-              </div>
+             
               <div className="flex-1">
                 <h3 className="font-medium mb-2">Welcome to {desk.name}!</h3>
                 <p className="text-muted-foreground text-sm mb-3">

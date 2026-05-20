@@ -51,7 +51,6 @@ export function ProfileNotebooksView({profile, notebooks}: ProfileNotebooksViewP
     if (notebooks.length === 0) {
       return <EmptyState variant="item" message={emptyText} />
     }
-  console.log(notebooks);
     return (
         
       

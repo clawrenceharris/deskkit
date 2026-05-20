@@ -4,7 +4,7 @@ import { getShortDate } from "@/shared/utils";
 import { AvatarGroup, Card, CardFooter, CardHeader, AvatarGroupCount, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui";
 import { DeskForCard } from "@/features/desk/infrastructure/queries";
 import { ProfileButton } from "@/components/shared";
-import { Pencil, Settings, Trash2 } from "lucide-react";
+import { LogOut, Pencil, Settings, Trash2 } from "lucide-react";
 import { useDeskPolicy } from "../../hooks";
 import { useSchoolContext } from "@/app/providers/SchoolProvider";
 import { useAuth } from "@/app/providers";
@@ -15,6 +15,7 @@ interface DeskListItemProps extends MotionProps {
   onEditClick?: () => void;
   onDeleteClick?: () => void;
   onManageClick?: () => void;
+  onLeaveClick?: () => void;
   desk: DeskForCard;
   selected?: boolean;
 }
@@ -25,7 +26,8 @@ export function DeskListItem ({
   onClick,
   onEditClick,
   onDeleteClick,
-  onManageClick
+  onManageClick,
+  onLeaveClick
 }: DeskListItemProps) {
   const lastItem = desk.notebooks[desk.notebooks.length - 1];
   const { user } = useAuth();
@@ -136,10 +138,12 @@ export function DeskListItem ({
         <ContextMenuItem onClick={handleManageClick}>
           <Settings/> Manage
         </ContextMenuItem>
-        <ContextMenuItem variant="destructive" onClick={handleDeleteClick}>
+        {desk.creatorId === user?.id &&<ContextMenuItem variant="destructive" onClick={handleDeleteClick}>
           <Trash2/> Delete
-        </ContextMenuItem>
-        
+        </ContextMenuItem>}
+        {desk.creatorId !== user?.id && <ContextMenuItem variant="destructive" onClick={onLeaveClick}>
+          <LogOut/> Leave Desk
+        </ContextMenuItem>}
       </ContextMenuContent>
        
     </ContextMenu>

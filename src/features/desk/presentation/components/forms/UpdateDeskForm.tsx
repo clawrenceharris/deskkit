@@ -15,7 +15,6 @@ export function UpdateDeskForm({deskId, userId, onSuccess, onError, onCancel}: U
     const { data: myDesk } = useMyDesk(userId); 
     const {data: schools = [], isLoading: isLoadingSchools} = useUserSchools(userId); 
     const handleSchoolChange = (value: string) => {
-      console.log(value);
       if(value.startsWith("__new__:")) {
         const newSchoolName = value.split("__new__:")[1];
         console.log(newSchoolName);
@@ -23,7 +22,6 @@ export function UpdateDeskForm({deskId, userId, onSuccess, onError, onCancel}: U
         setValue("schoolId", value);
       }
     }
-    console.log(getValues("schoolId"));
     return (
       <Form<UpdateDeskFormValues>
         form={form}

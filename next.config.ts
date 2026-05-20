@@ -39,13 +39,18 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "3000",
-        pathname: "/images/**",
-        
+          
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1] ?? '',
+        pathname: '/storage/v1/object/public/**',
       }
+ 
     ],
   },
 };

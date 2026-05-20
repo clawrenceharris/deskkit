@@ -23,6 +23,10 @@ export function ProfileView({ profile }: ProfileViewProps){
   const { signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.PROFILE);
   const { isCurrentUser } = useProfileContext();
+  function handleEditUsernameClick() {
+    setActiveTab(ProfileTab.SETTINGS);
+    settings.push("edit-profile");
+  }
   const settings = useUserSettings();
 
   function handleAction(action: SettingsAction) {
@@ -48,10 +52,7 @@ export function ProfileView({ profile }: ProfileViewProps){
     settings.push("manage-school");
   }
 
-  function handleEditUsernameClick() {
-    setActiveTab(ProfileTab.SETTINGS);
-    settings.push("edit-profile");
-  }
+ 
     return (
         <>
           <ProfileNavbar className="my-4" onTabClick={handleTabClick} currentTab={activeTab} profile={profile}/>
@@ -61,33 +62,12 @@ export function ProfileView({ profile }: ProfileViewProps){
           {activeTab === ProfileTab.PROFILE && (
             <div className="flex flex-col min-h-0 flex-1 px-5 py-3">
               
-              <ProfileHeader profile={profile} />
+              <ProfileHeader
+               onEditUsernameClick={handleEditUsernameClick}
+               profile={profile} />
               <div className="flex flex-col gap-3 mt-4">
-                {/* Username Row */}
-                <div className="flex flex-row items-center">
-                  
-                  <div className="flex-1">
-                    <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
-                      <AtSign className="size-5" />
-
-                      {profile.username}
-                      {isCurrentUser && (
-                        <Button
-                        onClick={handleEditUsernameClick}
-                        size="icon-sm"
-                        variant="ghost"
-                        className="text-muted-foreground"
-                      >
-                        <Pencil className="size-3" strokeWidth={3} />
-                      </Button> 
-                      )}
-                    </span>
-                  </div>
-                </div>
-                {/* School Row */}
-                <div className="flex flex-row items-center">
+              
                 
-                  <div className="flex-1">
                     {profile.school ? (
                       <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
                        <GraduationCap className="size-5" />
@@ -102,8 +82,6 @@ export function ProfileView({ profile }: ProfileViewProps){
                         </Button> }
                       </span>
                     ) : null}
-                  </div>
-                </div>
               </div>
             </div>    
           )}

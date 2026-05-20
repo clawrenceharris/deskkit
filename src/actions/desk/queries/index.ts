@@ -5,3 +5,4 @@ export * from "./getDeskPolicyAction";
 export * from "./getMyDeskAction";
 export * from "./getDesksByCreatorAction";
 export * from "./getJoinedDesksAction";
+export * from "./getSchoolDeskAction";

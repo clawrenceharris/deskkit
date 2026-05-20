@@ -6,17 +6,20 @@ import { ChevronRight, Loader2, Plus } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
-import type { DeskForCard } from "@/features/desk/infrastructure/queries";
-import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards } from "../../hooks";
+import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards, useSchoolDesk, useSchoolDeskDetail } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
-import {  SearchBar } from "@/components/shared";
+import {  Icon, SearchBar } from "@/components/shared";
 import { useSchool } from "@/features/school/presentation/hooks";
 import { DeskDashboardColumn } from "./DeskDashboardColumn";
 import { motion } from "motion/react";
 import { Desk } from "@/lib/db/prisma";
-
+import { useJoinedDesksCard } from "../../hooks/useJoinedDesks";
+import { useJoinOrLeaveDesk } from "../../hooks/useJoinOrLeaveDesk";
+import { useQueryClient } from "@tanstack/react-query";
+import { deskKeys } from "@/lib/queries";
+import deskIcon from "@/assets/desk-icon.png";
 type DesksColumnProps = ColumnProps & {
-  onDeskClick: (desk: DeskForCard) => void;
+  onDeskClick: (desk: Desk) => void;
 }
 
 
@@ -30,9 +33,9 @@ export function DesksColumn ({
   onDeskClick,
   ...props
 }: DesksColumnProps) {
-  const { user } = useUser();
+  const { user, profile } = useUser();
   const { currentDeskId } = useDeskContext();
-  const { data: desks = [], isLoading: isLoadingDesks, error } = useCreatorDeskCards(user.id);
+  const { data: desks = [], isLoading: isLoadingDesks, error } = useJoinedDesksCard(user.id);
 
   const { query, search: searchDesks, clearResults, results: filteredDesks, isLoading: isFilteredDesksLoading } = useSearch({
     data: desks,
@@ -46,6 +49,11 @@ export function DesksColumn ({
   const { modals: { "desk:create": createDeskModal, "desk:update": updateDeskModal, "desk:delete": deleteDeskModal }} = useModals();
   const { openLeftLayout, isExpandedMode } = useLayout();
   const { handleSectionClick } = useHomeNavigation();
+  const { leaveDesk } = useJoinOrLeaveDesk();
+  const { data: myDesk, isLoading: isLoadingMyDesk } = useDesk(profile.myDesk?.desk.id ?? null);
+  async function handleLeaveDesk(desk: Desk) {
+    leaveDesk({deskId: desk.id, userId: user.id});
+  }
   async function handleEditDesk(desk: Desk) {
     updateDeskModal.open(desk.id, user.id);
   }
@@ -54,7 +62,6 @@ export function DesksColumn ({
       deleteDeskModal.open(desk.name);
   }
   function handleManageDesk(desk: Desk) {
-    console.log(desk);
   }
   const headerRight = (
     <div className="flex items-center gap-2">
@@ -138,6 +145,7 @@ export function DesksColumn ({
         }}
       >
        
+      
         {query && filteredDesks.length === 0 ? ( 
           <div className="centered">
             <EmptyState 
@@ -151,10 +159,24 @@ export function DesksColumn ({
           </div>
         ) : ( 
           <div className="flex flex-col gap-4 h-full  overflow-y-auto p-4">
+             { myDesk && (
+                <Button  
+                  variant="secondary" 
+                  className="w-full rounded-lg font-bold" 
+                  onClick={() => onDeskClick(myDesk)}
+                  disabled={isLoadingMyDesk}
+                >
+                  <Icon src={deskIcon} alt="Desk Icon" className="size-4 invert " />
+                  My Desk
+                  <ChevronRight strokeWidth={3} className="ml-auto" />
+                </Button>
+            )}
+            
             <PlaceholderDesks />
             {(query ? filteredDesks : desks).map((desk) => (
 
                 <DeskListItem
+                  onLeaveClick={() => handleLeaveDesk(desk)}
                   onEditClick={() => handleEditDesk(desk)}
                   onDeleteClick={() => handleDeleteDesk(desk)}
                   onManageClick={() => handleManageDesk(desk)}
@@ -214,11 +236,20 @@ type DeskPlaceholderProps = {
 function PlaceholderDesks(){
   const { currentSchoolId } = useSchoolContext();
   const { user } = useUser();
-  const { data: school, isLoading: isLoadingSchool } = useSchool(currentSchoolId);
+  const { data: school } = useSchool(currentSchoolId);
   const { createSchoolDesk, isLoading: isCreateSchoolDeskLoading } = useCreateSchoolDesk();
   const { createMyDesk, isLoading: isCreateMyDeskLoading } = useCreateMyDesk();
-  const { data: myDesk, isLoading: isLoadingMyDesk }  = useMyDesk(user.id)
-  
+  const { data: myDesk, isLoading: isLoadingMyDesk }  = useMyDesk(user.id);
+  const { data: schoolDesk, isLoading: isLoadingSchoolDesk }  = useSchoolDeskDetail(currentSchoolId);
+  const { joinDesk, isJoining } = useJoinOrLeaveDesk();
+  const queryClient = useQueryClient();
+  function handleJoinSchoolDesk() {
+    if(!school || !school.schoolDesk) return;
+    joinDesk({deskId: school.schoolDesk.desk.id, userId: user.id, role: "CONTRIBUTOR"}).then(() => {
+      queryClient.invalidateQueries({ queryKey: deskKeys.schoolDesk(currentSchoolId ?? "", "detail") });
+
+    });
+  }
   function handleCreateSchoolDesk() {
     if(!school) return;
     createSchoolDesk(school.id);
@@ -230,15 +261,25 @@ function PlaceholderDesks(){
   return (
 
     <>
-      {!school?.schoolDesk && !isLoadingSchool && (
+      {school && !schoolDesk && !isLoadingSchoolDesk ? (
         <DeskPlaceholder 
           title="My School Desk" 
-          description={`A Desk for ${school?.name ?? "this school"} has not been created yet. Create one to share resources with students in the same school.`} 
+          description={`A Desk for ${school.name} has not been created yet. Create one to share resources with students in the same school.`} 
           actionLabel="Create My School Desk" 
           isLoading={isCreateSchoolDeskLoading}
           onAction={handleCreateSchoolDesk}
         /> 
-      )}
+      ) : 
+      
+      school && schoolDesk && !schoolDesk.members.some(m => m.profile.userId === user.id) && !isLoadingSchoolDesk ? (
+        <DeskPlaceholder 
+          title={schoolDesk.name}
+          description={`You are not a member of ${school.name}'s official Desk yet. Join now to collaborate with students in this school.`} 
+          actionLabel="Join School Desk" 
+          isLoading={isJoining}
+          onAction={handleJoinSchoolDesk}
+        /> 
+        ) : null }
 
       {!myDesk && !isLoadingMyDesk && (
       

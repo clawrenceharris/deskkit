@@ -1,9 +1,10 @@
 import { getJoinedDesksAction, getJoinedDesksCardAction, getJoinedDesksDetailAction } from "@/actions/desk";
+import { deskKeys } from "@/lib/queries";
 import { useQuery } from "@tanstack/react-query";
 
 export function useJoinedDesks(userId: string | null) {
     return useQuery({
-        queryKey: ['joined-desks'],
+        queryKey: deskKeys.listByUserId(userId ?? ""),
         queryFn: async () => {
             if(!userId){
                 throw new Error("userId is required to fetch joined desks.");
@@ -20,7 +21,7 @@ export function useJoinedDesks(userId: string | null) {
 
 export function useJoinedDesksDetail(userId: string | null) {
     return useQuery({
-        queryKey: ['joined-desks-detail'],
+        queryKey: deskKeys.listByUserId(userId ?? "", "detail"),
         queryFn: async () => {
             if(!userId){
                 throw new Error("userId is required to fetch joined desks detail.");
@@ -37,7 +38,7 @@ export function useJoinedDesksDetail(userId: string | null) {
 
 export function useJoinedDesksCard(userId: string | null) {
     return useQuery({
-        queryKey: ['joined-desks-card'],
+        queryKey: deskKeys.listByUserId(userId ?? "", "card"),
         queryFn: async () => {
             if(!userId){
                 throw new Error("userId is required to fetch joined desks card.");

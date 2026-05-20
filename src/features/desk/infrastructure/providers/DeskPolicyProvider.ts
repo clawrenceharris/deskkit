@@ -13,7 +13,6 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
     async getDeskPolicy(data: GetDeskPolicyData): Promise<GetDeskPolicyResult> {
         try {
             const permission = await this.makeDeskPolicy(data);
-            console.log("permission", permission);
             return {
                 canPreview: permission.canPreview(),
                 canView: permission.canView(),
@@ -23,7 +22,6 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
                 canJoin: permission.canJoin(),
             };
         } catch (error) {
-            console.error("error fetching desk policy", error);
             throw new Error(getUserErrorMessage(error));
         }
     }
@@ -43,25 +41,21 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
         const desk = await this.deskRepository.query.getDeskDetail(data.deskId);
 
         if(!desk || !user){
-            console.error("Desk or user not found", { desk, user });
             throw new Error("Desk or user not found");
         }
        
         // If the desk is the user's my desk
         if(desk.id === user.myDesk?.deskId){
-            console.log("My desk policy", { role, desk, user });
             return new MyDeskPolicy(role, desk, user, null);
         }
         // If the desk is a school desk
         else {
             const school = await this.schoolRepository.query.getSchoolPolicy(data.schoolId);
-            if(school?.id === data.schoolId){
-                console.log("School desk policy", { role, desk, user, school });
+            if(school?.schoolDesk?.deskId === data.schoolId){
                 return new SchoolDeskPolicy(role, desk, user, school);
 
             }
         }
-        console.log("Default desk policy", { role, desk, user });
         return new DeskPolicyService(role, desk, user, null);
     }
     /**

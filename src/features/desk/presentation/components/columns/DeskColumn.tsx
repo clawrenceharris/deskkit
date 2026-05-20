@@ -22,7 +22,7 @@ export function DeskColumn ({
   onNotebookClick,
   ...props
 }: DeskColumnProps) {
-  const { currentSection, currentDeskId: deskId } = useDeskContext();
+  const { currentSection, setCurrentDeskId, currentDeskId: deskId } = useDeskContext();
   const {data: desk, isLoading: isLoadingDesk} = useDeskDetail(deskId);
   const { user, profile } = useUser();
   const { joinDesk, leaveDesk, isJoining, isLeaving } = useJoinOrLeaveDesk();
@@ -36,7 +36,9 @@ export function DeskColumn ({
   
   function handleLeaveSchoolDesk() {
     if(!deskId) return;
-    leaveDesk({deskId, userId: user.id});
+    leaveDesk({deskId, userId: user.id}).then(() => {
+      setCurrentDeskId(null);
+    });
   }
 
   const renderDeskView = (desk: DeskForDetail) => {
@@ -153,10 +155,10 @@ export function DeskColumn ({
   const isMember = desk.members.some(member => member.profile.userId === user.id);
   const canJoin = deskPolicy?.canJoin ?? false;
   const secondaryAction = isMember && canJoin ? handleLeaveSchoolDesk : undefined;
-  const secondaryButtonLabel = isMember && canJoin ? "Remove desk" : undefined;
+  const secondaryButtonLabel = isMember && canJoin ? "Remove Desk" : undefined;
   const secondaryButtonVariant = isMember && canJoin ? "destructive" : "outline";
   const primaryAction = canJoin ? handleJoinSchoolDesk : isMember ? handleLeaveSchoolDesk : undefined;
-  const primaryButtonLabel = canJoin ? "Join desk" : isMember ? "Leave desk" : "Join desk";
+  const primaryButtonLabel = canJoin ? "Join Desk" : isMember ? "Leave desk" : "Join Desk";
   if(!deskPolicy?.canView){
     return (
       <Column title={desk.name} {...props}>
@@ -167,10 +169,10 @@ export function DeskColumn ({
             buttonVariant={"tertiary" }
             onAction={primaryAction} 
             actionLabel={primaryButtonLabel}
-            isLoadingAction={isJoining}
+            isLoadingAction={primaryButtonLabel === "Join Desk" ? isJoining : isLeaving}
             secondaryButtonVariant={secondaryButtonVariant}
             onSecondaryAction={secondaryAction}
-            isLoadingSecondaryAction={isMember ? isLeaving : undefined}
+            isLoadingSecondaryAction={secondaryButtonLabel ? isLeaving : undefined}
             secondaryActionLabel={secondaryButtonLabel}
           />
         </div>

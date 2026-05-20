@@ -42,7 +42,6 @@ export function ModalProvider({ children }: ModalProviderProps) {
 
   const openModal = useCallback(
     <T extends ModalProps>(type: ModalType,  props: T) => {
-      console.log("Opening modal:", type);
       if (!modalRegistry.has(type)) {
         return;
       }

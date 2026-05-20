@@ -1,12 +1,13 @@
 export const deskKeys = {
     all: ["desks"] as const,
     lists: () => [...deskKeys.all] as const,
-    listByUserId: (userId: string) => [...deskKeys.lists(), "user", userId] as const,
+    listByUserId: (userId: string, shape: "base" | "detail" | "card" = "base") => [...deskKeys.lists(), "user", userId, shape] as const,
     listBySchoolId: (schoolId: string) => [...deskKeys.lists(), "school", schoolId] as const,
     details: () => [...deskKeys.all, "detail"] as const,
     detail: (deskId: string, shape: "base" | "detail" | "card" = "base") => [...deskKeys.details(), deskId, shape] as const,
     members: (deskId: string) => [...deskKeys.all, "members", deskId] as const,
     policy: (deskId: string) => [...deskKeys.all, "policy", deskId] as const,
+    schoolDesk: (schoolId: string, shape: "base" | "detail" | "card" = "base") => [...deskKeys.all, "schoolDesk", schoolId, shape] as const,
     myDesk: (userId: string, shape: "base" | "detail" = "base") => [...deskKeys.all, "myDesk", userId, shape] as const,
 }
 

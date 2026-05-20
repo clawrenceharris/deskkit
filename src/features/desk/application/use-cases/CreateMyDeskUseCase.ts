@@ -10,9 +10,12 @@ export class CreateMyDeskUseCase {
     constructor(private readonly deskRepository: DeskRepository, private readonly profileRepository: ProfileRepository) {}
 
     async execute(userId: string): Promise<CreateMyDeskUseCaseResult> {
-        const profile = await this.profileRepository.query.getProfile(userId);
+        const profile = await this.profileRepository.query.getProfileDetail(userId);
         if(!profile){
             return fail(new ApplicationError({code: AppErrorCode.RESOURCE_NOT_FOUND, message: "Profile not found"}));
+        }
+        if(profile.myDesk){
+            return fail(new ApplicationError({code: AppErrorCode.DATABASE_CONFLICT, message: "My Desk already exists"}));
         }
         const myDesk = await this.deskRepository.createMyDesk(userId);
         return ok({deskId: myDesk.id, creatorId: userId, deskName: myDesk.name });

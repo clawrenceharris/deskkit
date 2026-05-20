@@ -94,6 +94,9 @@ export function useGlobalSearch({
     ? selectedValue
     : firstCommandValue;
   const selectedResult = resultByValue.get(activeSelectedValue) ?? null;
+  const selectedRecentSearch =
+    recentSearches.find((recent) => `recent:${recent.id}` === activeSelectedValue) ??
+    null;
 
   const selectHeadPath = useCallback((value: string) => {
     const { start, end } = getHeadSelectionRange(value);
@@ -103,6 +106,28 @@ export function useGlobalSearch({
       inputRef.current?.setSelectionRange(start, end);
     });
   }, []);
+
+  const replaceInputWithUndoEntry = useCallback(
+    (value: string) => {
+      const input = inputRef.current;
+
+      if (!input) {
+        setQuery(value);
+        return;
+      }
+
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
+
+      if (typeof document.execCommand === "function") {
+        document.execCommand("insertText", false, value);
+      }
+      setQuery(value);
+
+      selectHeadPath(value);
+    },
+    [selectHeadPath],
+  );
 
   const closeSearch = useCallback(() => {
     setOpen(false);
@@ -160,19 +185,28 @@ export function useGlobalSearch({
 
   const handleRecentSelect = useCallback(
     (recentQuery: string) => {
-      setQuery(recentQuery);
-      selectHeadPath(recentQuery);
+      replaceInputWithUndoEntry(recentQuery);
     },
-    [selectHeadPath],
+    [replaceInputWithUndoEntry],
   );
 
   const handleAutoFill = useCallback(() => {
+    if (selectedRecentSearch) {
+      replaceInputWithUndoEntry(selectedRecentSearch.query);
+      return;
+    }
+
     if (!selectedResult) return;
 
     const nextQuery = buildAutoFillQuery(parsedPath, selectedResult, context);
-    setQuery(nextQuery);
-    selectHeadPath(nextQuery);
-  }, [context, parsedPath, selectHeadPath, selectedResult]);
+    replaceInputWithUndoEntry(nextQuery);
+  }, [
+    context,
+    parsedPath,
+    replaceInputWithUndoEntry,
+    selectedRecentSearch,
+    selectedResult,
+  ]);
 
   const handleInputKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
@@ -182,12 +216,12 @@ export function useGlobalSearch({
         return;
       }
 
-      if (event.key === "Tab" && selectedResult) {
+      if (event.key === "Tab" && (selectedResult || selectedRecentSearch)) {
         event.preventDefault();
         handleAutoFill();
       }
     },
-    [handleAutoFill, navigateToResult, selectedResult],
+    [handleAutoFill, navigateToResult, selectedRecentSearch, selectedResult],
   );
 
   useEffect(() => {

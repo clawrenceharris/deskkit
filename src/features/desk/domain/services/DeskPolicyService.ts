@@ -22,9 +22,9 @@ export class DeskPolicyService implements DeskPolicy {
      * @remark A user can view a desk if they are a member of the desk
      */
     canView(): boolean {
-        const { role, user } = this;
-        if(!role || !user) return false;
-        return this.desk.members.some(member => member.profile.userId === user.userId);
+        const { role, user, desk } = this;
+        if(!role || !user || !desk) return false;
+        return desk.members.some(member => member.profile.userId === user.userId) || desk.creatorId === user.userId;
     }
     /**
      * @remark A user can post new resources to the desk if they are a member of the desk

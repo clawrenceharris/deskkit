@@ -11,15 +11,16 @@ export function useCreateSchoolDesk() {
     
     const createSchoolDeskMutation = useMutation({
         mutationKey: ["createSchoolDesk"],
-        mutationFn: async ({schoolId}: {schoolId: string}) => {
+        mutationFn: async (schoolId: string) => {
             const result = await createSchoolDeskAction(schoolId);
             if(!result.success){
                 throw new ApplicationError(result.error);
             }
             return result.data;
         },
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: deskKeys.listBySchoolId(variables.schoolId) });
+        onSuccess: (_, schoolId) => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.listBySchoolId(schoolId) });
+            toast.success(`School Desk created successfully`);
         },
         onError: (error) => {
             toast.error(getUserErrorMessage(error));
@@ -27,7 +28,7 @@ export function useCreateSchoolDesk() {
     });
     
     const createSchoolDesk = useCallback(async(schoolId: string) => {
-        return await createSchoolDeskMutation.mutateAsync({schoolId});
+         createSchoolDeskMutation.mutate(schoolId);
     }, [createSchoolDeskMutation]);
    
     return { createSchoolDesk, error: createSchoolDeskMutation.error, isLoading: createSchoolDeskMutation.isPending};

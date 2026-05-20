@@ -1,12 +1,13 @@
 import {  Button, Field, FieldContent, FieldDescription, FieldError, FieldLabel   } from "@/components/ui";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Control, Controller, FieldValues, Path, useWatch } from "react-hook-form";
-import { Profile } from "../../infrastructure/queries";
+import { Profile } from "../../../infrastructure/queries";
 import { Loader2, Pencil, Trash2} from "lucide-react";
-import { ProfileAvatar } from "../components/ui";
+import { ProfileAvatar } from "../ui";
 import { cn } from "@/lib/utils";
 
 const AVATAR_INPUT_ID = "profileImage-upload";
+
 type ProfileAvatarFieldProps<T extends FieldValues> = {
     control: Control<T>;
     profile: Profile | null;
@@ -16,7 +17,7 @@ type ProfileAvatarFieldProps<T extends FieldValues> = {
     name: Path<T>;
     isLoading?: boolean;
     
-  }
+  } & React.ComponentProps<typeof ProfileAvatar>;
 
 export function ProfileAvatarField<T extends FieldValues>({
   control,
@@ -26,27 +27,35 @@ export function ProfileAvatarField<T extends FieldValues>({
   isLoading,
   className,
   name,
+  ...props
 }: ProfileAvatarFieldProps<T>) {
   const file = useWatch({ control, name });
   
-  const previewUrl = useMemo(() => {
-    if (file as unknown instanceof File) {
-      return URL.createObjectURL(file);
-    }
-  }, [file]);
-  console.log({previewUrl});
-
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  function isFile(value: unknown): value is File {
+    return (
+      typeof File !== "undefined" &&
+      value instanceof File &&
+      value.size > 0
+    );
+  }
   useEffect(() => {
-    return () => {
-      if (previewUrl) {
+    if (!isFile(file)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPreviewUrl(null);
+      return;
+    }
 
-        URL.revokeObjectURL(previewUrl);
-      }
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
     };
-  }, [previewUrl]);
+  }, [file]);
   return (
     <Controller
-      name={"avatarFile" as Path<T>}
+      name={name}
       control={control}
       render={({ field, fieldState }) => (
         <Field
@@ -69,7 +78,11 @@ export function ProfileAvatarField<T extends FieldValues>({
               htmlFor={AVATAR_INPUT_ID}
               className="group relative flex max-w-24 h-24 w-full cursor-pointer justify-center rounded-full transition-all duration-300 hover:shadow-lg shadow-secondary/50"
             >
-              <ProfileAvatar profile={profile} previewUrl={previewUrl ?? profile?.avatarUrl} />
+              <ProfileAvatar 
+              profile={profile} 
+              previewUrl={previewUrl ?? profile?.avatarUrl} 
+              {...props}
+              />
               <div
                   className={cn("pointer-events-none absolute inset-0 flex items-center justify-center rounded-full",
                     "bg-secondary/80 opacity-0 transition-opacity group-hover:opacity-100",

@@ -82,6 +82,7 @@ export function GlobalSearch({
               <GlobalSearchResults
                 groups={groups}
                 recentSearches={recentSearches}
+                selectedValue={selectedValue}
                 showRecentSearches={showRecentSearches}
                 onRecentSelect={handleRecentSelect}
                 onResultSelect={navigateToResult}

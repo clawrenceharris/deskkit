@@ -11,22 +11,25 @@ export function useCreateMyDesk() {
    
     const createMyDeskMutation = useMutation({
         mutationKey: ["createMyDesk"],
-        mutationFn: async ({userId}: {userId: string}) => {
+        mutationFn: async (userId: string) => {
             const result = await createMyDeskAction(userId);
             if(!result.success){
                 throw new ApplicationError(result.error);
             }
             return result.data;
         },
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: deskKeys.listByUserId(variables.userId) });
+        onSuccess: (_, userId) => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.myDesk(userId) });
+            toast.success(`My Desk created successfully`);
         },
-        onError: (error) => {
-            toast.error(getUserErrorMessage(error));
+        onError: (error, userId) => {
+            queryClient.invalidateQueries({ queryKey: deskKeys.myDesk(userId) });
+
+            toast.error(error.message);
         },
     });
     const createMyDesk = useCallback(async(userId: string) => {
-        return await createMyDeskMutation.mutateAsync({userId});
+        createMyDeskMutation.mutate(userId);
 
     }, [createMyDeskMutation]);
     return { createMyDesk, error: createMyDeskMutation.error, isLoading: createMyDeskMutation.isPending};

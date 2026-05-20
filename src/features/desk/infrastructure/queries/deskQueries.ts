@@ -32,6 +32,7 @@ export const deskForDetailArgs = {
           role: true,
             profile: {
               select: {
+                schoolId: true,
                 userId: true,
                 username: true,
                 displayName: true,
