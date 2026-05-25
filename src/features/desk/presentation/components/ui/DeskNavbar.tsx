@@ -14,9 +14,10 @@ type DeskNavbarProps = {
   orientation?: "horizontal" | "vertical";
   showsLabels?: boolean;
   sections?: DeskSection[];
+  disabled?: boolean;
 }
 
-export function DeskNavbar({onNavigate, className, orientation = "horizontal", showsLabels = true, sections = [DeskSection.home, DeskSection.members, DeskSection.settings]}: DeskNavbarProps) {
+export function DeskNavbar({onNavigate, className, disabled = false, orientation = "horizontal", showsLabels = true, sections = [DeskSection.home, DeskSection.members, DeskSection.settings]}: DeskNavbarProps) {
   const { currentSection } = useDeskContext();
   function getSectionLabel(section: DeskSection){
     switch(section){
@@ -54,7 +55,13 @@ export function DeskNavbar({onNavigate, className, orientation = "horizontal", s
       <ul className={cn("flex h-full w-full flex-row gap-2 justify-evenly py-3", orientation === "horizontal" ? "flex-row" : "flex-col")}>
         {sections.map(s => (
           <li key={s} className="flex items-center justify-center relative">
-         <NavButton selected={currentSection === s} icon={getSectionIcon(s)} label={showsLabels ? getSectionLabel(s) : ""} onClick={() => onNavigate(s)} />
+         <NavButton 
+          selected={currentSection === s} 
+          icon={getSectionIcon(s)} 
+          label={showsLabels ? getSectionLabel(s) : ""} 
+          onClick={() => onNavigate(s)} 
+          disabled={disabled} 
+         />
          </li>
         ))}
       </ul>

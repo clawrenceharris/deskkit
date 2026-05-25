@@ -31,10 +31,11 @@ export class PrismaDeskRepository implements DeskRepository {
   }
 
 
-  async deleteDesk(id: string): Promise<void> {
-    await this.prisma.desk.delete({
+  async deleteDesk(id: string): Promise<Desk> {
+    const deletedDesk = await this.prisma.desk.delete({
       where: { id },
     });
+    return deletedDesk;
   }
   
   async updateDesk(input: UpdateDeskInput): Promise<Desk> {

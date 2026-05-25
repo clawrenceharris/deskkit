@@ -47,17 +47,10 @@ export class DeskPolicyProvider implements DeskPolicyProviderInterface {
        
         // If the desk is the user's my desk
         if(desk.id === user.myDesk?.deskId){
-            return new MyDeskPolicy(role, desk, user, null);
+            return new MyDeskPolicy(role, desk, user);
         }
-        // If the desk is a school desk
-        else {
-            const school = await this.schoolRepository.query.getSchoolPolicy(data.schoolId);
-            if(school?.schoolDesk?.deskId === data.schoolId){
-                return new SchoolDeskPolicy(role, desk, user, school);
-
-            }
-        }
-        return new DeskPolicyService(role, desk, user, null);
+        
+        return new DeskPolicyService(role, desk, user);
     }
     /**
      *  Generic helper method for retrieving a resource (e.g. notebook, question, chalkboard message) from the Desk

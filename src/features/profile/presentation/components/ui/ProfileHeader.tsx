@@ -8,6 +8,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { ProfileAvatar } from "./ProfileAvatar";
 import { ProfileTab, UpdateProfileFormValues } from "@/types/profile";
 import { useProfileContext } from "@/app/providers";
+import { useActivityStatus } from "@/features/presence/presentation/hooks";
 
 type ProfileHeaderProps = {
     profile: ProfileForDetail;
@@ -19,6 +20,7 @@ export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps
     
     const { user } = useAuth();
     const { isCurrentUser } = useProfileContext();
+    const activityStatus = useActivityStatus(profile.userId);
    
     function handleSubmit(data: UpdateProfileFormValues){
         updateProfile(data);
@@ -32,7 +34,7 @@ export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps
           {profile.userId === user?.id ? (
               <ProfileAvatarField
                 profile={profile}
-                status="online" 
+                status={activityStatus.status}
                 size="2xl"
                 isLoading={isLoading}
                 control={control}
@@ -41,7 +43,7 @@ export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps
                 showDescription={false}
               />
             ) : (
-              <ProfileAvatar status="dnd" size="2xl" previewUrl={profile.avatarUrl} profile={profile} />
+              <ProfileAvatar status={activityStatus.status} size="2xl" previewUrl={profile.avatarUrl} profile={profile} />
             )}
              {isDirty && isValid && (  
               <Button type="submit" size="xs" variant="tertiary" disabled={isLoading}>

@@ -25,28 +25,28 @@ import { Icon } from "@/components/shared";
 import notebookIcon from "@/assets/notebook-icon.png";
 import users from "@/assets/users.png";
 import chatBubble from "@/assets/chat-bubble.png";
-import { useNotebooksByDeskId } from "@/features/notebook/presentation/hooks";
+import { useDeskNotebookCards, useDeskNotebooks } from "@/features/notebook/presentation/hooks";
 type DeskHomeViewProps = ColumnProps & {
   desk: DeskForDetail;
 }
 
 export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
   // Calculate desk statistics
-  const {data: notebooks = []} = useNotebooksByDeskId(desk.id);
+  const {data: notebooks = []} = useDeskNotebookCards(desk.id);
   const stats = useMemo(() => {
     const totalNotebooks = notebooks.length;
     const totalMembers = desk.members.length;
     const totalDownloads = notebooks.reduce((acc, notebook) =>
       acc + notebook.downloads.length, 0
     );
-    const totalVotes = desk.notebooks.reduce((acc, notebook) => {
+    const totalVotes = notebooks.reduce((acc, notebook) => {
       const upvotes = notebook.votes.filter(v => v.isUpvote).length;
       const downvotes = notebook.votes.filter(v => !v.isUpvote).length;
       return acc + (upvotes - downvotes);
     }, 0);
 
     return { totalNotebooks, totalMembers, totalDownloads, totalVotes };
-  }, [desk]);
+  }, [desk.members.length, notebooks]);
 
   // Get featured content (most recent and popular)
   const featuredContent = useMemo(() => {
@@ -101,9 +101,7 @@ export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
                         {notebook.materials.length} files
                       </Badge>
                     </div>
-                    <CardDescription className="line-clamp-2">
-                      {notebook.description || "No description available"}
-                    </CardDescription>
+                   
                   </CardHeader>
                   <CardFooter className="pt-0">
                     <div className="flex items-center justify-between w-full text-sm text-muted-foreground">

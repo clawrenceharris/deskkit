@@ -20,7 +20,7 @@ interface LayoutContextType {
   isLeftLayout: boolean;
   isRightLayout: boolean;
   isExpandedMode: boolean;
-
+  openDeskLayout: () => void;
   setRightMode: (mode: RightPanelMode) => void;
   openExpandedLayout: () => void;
   closeRightLayout: () => void;
@@ -55,12 +55,11 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
         return [first] as ColumnType[];
       }
       const deduped = unique(columns);
-      if(isExpandedMode && deduped.length === 0) return ["center"] as ColumnType[];
       if(deduped.length === 0) return ["left", "center"] as ColumnType[];
       if(deduped.length === 1) return [deduped[0], "center"] as ColumnType[];
       return unique(deduped) as ColumnType[];
     },
-    [unique, isExpandedMode],
+    [unique],
   );
   useEffect(() => {
     const expanded = searchParams.get("expanded") === "true";
@@ -80,6 +79,10 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
     [isMobile, normalize],
   );
 
+  const openDeskLayout = useCallback(() => {
+    commitColumns(isMobile ? ["center"] : ["left", "center"]);
+  }, [commitColumns, isMobile]);
+
   const openLeftLayout = useCallback(() => {
     commitColumns(["left"]);
     setIsExpandedMode(false);
@@ -87,6 +90,7 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
   
   const openRightLayout = useCallback(() => {
     commitColumns(["right"]);
+    setIsExpandedMode(true);
   }, [commitColumns]);
 
   const openExpandedLayout = useCallback(() => {
@@ -159,8 +163,9 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
       openExpandedLayout,
       openRightLayout,
       openLeftLayout,
+      openDeskLayout,
     }),
-    [closeColumn, closeRightLayout, isColumnOpen, isExpandedMode, openColumn, openColumns, openExpandedLayout, openLeftLayout, openRightLayout, rightMode],
+    [closeColumn,openDeskLayout, closeRightLayout, isColumnOpen, isExpandedMode, openColumn, openColumns, openExpandedLayout, openLeftLayout, openRightLayout, rightMode],
   );
 
   return (

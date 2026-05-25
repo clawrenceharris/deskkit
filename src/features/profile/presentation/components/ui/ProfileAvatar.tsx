@@ -1,16 +1,16 @@
 import { Avatar } from "@/components/ui/avatar";
-import { Profile } from "../../../infrastructure/queries";
+import { Profile, ProfileForButton } from "../../../infrastructure/queries";
 import { AvatarBadge, AvatarImage, AvatarFallback } from "@/components/ui";
 import { Ban, CircleCheck, CircleDot, CircleX, Dot, Moon, UserIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ProfileAvatarProps = {
-    profile: Profile | null;
+    profile: ProfileForButton | null;
     previewUrl?: string | null;
     status?: "online" | "offline" | "away" | "dnd";
     statusClassName?: string;
 } & React.ComponentProps<typeof Avatar>;
-export function ProfileAvatar({profile, previewUrl, status, statusClassName, ...props}: ProfileAvatarProps) {
+export function ProfileAvatar({profile, previewUrl, status, statusClassName, className, ...props}: ProfileAvatarProps) {
   const statusBadge = {
     online: "bg-success",
     offline: "bg-gray-400",
@@ -33,10 +33,9 @@ export function ProfileAvatar({profile, previewUrl, status, statusClassName, ...
   }
   return (
     <Avatar
-      className="rounded-full bg-input/20 object-cover"
-      style={{
-        boxShadow: "0 0 0 1.5px var(--color-muted, #e4e4e7)",
-      }}
+      className={cn(
+        "rounded-full object-cover border border-muted-background", 
+        className)}
       {...props}
     >
       {status &&  (

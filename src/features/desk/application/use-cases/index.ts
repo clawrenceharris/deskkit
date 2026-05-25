@@ -4,3 +4,4 @@ export * from "./JoinOrLeaveDeskUseCase";
 export * from "./CreateDeskUseCase";
 export * from "./CreateSchoolDeskUseCase";
 export * from "./CreateMyDeskUseCase";
+export * from "./DeleteDeskUseCase";

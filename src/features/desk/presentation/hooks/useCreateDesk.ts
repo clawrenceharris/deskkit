@@ -20,7 +20,7 @@ export function useCreateDesk({userId, onSuccess, onError}: UseCreateDeskProps) 
         mutationFn: async (data: CreateDeskInput) => {
             const result = await createDeskAction(data);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

@@ -5,7 +5,6 @@ import {
     DeskForCard,
     DeskForDetail,
 } from "../../infrastructure/queries";
-import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys } from "@/lib/queries";
 import { getDeskCardsByCreatorAction, getDesksByCreatorAction, getDetailedDesksByCreatorAction } from "@/actions/desk";
 
@@ -49,7 +48,7 @@ export function useCreatorDeskCards(userId: string, select?: (data: DeskForCard[
         queryFn: async() => {
             const result = await getDeskCardsByCreatorAction(userId);
             if(!result.success){    
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

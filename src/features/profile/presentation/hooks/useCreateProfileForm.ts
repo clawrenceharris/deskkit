@@ -42,7 +42,7 @@ export function useCreateProfileForm({userId, onSuccess, onError}: UseCreateProf
             schoolId: data.schoolId,
         });
         if(!result.success){
-            throw new ApplicationError(result.error);
+            throw result.error;
         }
         return result.data;
         },

@@ -9,8 +9,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { SearchIcon, Tick02Icon } from "@hugeicons/core-free-icons"
+import { Check, Search } from "lucide-react"
 
 function Command({
   className,
@@ -35,7 +34,7 @@ const CommandInput = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <div data-slot="command-input-wrapper" className="p-1 pb-0">
-      <InputGroup className="h-9 bg-input/20">
+      <InputGroup className="h-9 bg-muted/20">
         <CommandPrimitive.Input
           ref={ref}
           data-slot="command-input"
@@ -45,8 +44,8 @@ const CommandInput = React.forwardRef<
           )}
           {...props}
         />
-        <InputGroupAddon>
-          <HugeiconsIcon icon={SearchIcon} strokeWidth={2} className="size-4 shrink-0 opacity-50" />
+        <InputGroupAddon>   
+          <Search className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
       </InputGroup>
     </div>
@@ -127,7 +126,7 @@ function CommandItem({
       {...props}
     >
       {children}
-      <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
+      <Check className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
     </CommandPrimitive.Item>
   )
 }

@@ -2,7 +2,6 @@ import { ModalType } from "@/lib/modals/types";
 import { modalRegistry } from "@/lib/modals";
 import { CreateDeskModal } from "./CreateDeskModal";
 import { UpdateDeskModal } from "./UpdateDeskModal";
-import { ConfirmationModal } from "@/components/shared";
 
 export * from "./CreateDeskModal";
 export * from "./UpdateDeskModal";
@@ -10,7 +9,6 @@ export * from "./UpdateDeskModal";
 export const DESK_MODAL_TYPES = {
   CREATE: "desk:create",
   UPDATE: "desk:update",
-  DELETE: "desk:delete",
 } as const satisfies Record<string, ModalType>;
 
 
@@ -18,5 +16,4 @@ export const DESK_MODAL_TYPES = {
 export function registerDeskModals() {
   modalRegistry.register(DESK_MODAL_TYPES.CREATE, CreateDeskModal);
   modalRegistry.register(DESK_MODAL_TYPES.UPDATE, UpdateDeskModal);
-  modalRegistry.register(DESK_MODAL_TYPES.DELETE, ConfirmationModal);
 }

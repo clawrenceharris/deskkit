@@ -77,7 +77,7 @@ export function Column ({
         duration: 0.3,
         ease: "easeInOut",
       }} 
-      className={cn("flex w-full flex-col transition-all duration-300 overflow-hidden rounded-3xl flex-1 h-full bg-surface relative", className)}
+      className={cn("flex w-full flex-col transition-all duration-300 overflow-hidden flex-1 h-full bg-surface relative", className)}
       style={{
       
         minWidth: closedWidth,
@@ -115,7 +115,7 @@ export function Column ({
             </div>
           )}
           
-          <div className={cn("h-full flex-1 overflow-y-hidden flex flex-col", contentContainerClassName, 
+          <div className={cn("h-full flex-1 bg-muted/40 flex flex-col overflow-y-auto", contentContainerClassName, 
             hideContentOnCollapse && !isOpen ? "hidden" : "" )}>
             {children}
           </div>

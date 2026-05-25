@@ -1,4 +1,18 @@
 import { Prisma } from "@/lib/db/prisma";
+
+
+
+export const notebookArgs = {
+  select: {
+    id: true,
+    deskId: true,
+    title: true,
+    description: true,
+    createdAt: true,
+    updatedAt: true,
+  },
+} satisfies Prisma.NotebookDefaultArgs;
+
 export const notebookMaterialArgs = {
   select: {
     id: true,
@@ -17,12 +31,12 @@ export const notebookMaterialArgs = {
   },
 } satisfies Prisma.MaterialDefaultArgs;
 export const notebookForDetailArgs = {
-    include: {
+    select: {
+      ...notebookArgs.select,
       votes: {
         select: {
           userId: true,
           isUpvote: true,
-          notebookId: true,
         },
       },
       downloads: {
@@ -39,7 +53,12 @@ export const notebookForDetailArgs = {
       },
       materials: {
         
-        ...notebookMaterialArgs,
+       select:{
+        id: true,
+        url: true,
+        title: true,
+        updatedAt: true,
+       }
         
       },
       creator: {
@@ -55,18 +74,21 @@ export const notebookForDetailArgs = {
   } satisfies Prisma.NotebookDefaultArgs;
 export const notebookForCardArgs = {
     select: {
+      ...notebookArgs.select,
       votes: {
         select: {
           userId: true,
           isUpvote: true,
         },
       },
-      id: true,
-      title: true,
-      createdAt: true,
-      updatedAt: true,
+      downloads: {
+        
+        select: {
+          userId: true,
+        },
+      },
       materials: {
-        ...notebookMaterialArgs,
+       ...notebookMaterialArgs,
       },
       creator: {
         select: {
@@ -86,15 +108,6 @@ export const notebookForCardArgs = {
     },
   } satisfies Prisma.VoteDefaultArgs;
 
-  export const notebookArgs = {
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  } satisfies Prisma.NotebookDefaultArgs;
   export type Notebook = Prisma.NotebookGetPayload<typeof notebookArgs>;  
   export type NotebookForDetail = Prisma.NotebookGetPayload<typeof notebookForDetailArgs>;
   export type NotebookForCard = Prisma.NotebookGetPayload<typeof notebookForCardArgs>;

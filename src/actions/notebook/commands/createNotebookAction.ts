@@ -11,11 +11,13 @@ export async function createNotebookAction(input: CreateNotebookInput): Promise<
         const useCase = await makeCreateNotebookUseCase();
         const result = await useCase.execute(input);
         if(!result.success){
+            console.error("Error creating notebook", result.error);
             return fail(result.error);
         }
         return ok(result.data);
     } catch (error) {
         const appError = ApplicationError.unexpected(error);
+        console.error("Error creating notebook", appError);
         return fail(toActionError(appError));
     }
     

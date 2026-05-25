@@ -15,7 +15,7 @@ export const useDeleteNotebook = () => {
         mutationFn: async({notebookId}: {deskId: string; notebookId: string}) => {
             const result = await deleteNotebookAction(notebookId);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }  
             return result.data;   
         },

@@ -14,11 +14,12 @@ export const deskKeys = {
 export const notebookKeys = {
     all: ["notebooks"] as const,
     lists: () => [...notebookKeys.all] as const,
-    listByDeskId: (deskId: string) => [...notebookKeys.lists(), deskId] as const,
-    listByUserId: (userId: string) => [...notebookKeys.lists(), "user", userId] as const,
+    listByDeskId: (deskId: string, shape: "base" | "detail" | "card" = "base") => [...notebookKeys.lists(), "desk", deskId, shape] as const,
+    listByUserId: (userId: string, shape: "base" | "detail" | "card" = "base") => [...notebookKeys.lists(), "user", userId, shape] as const,
+    listBySchoolId: (schoolId: string, shape: "base" | "detail" | "card" = "base") => [...notebookKeys.lists(), "school", schoolId, shape] as const,
     details: () => [...notebookKeys.all, "detail"] as const,
     votes: (notebookId: string) => [...notebookKeys.all, "votes", notebookId] as const,
-    detail: (notebookId: string) => [...notebookKeys.details(), notebookId] as const,
+    detail: (notebookId: string, shape: "base" | "detail" | "card" = "base") => [...notebookKeys.details(), notebookId, shape] as const,
 }
 
 export const schoolKeys = {
@@ -34,4 +35,10 @@ export const profileKeys = {
     all: ["profiles"] as const,
     details: () => [...profileKeys.all, "detail"] as const,
     detail: (userId: string, shape: "base" | "detail" = "base") => [...profileKeys.details(), userId, shape] as const,
+}
+
+export const presenceKeys = {
+    all: ["presence"] as const,
+    status: (userId: string) => [...presenceKeys.all, "status", userId] as const,
+    statuses: (userIds: string[]) => [...presenceKeys.all, "statuses", ...userIds.sort()] as const,
 }

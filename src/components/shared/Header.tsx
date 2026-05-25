@@ -1,5 +1,5 @@
 "use client"
-import { ProfileButton,ThemeButton } from ".";
+import { Icon, ProfileButton,ThemeButton } from ".";
 import { GlobalSearch } from "./GlobalSearch";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -7,6 +7,8 @@ import { useDesk } from "@/features/desk/presentation/hooks";
 import { useNotebook } from "@/features/notebook/presentation/hooks";
 import Link from "next/link";
 import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "../ui";
+import desk from "@/assets/desk.png";
 
 type HeaderProps = {
   searchEnabled?: boolean;
@@ -20,27 +22,51 @@ export function Header({searchEnabled = false, profile}: HeaderProps) {
   const { data: currentDesk } = useDesk(currentDeskId);
   const { data: currentNotebook } = useNotebook(currentNotebookId);
   return (
-      <header className="flex items-center gap-4 justify-between px-4">
+    <header className="flex items-center gap-4 justify-between sticky top-0">
+      <div className="flex items-center gap-4 px-3 py-2 bg-surface  shadow-sm border rounded-xl" >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {profile && (
+              <ProfileButton 
+                profile={profile} 
+                showsName={false} 
+                className="border-0"
+              />
+            )}
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm font-semibold text-muted-foreground">My Profile</p>
+          </TooltipContent>
+        </Tooltip>
+          
+        <Tooltip>
 
-        <div className="flex items-center gap-4">
-          {profile && (
-            <ProfileButton 
-            className="p-1"
-            profile={profile} 
-            showsName={false} 
-          />)}
-          <ThemeButton /> 
-        </div>
+          <TooltipTrigger asChild>
+            <Button size="icon" className="flex cursor-pointer items-center justify-center size-11 bg-linear-to-t from-primary to-primary/50 rounded-full">
+              <Icon src={desk} alt="Desk" className="size-9" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm font-semibold text-muted-foreground">My Desk</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
         
-        {searchEnabled && ( 
-          <GlobalSearch
-            currentDeskName={currentDesk?.name}
-            currentNotebookTitle={currentNotebook?.title}
-          />
-        )}
+
+       
+      {searchEnabled && ( 
+        <GlobalSearch
+          currentDeskName={currentDesk?.name}
+          currentNotebookTitle={currentNotebook?.title}
+        />
+      )}
+      <div className="flex items-center gap-2">
+      
+        <ThemeButton /> 
         <Link href="/" className="flex items-center gap-2 justify-center bg-white shadow-md rounded-full size-[50px]">
           <Image src="/images/logo-secondary-2.png" alt="Desk Share Logo" width={40} height={40}/>
         </Link>
-      </header>
+      </div>   
+    </header>
   );
 }

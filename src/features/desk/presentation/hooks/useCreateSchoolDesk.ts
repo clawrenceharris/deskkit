@@ -14,7 +14,7 @@ export function useCreateSchoolDesk() {
         mutationFn: async (schoolId: string) => {
             const result = await createSchoolDeskAction(schoolId);
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

@@ -1,14 +1,13 @@
 "use client";
-import { ProfileButton } from "@/components/shared";
-import { AvatarGroup, AvatarGroupCount, Button } from "@/components/ui";
+import { AvatarGroup, AvatarGroupCount } from "@/components/ui";
 import { useDeskDetail } from "../../hooks/useDesk";
 import {  LoadingState } from "@/components/states";
 import { DeskNavbar } from "../ui/DeskNavbar";
 import { useDeskPolicy } from "../../hooks";
-import { DeskSection, useDeskContext, useHomeNavigation, useSchoolContext, useUser } from "@/app/providers";
-import { ChevronLeft } from "lucide-react";
-import { DeskSectionCard } from "../ui";
+import { DeskSection, useDeskContext, useHomeNavigation, useUser } from "@/app/providers";
+import { DeskSpaceCard } from "../ui";
 import { chalkboardSupplies, notebookSupplies, studyRoomsSupplies } from "@/lib/constants";
+import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 
 type DeskDetailsColumnProps = {
     deskId: string;
@@ -17,9 +16,7 @@ type DeskDetailsColumnProps = {
 export function DeskDashboardColumn({deskId}: DeskDetailsColumnProps) {
   const { data: desk, isLoading } = useDeskDetail(deskId);
   const { user } = useUser();
-  const { currentSchoolId } = useSchoolContext();
-  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId, userId: user.id, schoolId: currentSchoolId, resourceType: "notebook"});
-  const { handleDeskExit } = useHomeNavigation();
+  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId, userId: user.id, resourceType: "notebook"});
   const { handleSectionClick } = useHomeNavigation();
   const { currentSection } = useDeskContext();
   function handleNavigate(section: DeskSection) {
@@ -47,16 +44,13 @@ export function DeskDashboardColumn({deskId}: DeskDetailsColumnProps) {
        
          
         <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/60 w-full h-full" />
-        <Button className="absolute top-3 left-3 text-white bg-black/50 hover:bg-black/30  rounded-full" variant="ghost" size="icon" onClick={handleDeskExit}>
-            <ChevronLeft strokeWidth={3}/>
-        </Button>
-        <div className="absolute text-white px-4 py-2 bottom-0 left-0 flex items-center justify-between w-full">
-          <p>{desk.name}</p>
+        
+        <div className="absolute text-white px-4 py-2 bottom-0 left-0 flex items-center justify-end w-full">
         
           <AvatarGroup  className="flex items-center text-black">
             {desk.members?.slice(0, 3).map((member) => (
               <span key={member.profile.userId} onClick={e => e.stopPropagation()}>
-                <ProfileButton tabIndex={-1} disabled size="icon-sm" profile={member.profile} />
+                <ProfileAvatarWithStatus size="default" profile={member.profile} className="shadow-none"/>
               </span>
             ))}
             {desk.members?.length > 3 &&
@@ -69,32 +63,35 @@ export function DeskDashboardColumn({deskId}: DeskDetailsColumnProps) {
 
         </div>
       </div>
-      <DeskNavbar onNavigate={handleNavigate}/>
+      <DeskNavbar onNavigate={handleNavigate} disabled={!deskPolicy?.canView}/>
       <div className="grid grid-cols-1 grid-rows-3 w-full h-full flex-1 gap-2 p-3">
       
         
-        <DeskSectionCard
+        <DeskSpaceCard
           selected={currentSection === DeskSection.notebooks}
           label="Notebooks"
           section={DeskSection.notebooks}
           supplies={notebookSupplies}
           onClick={handleNavigate}
+          locked={!deskPolicy?.canView}
         />
         
 
-        <DeskSectionCard
+        <DeskSpaceCard
           selected={currentSection === DeskSection.chalkboards}
           label="Chalkboard"
           section={DeskSection.chalkboards}
           supplies={chalkboardSupplies}
           onClick={handleNavigate}
+          locked={!deskPolicy?.canView}
         />
       
-        <DeskSectionCard
+        <DeskSpaceCard
           label="Study Rooms"
           section={DeskSection.studyRooms}
           supplies={studyRoomsSupplies}
           onClick={() => {}}
+          locked={!deskPolicy?.canView}
         />
       </div>
     </div>

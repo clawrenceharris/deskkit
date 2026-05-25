@@ -27,7 +27,7 @@ export class SchoolReadService {
   }
 
   async getDetailedSchools(): Promise<Result<SchoolForDetail[], ApplicationError>> {
-    const schools = await this.schoolReadRepository.getDetailedSchools();
+    const schools = await this.schoolReadRepository.getSchoolsDetail();
     return ok(schools);
   }
 

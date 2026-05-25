@@ -15,14 +15,14 @@ export function MinimalDeskListItem({desk}: MinimalDeskListItemProps) {
   return (
 
     <HoverCard>
-        <HoverCardContent className="w-96 p-1 rounded-2xl" side="top">
-            <DeskListItem desk={desk}/>
+        <HoverCardContent className="w-90 p-0 rounded-xl" side="right">
+            <DeskListItem desk={desk} showMembers={false}/>
         </HoverCardContent>
         <HoverCardTrigger asChild>
           
             <Link 
             href={APP_ROUTES.desk(desk.id)}        
-            className="flex w-full gap-2 hover:bg-muted items-center justify-between rounded-lg bg-surface text-foreground shadow-md border border-muted p-4"
+            className="flex w-full gap-2 hover:bg-muted/70 items-center justify-between rounded-lg bg-surface text-foreground shadow-md border border-muted p-4"
             >
             <div className="flex items-center gap-2">
 

@@ -9,9 +9,8 @@ export class MyDeskPolicy extends DeskPolicyService {
         role: MemberRole | null, 
         desk: DeskForDetail, 
         user: ProfileForPolicy | null, 
-        school: SchoolForPolicy | null
         ) {
-        super(role, desk, user, school);
+        super(role, desk, user);
     }
     /**
      * @remark A user can preview their own desk if it belongs to them

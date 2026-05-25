@@ -10,6 +10,7 @@ import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { useProfileDetail } from "@/features/profile/presentation/hooks";
 import { ErrorState } from "@/components/states";
 import { useAuth } from "./";
+import { PresenceProvider } from "@/features/presence/presentation/providers";
 
 type UserContextType = {
   user: User;
@@ -101,7 +102,9 @@ export function UserProvider({
 
   return (
     <UserContext.Provider value={{ profile, user }}>
-      {children}
+      <PresenceProvider userId={user.id}>
+        {children}
+      </PresenceProvider>
     </UserContext.Provider>
   );
 }

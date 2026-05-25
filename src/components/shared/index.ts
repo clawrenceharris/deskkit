@@ -8,3 +8,4 @@ export * from "./GlobalSearch";
 export * from "./NavButton";
 export * from "./ConfirmationModal";
 export * from "./Icon";
+export * from "./Column";

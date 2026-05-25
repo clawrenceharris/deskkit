@@ -1,13 +1,13 @@
 
-import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { NotebookForCard, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
 import { useMemo } from "react";
 
 interface DeskHeaderProps {
-  notebooks: NotebookForDetail[];
+  notebooks: NotebookForCard[];
 }
 
 export function DeskHeader({notebooks}: DeskHeaderProps) {
-  const downloadCount = useMemo(() =>{
+  const downloadCount = useMemo(() => {
     return notebooks.reduce((acc, item) => item.downloads.length + acc, 0)
   },[notebooks]);
   const voteCount = useMemo(() =>{
@@ -18,7 +18,7 @@ export function DeskHeader({notebooks}: DeskHeaderProps) {
     } ,0)
   },[notebooks])
   return (
-    <div role="header" className="column-header justify-between -top-30 bg-surface">
+    <div  className="column-header justify-between bg-surface -top-30  p-5">
      
         <div className="flex flex-1 justify-between w-full">
           <div

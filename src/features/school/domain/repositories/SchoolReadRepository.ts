@@ -8,7 +8,7 @@ export interface SchoolReadRepository {
   getSchoolPolicy(schoolId: string): Promise<SchoolForPolicy | null>;
 
   getSchools(): Promise<School[]>;
-  getDetailedSchools(): Promise<SchoolForDetail[]>;
+  getSchoolsDetail(): Promise<SchoolForDetail[]>;
   getPolicySchools(): Promise<SchoolForPolicy[]>;
 
   getSchoolsByUserId(userId: string): Promise<School[]>;

@@ -126,16 +126,6 @@ export function useModals() {
                 });
             }
         },
-        [DESK_MODAL_TYPES.DELETE]: {
-            open: (deskName: string) => {
-                openModal<DeleteDeskModalProps>(DESK_MODAL_TYPES.DELETE, {
-                    deskName,
-                    isAlert: true,
-                    onSuccess: handleDeleteDesk,
-                    onCancel: closeModal,
-                });
-            }
-        },
     }
     return {modals};
 }

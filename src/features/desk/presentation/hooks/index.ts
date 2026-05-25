@@ -10,3 +10,6 @@ export * from "./useUpdateDesk";
 export * from "./useCreateDesk";
 export * from "./useUpdateDeskForm";
 export * from "./useDeskMemberPresence";
+export * from "./useDeleteDesk";
+export * from "./useJoinOrLeaveDesk";
+export * from "./useJoinedDesks";

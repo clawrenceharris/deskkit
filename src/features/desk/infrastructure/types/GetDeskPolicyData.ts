@@ -3,6 +3,5 @@ export type GetDeskPolicyData = {
     userId: string;
     resourceId: string | null;
     deskType: "school" | "my" | null;
-    schoolId: string;
     resourceType: "notebook" | "question" | "chalkboard" | null;
 }

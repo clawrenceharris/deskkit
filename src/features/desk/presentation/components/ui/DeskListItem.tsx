@@ -2,13 +2,12 @@
 import { MotionProps } from "motion/react";
 import { getShortDate } from "@/shared/utils";
 import { AvatarGroup, Card, CardFooter, CardHeader, AvatarGroupCount, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui";
-import { Desk, DeskForCard } from "@/features/desk/infrastructure/queries";
-import { ProfileButton } from "@/components/shared";
+import { DeskForCard } from "@/features/desk/infrastructure/queries";
 import { LogOut, Pencil, Settings, Trash2 } from "lucide-react";
 import { useDeskPolicy } from "../../hooks";
-import { useSchoolContext } from "@/app/providers/SchoolProvider";
 import { useAuth } from "@/app/providers";
 import { toast } from "sonner";
+import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 
 interface DeskListItemProps extends MotionProps {
   onClick?: (desk: DeskForCard) => void;
@@ -17,6 +16,7 @@ interface DeskListItemProps extends MotionProps {
   onManageClick?: () => void;
   onLeaveClick?: () => void;
   desk: DeskForCard;
+  showMembers?: boolean;
   selected?: boolean;
 }
 
@@ -27,19 +27,15 @@ export function DeskListItem ({
   onEditClick,
   onDeleteClick,
   onManageClick,
-  onLeaveClick
+  onLeaveClick,
+  showMembers = true
 }: DeskListItemProps) {
   const { user } = useAuth();
-  const { currentSchoolId } = useSchoolContext();
-  const { data: policy } = useDeskPolicy({
-    deskId: desk.id, 
-    userId: user?.id ?? null, 
-    schoolId: currentSchoolId, 
-  });
+  const { data: policy } = useDeskPolicy({ deskId: desk.id, userId: user?.id ?? null  });
   const lastItem = desk.notebooks[desk.notebooks.length - 1];
 
   function handleEditClick() {
-    if(policy?.canUpdate) {
+    if(policy && policy.canUpdate) {
       onEditClick?.();
     }
     else {
@@ -47,7 +43,7 @@ export function DeskListItem ({
     }
   }
   function handleDeleteClick() {
-    if(policy?.canDelete) {
+    if(policy && policy.canDelete) {
       onDeleteClick?.();
     }
     else {
@@ -101,12 +97,14 @@ export function DeskListItem ({
 
               
               <p>{desk.name}</p>
-              <AvatarGroup  className="flex items-center">
+              {showMembers && (
+                <AvatarGroup  className="flex items-center">
                 {desk.members.slice(0, 3).map((member) => (
-                  <ProfileButton tabIndex={-1} disabled size="icon-sm" profile={member.profile} key={member.profile.userId}/>
+                  <ProfileAvatarWithStatus className="border-none" tabIndex={-1} profile={member.profile} key={member.profile.userId}/>
                 ))}
                 {desk.members.length > 3 && <AvatarGroupCount className="text-foreground size-[20px] bg-secondary-foreground">+{desk.members.length - 3}</AvatarGroupCount>}
               </AvatarGroup>
+            )}
             
             </div>
           </CardHeader>

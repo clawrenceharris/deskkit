@@ -14,7 +14,9 @@ export const schoolForDetailArgs = {
             },
         },
         schoolDesk: {
+            
             select: {
+                schoolId: true,
                 desk: {
                     ...deskForDetailArgs,
                 },

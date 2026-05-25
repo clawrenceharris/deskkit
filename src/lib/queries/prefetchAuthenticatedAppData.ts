@@ -5,7 +5,6 @@ import { getProfileDetailAction } from "@/actions/profile";
 import { getSchoolDetailAction } from "@/actions/school";
 import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys, profileKeys, schoolKeys } from "./keys";
 
 /**
@@ -24,7 +23,7 @@ export async function prefetchAuthenticatedAppData(queryClient: QueryClient) {
       queryKey: profileKeys.detail(user.id, "detail"),
       queryFn: async () => {
         const result = await getProfileDetailAction(user.id);
-        if (!result.success) throw new ApplicationError(result.error);
+        if (!result.success) throw result.error;
         return result.data;
       },
     }),
@@ -32,7 +31,7 @@ export async function prefetchAuthenticatedAppData(queryClient: QueryClient) {
       queryKey: [...deskKeys.listByUserId(user.id), "card"] as const,
       queryFn: async () => {
         const result = await getDeskCardsByCreatorAction(user.id);
-        if (!result.success) throw new ApplicationError(result.error);
+        if (!result.success) throw result.error;
         return result.data;
       },
     }),
@@ -49,7 +48,7 @@ export async function prefetchAuthenticatedAppData(queryClient: QueryClient) {
       queryKey: schoolKeys.detail(schoolId),
       queryFn: async () => {
         const result = await getSchoolDetailAction(schoolId);
-        if (!result.success) throw new ApplicationError(result.error);
+        if (!result.success) throw result.error;
         return result.data;
       },
     }),
@@ -57,7 +56,7 @@ export async function prefetchAuthenticatedAppData(queryClient: QueryClient) {
       queryKey: deskKeys.listBySchoolId(schoolId),
       queryFn: async () => {
         const result = await getDesksBySchoolAction(schoolId);
-        if (!result.success) throw new ApplicationError(result.error);
+        if (!result.success) throw result.error;
         return result.data;
       },
     }),

@@ -2,7 +2,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { getNotebookDetailAction, voteNotebookAction } from "@/actions/notebook";
-import { ApplicationError } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { NotebookVote } from "../../infrastructure/queries/notebookQueries";
 import { useUser } from "@/app/providers";
@@ -20,7 +19,7 @@ export function useVotes(notebookId: string | null) {
             const result = await getNotebookDetailAction(notebookId);
 
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             queryClient.setQueryData(notebookKeys.votes(notebookId), result.data);
             return result.data?.votes ?? [];
@@ -39,7 +38,7 @@ export const useMakeVote = () => {
         mutationFn: async ({notebookId, isUpvote}: {notebookId: string,deskId: string, isUpvote: boolean | null}) => {
             const result = await voteNotebookAction({notebookId, isUpvote, userId: user.id});
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
         },
         onMutate: (variables) => {
@@ -68,16 +67,12 @@ export const useMakeVote = () => {
            
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({queryKey: notebookKeys.votes(variables.notebookId)});
-            queryClient.invalidateQueries({queryKey: notebookKeys.listByUserId(user.id)});
-            queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId)});
+            queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId, "card")});
+
 
         },
         onError: (error, variables) => {
-            // Rollback optimistic update by invalidating/re-fetching the votes query
-            queryClient.invalidateQueries({queryKey: notebookKeys.votes(variables.notebookId)});
-            queryClient.invalidateQueries({queryKey: notebookKeys.listByUserId(user.id)});
-            queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId)});
+            queryClient.invalidateQueries({queryKey: notebookKeys.listByDeskId(variables.deskId, "card")});
             toast.error(error.message);
         },
     });
@@ -87,7 +82,7 @@ export const useMakeVote = () => {
             
             const result = await voteNotebookAction({notebookId, isUpvote: null, userId: user.id});
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
         },
         onSuccess: (_, variables) => {

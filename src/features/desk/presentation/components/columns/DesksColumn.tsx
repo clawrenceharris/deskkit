@@ -1,23 +1,25 @@
 "use client";
-import { Column, type ColumnProps } from "./Column";
+import { useState } from "react";
+import { Column, type ColumnProps } from "@/components/shared";
+import { DeskDashboardColumn } from "./";
 import { DeskSection, useDeskContext, useHomeNavigation, useLayout, useSchoolContext, useUser } from "@/app/providers";
-import { Button, Card, CardDescription, CardTitle } from "@/components/ui";
-import { ChevronRight, Loader2, Plus } from "lucide-react";
+import { Button, Card, CardDescription, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui";
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, LogOut, Plus, Settings, Trash2 } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
-import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useCreatorDeskCards, useSchoolDesk, useSchoolDeskDetail, useDeskCard } from "../../hooks";
+import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useSchoolDeskDetail, useDeskPolicy } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
-import {  Icon, SearchBar } from "@/components/shared";
+import { Icon, SearchBar } from "@/components/shared";
 import { useSchool } from "@/features/school/presentation/hooks";
-import { DeskDashboardColumn } from "./DeskDashboardColumn";
 import { motion } from "motion/react";
-import { useJoinedDesksCard } from "../../hooks/useJoinedDesks";
-import { useJoinOrLeaveDesk } from "../../hooks/useJoinOrLeaveDesk";
+import { useJoinedDesksCard, useDeleteDesk, useJoinOrLeaveDesk } from "../../hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { deskKeys } from "@/lib/queries";
 import deskIcon from "@/assets/desk-icon.png";
-import { Desk, DeskForCard } from "@/features/desk/infrastructure/queries";
+import { Desk } from "@/features/desk/infrastructure/queries";
+import { toast } from "sonner";
+
 type DesksColumnProps = ColumnProps & {
   onDeskClick: (desk: Desk) => void;
 }
@@ -31,6 +33,7 @@ type DesksColumnProps = ColumnProps & {
  */
 export function DesksColumn ({
   onDeskClick,
+  onCollapse,
   ...props
 }: DesksColumnProps) {
   const { user, profile } = useUser();
@@ -44,25 +47,100 @@ export function DesksColumn ({
   const isMobile = useMediaQuery("(max-width: 768px)", {
     initializeWithValue: false,
   });
-  // const sortedDesks = useMemo(() => desks.sort((a, b) => b.members.find(member => member.profile.userId === user.id)?.me.getTime() - a.members.find(member => member.profile.userId === user.id)?.createdAt.getTime()), [desks]);
   const { data: currentDesk, isLoading: isLoadingCurrentDesk } = useDesk(currentDeskId);
-  const { modals: { "desk:create": createDeskModal, "desk:update": updateDeskModal, "desk:delete": deleteDeskModal }} = useModals();
-  const { openLeftLayout, isExpandedMode } = useLayout();
+  const { modals: { 
+    "desk:create": createDeskModal,
+    "desk:update": updateDeskModal, 
+    "confirmation": confirmationModal
+  }} = useModals();
+  const { openLeftLayout, isExpandedMode, isRightLayout } = useLayout();
   const { handleSectionClick } = useHomeNavigation();
   const { leaveDesk } = useJoinOrLeaveDesk();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: myDesk, isLoading: isLoadingMyDesk } = useDesk(profile.myDesk?.desk.id ?? null);
-  async function handleLeaveDesk(desk: DeskForCard) {
-    leaveDesk({deskId: desk.id, userId: user.id});
+  const { data: policy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId: currentDeskId, userId: user.id});
+  const { deleteDesk } = useDeleteDesk();
+  
+  
+  async function handleLeaveDesk(desk: Desk) {
+    confirmationModal.open({
+      title: "Leave Desk",
+      description: "Are you sure you want to leave this desk?",
+      onConfirm: () => {
+        leaveDesk({deskId: desk.id, userId: user.id});
+      }
+    });
   }
-  async function handleEditDesk(desk: DeskForCard) {
+  async function handleEditDesk(desk: Desk) {
     updateDeskModal.open(desk.id, user.id);
   }
-  async function handleDeleteDesk(desk: DeskForCard) {
+  async function handleDeleteDesk(desk: Desk) {
    
-      deleteDeskModal.open(desk.name);
+      confirmationModal.open({
+        title: "Delete Desk",
+        description: "Are you sure you want to delete this desk?",
+        onConfirm: () =>{
+          if(policy && policy.canDelete) {
+            deleteDesk(desk.id);
+          }
+          else {
+            toast.error("You do not have permission to delete this desk");
+          }
+        }
+      });
   }
-  function handleManageDesk(desk: DeskForCard) {
+  function handleManageDesk() {
+    handleSectionClick(DeskSection.settings);
   }
+  const renderDeskTitle = () => (
+
+    currentDesk ?( 
+    
+    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <DropdownMenuTrigger
+         asChild>
+       <div 
+       onContextMenu={(e) => {
+        e.preventDefault();
+        setIsMenuOpen(true);
+      }}
+       className="flex flex-1">
+
+     
+          <Button
+            className="flex items-center hover:shadow-sm border border-muted-foreground/20 bg-muted/40 gap-2 justify-between flex-1  hover:bg-muted rounded-md"
+            variant="ghost"
+            size="sm"
+            onClick={() => onDeskClick(currentDesk)}
+          >
+            <span title={currentDesk.name} className="truncate w-full max-w-[270px]">
+              {currentDesk.name}
+            </span>
+            <ChevronDown strokeWidth={3} />
+          </Button>
+          </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={handleManageDesk}>
+          <Settings />
+          Manage Desk
+        </DropdownMenuItem>
+        {currentDesk.creatorId === user.id && (
+          <DropdownMenuItem variant="destructive" onClick={() => handleDeleteDesk(currentDesk)}>
+            <Trash2 />
+            Delete Desk
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem variant="destructive" onClick={() => handleLeaveDesk(currentDesk)}>
+          <LogOut />
+          Leave Desk
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+    ) : ( 
+    <h2 className="text-lg font-semibold">Your Desks</h2> 
+    )
+  )
   const headerRight = (
     <div className="flex items-center gap-2">
       <SearchBar
@@ -92,7 +170,7 @@ export function DesksColumn ({
   }
  
  
-  if (isLoadingDesks || isLoadingCurrentDesk) {
+  if (isLoadingDesks || isLoadingCurrentDesk || isLoadingDeskPolicy) {
     return (
       <Column {...props}>
         <div className="centered">
@@ -114,20 +192,23 @@ export function DesksColumn ({
   return (
     <Column 
       {...props}
-      title={!currentDesk ? "Your Desks" : currentDesk.name}
-      showsHeader={!currentDesk || isExpandedMode}
-      headerRight={headerRight}
+      title={renderDeskTitle()}
+      headerRight={!currentDesk ? headerRight : undefined}
       contentContainerClassName="flex relative flex-col overflow-hidden"
       hideContentOnCollapse={false}
+      toggle={<Button variant="ghost" size="icon" onClick={onCollapse}>
+        <ChevronLeft strokeWidth={3}/>
+      </Button>}
     >  
-      {isExpandedMode ? (
+      {isExpandedMode || isRightLayout ? (
          <div className="flex flex-col gap-4 max-h-[500px] my-auto h-full items-center justify-center p-4">
          
         
         <DeskNavbar
           className="flex-1 h-full border-0"
-          sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members, DeskSection.settings]}
+          sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members]}
           showsLabels={false}
+          disabled={!policy?.canView || !policy?.canPreview}
           onNavigate={handleSectionClick}
           orientation="vertical"
         />
@@ -179,7 +260,7 @@ export function DesksColumn ({
                   onLeaveClick={() => handleLeaveDesk(desk)}
                   onEditClick={() => handleEditDesk(desk)}
                   onDeleteClick={() => handleDeleteDesk(desk)}
-                  onManageClick={() => handleManageDesk(desk)}
+                  onManageClick={handleManageDesk}
                   onClick={onDeskClick}
                   selected={desk.id === currentDeskId}
                   key={desk.id}

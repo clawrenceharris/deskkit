@@ -7,17 +7,18 @@ import { Button } from "@/components/ui";
 import { ProfileHeader, ProfileNavbar } from "../ui";
 import { useState } from "react";
 import { useAuth, useProfileContext } from "@/app/providers";
-import { useNotebooksByUserId } from "@/features/notebook/presentation/hooks";
+import { useUserNotebooks } from "@/features/notebook/presentation/hooks";
 import { useModals } from "@/hooks/useModals";
 import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { useUserSettings } from "../../providers";
 import { EmptyState } from "@/components/states";
+import { ActivityStatusPicker } from "@/features/presence/presentation/components";
 
 type ProfileViewProps = {
   profile: ProfileForDetail;
 }
 export function ProfileView({ profile }: ProfileViewProps){
-  const {data: notebooks = []} = useNotebooksByUserId(profile.userId);
+  const {data: notebooks = []} = useUserNotebooks(profile.userId);
   const { modals: { "confirmation": confirmationModal }} = useModals();
   
   const { signOut } = useAuth();
@@ -53,78 +54,83 @@ export function ProfileView({ profile }: ProfileViewProps){
   }
 
  
-    return (
-        <>
-          <ProfileNavbar className="my-4" onTabClick={handleTabClick} currentTab={activeTab} profile={profile}/>
+  return (
+    <>
+      <ProfileNavbar onTabClick={handleTabClick} currentTab={activeTab} profile={profile}/>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 flex-1 py-4 flex-col bg-muted/30 overflow-hidden">
 
-          {activeTab === ProfileTab.PROFILE && (
-            <div className="flex flex-col min-h-0 flex-1 px-5 py-3">
-              
-              <ProfileHeader
-               onEditUsernameClick={handleEditUsernameClick}
-               profile={profile} />
-              <div className="flex flex-col gap-3 mt-4">
-              
-                
-                    {profile.school ? (
-                      <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
-                       <GraduationCap className="size-5" />
-                       {profile.school.name}
-                       { isCurrentUser && <Button
-                          onClick={handleEditSchoolClick}
-                          size="icon-sm"
-                          variant="ghost"
-                          className="text-muted-foreground"
-                        >
-                          <Pencil className="size-3" strokeWidth={3} />
-                        </Button> }
-                      </span>
-                    ) : null}
+        {activeTab === ProfileTab.PROFILE && (
+          <div className="flex flex-col min-h-0 flex-1 px-5 py-3">
+            
+            <ProfileHeader
+              onEditUsernameClick={handleEditUsernameClick}
+              profile={profile} />
+            {isCurrentUser && (
+              <div className="mt-4">
+                <ActivityStatusPicker />
               </div>
-            </div>    
-          )}
-          
-     
-          {activeTab === ProfileTab.DESKS && ( 
-            <div className="flex min-h-0 flex-1 flex-col px-5">
-              <h3 className="mb-3 text-lg font-bold">Desks</h3>
-              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-4">
-                {profile.memberships.length <= 0 ? profile.memberships.map((m) => (
-                    <MinimalDeskListItem desk={m.desk} key={m.desk.id}/>
-                  )) : (
-                    <div className="flex flex-col gap-2">
-                      <EmptyState
-                        itemVariant="outline"
-                        message={isCurrentUser ? "You are not a member of any desks" : `${profile.displayName ?? profile.username} is not a member of any desks`}
-                        variant="item"  
-                     
-                      />
-                    </div>
-                  )
-                }
-              </div>
-            </div>
-          )}
-          {activeTab === ProfileTab.NOTEBOOKS && (
-            <div className="flex min-h-0 flex-1 flex-col px-5">
-              <h3 className="mb-3 text-lg font-bold">Notebooks</h3>
-              <ProfileNotebooksView profile={profile} notebooks={notebooks}/>
-            </div>
-          )}
-          {activeTab === ProfileTab.SETTINGS && (
-
-             
-                <ProfileSettingsStack
-                  profile={profile}
-                  onNavigate={settings.push}
-                  onBack={settings.pop}
-                  onAction={handleAction}
-                />
+            )}
+            <div className="flex flex-col gap-3 mt-4">
+            
               
-          )}
-        </div>
-        </>
-    )
+                  {profile.school ? (
+                    <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
+                      <GraduationCap className="size-5" />
+                      {profile.school.name}
+                      { isCurrentUser && <Button
+                        onClick={handleEditSchoolClick}
+                        size="icon-sm"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                      >
+                        <Pencil className="size-3" strokeWidth={3} />
+                      </Button> }
+                    </span>
+                  ) : null}
+            </div>
+          </div>    
+        )}
+        
+    
+        {activeTab === ProfileTab.DESKS && ( 
+          <div className="flex min-h-0 flex-1 flex-col px-5">
+            <h3 className="mb-3 text-lg font-bold">Desks</h3>
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-4">
+              {profile.memberships.length > 0 ? profile.memberships.map((m) => (
+                  <MinimalDeskListItem desk={m.desk} key={m.desk.id}/>
+                )) : (
+                  <div className="flex flex-col gap-2">
+                    <EmptyState
+                      itemVariant="outline"
+                      message={isCurrentUser ? "You are not a member of any desks" : `${profile.displayName ?? profile.username} is not a member of any desks`}
+                      variant="item"  
+                    
+                    />
+                  </div>
+                )
+              }
+            </div>
+          </div>
+        )}
+        {activeTab === ProfileTab.NOTEBOOKS && (
+          <div className="flex min-h-0 flex-1 flex-col px-5">
+            <h3 className="mb-3 text-lg font-bold">Notebooks</h3>
+            <ProfileNotebooksView profile={profile} notebooks={notebooks}/>
+          </div>
+        )}
+        {activeTab === ProfileTab.SETTINGS && (
+
+            
+              <ProfileSettingsStack
+                profile={profile}
+                onNavigate={settings.push}
+                onBack={settings.pop}
+                onAction={handleAction}
+              />
+            
+        )}
+      </div>
+    </>
+  )
 }

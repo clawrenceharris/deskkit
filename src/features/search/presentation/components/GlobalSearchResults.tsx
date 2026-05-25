@@ -13,7 +13,7 @@ import type {
 } from "@/features/search/domain";
 import type { RecentSearch } from "@/features/search/infrastructure/recentSearchesStorage";
 import { Icon } from "@/components/shared";
-import { ProfileAvatar } from "@/features/profile/presentation/components/ui";
+import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 import tabIcon from "@/assets/tab.png";
 type GlobalSearchResultsProps = {
   groups: GroupedSearchResults[];
@@ -26,10 +26,10 @@ type GlobalSearchResultsProps = {
 
 function FillHint() {
   return (
-    <span className="pointer-events-none absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded bg-background/90 px-2 py-0.5 text-[10px] font-medium text-muted-foreground shadow-sm">
-      <Icon src={tabIcon} alt="Tab Icon" className="opacity-40" />
-      <span>Fill</span>
-    </span>
+    <CommandShortcut className="border text-primary shadow-xs ml-auto pointer-events-none absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded bg-background/90 px-2 py-0.5 text-[10px] font-medium">
+        <Icon  className="dark:invert opacity-40" src={tabIcon} alt="Tab Icon" />
+        <span className="text-primary">Fill</span>
+    </CommandShortcut>
   );
 }
 
@@ -49,7 +49,7 @@ function SearchResultItem({
         value={result.value}
         onSelect={() => onSelect(result)}
       >
-        <Icon src={deskIcon} alt="Desk" className="object-contain opacity-50 drop-shadow-md select-none group-focus-within/desk-result:opacity-100" />
+        <Icon className="dark:invert object-contain opacity-50 drop-shadow-md select-none group-focus-within/desk-result:opacity-100" src={deskIcon} alt="Desk" />
         <span className="truncate">{result.desk.name}</span>
         {selected && <FillHint />}
       </CommandItem>
@@ -63,7 +63,7 @@ function SearchResultItem({
         value={result.value}
         onSelect={() => onSelect(result)}
       >
-        <Icon src={notebookIcon} alt="Notebook" className="opacity-50 group-focus-within/notebook-result:opacity-100" />
+        <Icon className="dark:invert opacity-50 group-focus-within/notebook-result:opacity-100" src={notebookIcon} alt="Notebook" />
         <span className="truncate">{result.notebook.title}</span>
         
         {selected && <FillHint />}
@@ -77,7 +77,7 @@ function SearchResultItem({
       value={result.value}
       onSelect={() => onSelect(result)}
     >
-      <ProfileAvatar status="online" size="sm" profile={result.profile}/>
+      <ProfileAvatarWithStatus size="sm" profile={result.profile}/>
       <span className="truncate">{result.profile.displayName ?? result.profile.username} {result.profile.displayName && <span className="text-muted-foreground">{result.profile.username}</span>}</span>
       {selected && <FillHint />}
     </CommandItem>

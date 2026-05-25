@@ -48,8 +48,8 @@ export const useDownloadNotebook =  () => {
             );
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: notebookKeys.detail(variables.notebookId) });
-            queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId) });
+            queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(variables.deskId, "card") });
+            queryClient.invalidateQueries({ queryKey: deskKeys.detail(variables.deskId, "detail")});
         },
         onError: (_error, variables) => {
             queryClient.setQueryData(

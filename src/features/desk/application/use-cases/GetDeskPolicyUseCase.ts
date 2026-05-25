@@ -6,9 +6,9 @@ export class GetDeskPolicyUseCase {
     constructor(private readonly deskPolicyProvider: DeskPolicyProvider) {}
 
     async execute(input: GetDeskPolicyInput): Promise<Result<GetDeskPolicyResult>> {
-        const { deskId, schoolId, userId } = input;
-        if(!deskId || !schoolId || !userId){
-            console.error("Missing required fields", { deskId, schoolId, userId });
+        const { deskId, userId } = input;
+        if(!deskId || !userId){
+            console.error("Missing required fields", { deskId, userId });
             return { 
                 success: true, 
                 data: {
@@ -25,7 +25,6 @@ export class GetDeskPolicyUseCase {
             ...input,
             userId,
             deskId, 
-            schoolId,
             deskType: input.deskType ?? null,
             resourceId: input.resourceId ?? null, 
             resourceType: input.resourceType ?? null,

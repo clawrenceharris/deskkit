@@ -19,12 +19,14 @@ model Profile {
   updatedAt    DateTime   @updatedAt @map("updated_at")
   avatarPath   String?
   createdDesks Desk[]     @relation("DeskCreator") // desks this profile created
-  memberships  Member[] // desks this profile is a member of
+  memberships  Member[] // desks this user is a member of
   notebooks    Notebook[]
-  materials    Material[] // materials this profile has created
+  materials    Material[] // materials this user has created
   downloads    Download[]
-  myDesk       UserDesk? // the profile's personal desk
-
+  myDesk       UserDesk? // the users's personal desk
+  lastActiveAt    DateTime?
+  status          ActivityStatus?
+  statusExpiresAt DateTime?
   @@index([schoolId])
 }
 
@@ -38,7 +40,7 @@ model Desk {
   description String?
   imageUrl    String?
   imagePath   String?
-  isPublic    Boolean     @default(false)
+  visibility  DeskVisibility @default(SCHOOL)
   school      School?     @relation(fields: [schoolId], references: [id])
   creator     Profile     @relation("DeskCreator", fields: [creatorId], references: [userId], onDelete: SetDefault)
   members     Member[] // profiles that are members of this desk
@@ -174,6 +176,13 @@ enum MemberRole {
   OWNER
 }
 
+enum DeskVisibility {
+  PUBLIC
+  PRIVATE
+  SCHOOL
+  RESTRICTED
+}
+
 enum MaterialType {
   NOTES
   WORKSHEET
@@ -181,3 +190,11 @@ enum MaterialType {
   STUDY_GUIDE
   OTHER
 }
+
+enum ActivityStatus {
+  ONLINE
+  OFFLINE
+  AWAY
+  DND
+}
+

@@ -14,7 +14,7 @@ export function SettingsButton({
     return (
       <Button
         variant="tertiary"
-        className="flex w-full justify-between gap-2 hover:bg-muted rounded-lg bg-surface text-foreground shadow-md border border-muted p-4"
+        className="flex w-full justify-between gap-2 hover:bg-muted/70 rounded-lg bg-surface text-foreground shadow-md border border-muted p-4"
         onClick={onClick}
       >
         <div className="inline-flex items-center gap-2">

@@ -3,9 +3,7 @@ import { NotebookReadRepository } from "../../domain/repositories";
 import { notebookForCardArgs, notebookForDetailArgs } from "../queries";
 
 export class PrismaNotebookReadRepository implements NotebookReadRepository {
-  public readonly query: NotebookReadRepository;
   constructor(private readonly prisma: PrismaClient) {
-    this.query = new PrismaNotebookReadRepository(prisma);
   }
 
   async getNotebook(notebookId: string): Promise<Prisma.NotebookGetPayload<Prisma.NotebookDefaultArgs> | null> {

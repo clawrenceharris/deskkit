@@ -14,8 +14,8 @@ export function useCreateMyDesk() {
         mutationFn: async (userId: string) => {
             const result = await createMyDeskAction(userId);
             if(!result.success){
-                throw new ApplicationError(result.error);
-            }
+                throw result.error;
+            }   
             return result.data;
         },
         onSuccess: (_, userId) => {

@@ -17,8 +17,8 @@ type ProfileNavbarProps = {
 export function ProfileNavbar({onTabClick, currentTab, profile, className}: ProfileNavbarProps) {
   const { user } = useAuth();
   return (
-    <nav className={cn("flex flex-col gap-2", className)}>
-      <ul className="flex flex-row gap-2 justify-evenly border-b py-3">
+    <nav className={cn("flex flex-col gap-2 p-3 border-b", className)}>
+      <ul className="flex flex-1 flex-row gap-2 justify-between">
         <li>
           <NavButton selected={currentTab === ProfileTab.PROFILE} icon={profileIcon} label="Profile" onClick={() => onTabClick(ProfileTab.PROFILE)} />
         </li>

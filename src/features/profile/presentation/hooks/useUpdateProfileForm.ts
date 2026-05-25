@@ -5,7 +5,6 @@ import { Profile } from "../../infrastructure/queries";
 import { updateProfileAction } from "@/actions/profile";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationError } from "@/shared/utils/errors";
 import { useChangeUsername } from "./useChangeUsername";
 import { useCallback } from "react";
 import { deskKeys, notebookKeys, profileKeys, schoolKeys } from "@/lib/queries";
@@ -36,7 +35,7 @@ export const useUpdateProfileForm = ({onSuccess, onError, profile}: UseUpdatePro
                 userId: profile.userId,
             });
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
 

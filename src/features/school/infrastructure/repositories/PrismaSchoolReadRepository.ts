@@ -29,7 +29,7 @@ export class PrismaSchoolReadRepository implements SchoolReadRepository {
     return this.prisma.school.findMany();
   }
 
-  async getDetailedSchools(): Promise<Prisma.SchoolGetPayload<typeof schoolForDetailArgs>[]> {
+  async getSchoolsDetail(): Promise<Prisma.SchoolGetPayload<typeof schoolForDetailArgs>[]> {
     return this.prisma.school.findMany({
       ...schoolForDetailArgs,
     });

@@ -14,7 +14,7 @@ export function useDeskPolicy(input: GetDeskPolicyInput) {
       }
       return result.data;
     },
-    enabled: !!input.deskId && !!input.userId && !!input.schoolId,
+    enabled: !!input.deskId && !!input.userId,
 
    });
    

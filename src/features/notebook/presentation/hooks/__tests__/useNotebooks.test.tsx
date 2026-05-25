@@ -2,7 +2,7 @@ import { waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { notebookKeys } from "@/lib/queries";
 import { renderHookWithQueryClient } from "@/test/utils";
-import { useNotebooks, useNotebooksByDeskId, useNotebooksByUserId } from "../useNotebooks";
+import { useNotebooks, useDeskNotebooks, useUserNotebooks } from "../useNotebooks";
 
 const mocks = vi.hoisted(() => ({
   getNotebooks: vi.fn(),
@@ -34,7 +34,7 @@ describe("useNotebooks", () => {
   });
 
   it("does not fetch user notebooks without a user id", () => {
-    const { result } = renderHookWithQueryClient(() => useNotebooksByUserId(null));
+    const { result } = renderHookWithQueryClient(() => useUserNotebooks(null));
 
     expect(result.current.fetchStatus).toBe("idle");
     expect(mocks.getNotebooks).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe("useNotebooks", () => {
     mocks.getNotebooks.mockResolvedValue({ success: true, data: notebooks });
 
     const { result, queryClient } = renderHookWithQueryClient(() =>
-      useNotebooksByUserId("user-1"),
+      useUserNotebooks("user-1"),
     );
 
     await waitFor(() => expect(result.current.data).toEqual(notebooks));
@@ -60,7 +60,7 @@ describe("useNotebooks", () => {
     });
 
     const { result: successResult, queryClient } = renderHookWithQueryClient(() =>
-      useNotebooksByDeskId("desk-1"),
+      useDeskNotebooks("desk-1"),
     );
 
     await waitFor(() => {
@@ -73,7 +73,7 @@ describe("useNotebooks", () => {
 
     mocks.getNotebooks.mockResolvedValueOnce({ success: false, error: "No notebooks" });
     const { result: errorResult } = renderHookWithQueryClient(() =>
-      useNotebooksByDeskId("desk-2"),
+      useDeskNotebooks("desk-2"),
     );
 
     await waitFor(() => {

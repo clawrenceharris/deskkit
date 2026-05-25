@@ -1,20 +1,23 @@
 "use client";
 import { Column, type ColumnProps } from "./Column";
-import { Notebook, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { EmptyState, LoadingState } from "@/components/states";
 import { DeskSection, useDeskContext, useUser } from "@/app/providers";
-import type { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import type { NotebookForCard } from "@/features/notebook/infrastructure/queries";
 import { useDeskDetail, useDeskPolicy } from "../../hooks";
-import { Desk, DeskForCard, DeskForDetail } from "@/features/desk/infrastructure/queries";
+import { Desk, DeskForDetail } from "@/features/desk/infrastructure/queries";
 import { useJoinOrLeaveDesk } from "../../hooks/useJoinOrLeaveDesk";
-import { ChalkboardsView, ComingSoonView, DeskHomeView, NotebooksView } from "../views";
+import { ChalkboardsView, ComingSoonView, DeskHomeView, DeskMembersView, DeskNotebooksView, DeskSettingsView } from "../views";
 import { Icon } from "@/components/shared";
-import chalkboardIcon from "@/assets/chalkboard-icon.png";
-import deskIcon from "@/assets/desk-icon.png";
-import notebookIcon from "@/assets/notebook-icon.png";
+import chalkboardIcon from "@/assets/chalkboard.png";
+import deskIcon from "@/assets/desk.png";
+import notebookIcon from "@/assets/notebook.png";
 import { StaticImageData } from "next/image";
+import gearIcon from "@/assets/gear.png";
+import { startUiProfiler, stopUiProfiler } from "@/instrumentation";
+import { useEffect } from "react";
 interface DeskColumnProps extends ColumnProps {
-  onNotebookClick: (notebook: NotebookForDetail) => void;
+  onNotebookClick: (notebook: NotebookForCard) => void;
   onDeskClick: (desk: Desk) => void;
 }
 
@@ -24,9 +27,9 @@ export function DeskColumn ({
 }: DeskColumnProps) {
   const { currentSection, setCurrentDeskId, currentDeskId: deskId } = useDeskContext();
   const {data: desk, isLoading: isLoadingDesk} = useDeskDetail(deskId);
-  const { user, profile } = useUser();
+  const { user } = useUser();
   const { joinDesk, leaveDesk, isJoining, isLeaving } = useJoinOrLeaveDesk();
-  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId, userId: user.id, schoolId: profile.schoolId});
+  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId, userId: user.id});
   
   
   function handleJoinSchoolDesk() {
@@ -40,14 +43,19 @@ export function DeskColumn ({
       setCurrentDeskId(null);
     });
   }
-
+  useEffect(() => {
+    startUiProfiler("DeskColumn");
+    return () => {
+      stopUiProfiler("DeskColumn");
+    };
+  }, []);
   const renderDeskView = (desk: DeskForDetail) => {
    
     switch(currentSection) {
       
       case DeskSection.notebooks:
         return (
-          <NotebooksView
+          <DeskNotebooksView
             desk={desk}
             title={<DeskTitle 
               icon={notebookIcon}
@@ -81,17 +89,21 @@ export function DeskColumn ({
             {...props}
           />
       );
+     
       case DeskSection.settings:
         return (
-          <ComingSoonView
-            title="Settings"
+          <DeskSettingsView
+            desk={desk}
+            title={<DeskTitle 
+              icon={gearIcon}
+              title="Settings" /> }
             {...props}
           />
-      );
+        );
       case DeskSection.members:
         return (
-          <ComingSoonView
-            title="Members"
+          <DeskMembersView
+            desk={desk}
             {...props}
           />
       );
@@ -155,17 +167,17 @@ export function DeskColumn ({
   const isMember = desk.members.some(member => member.profile.userId === user.id);
   const canJoin = deskPolicy?.canJoin ?? false;
   const secondaryAction = isMember && canJoin ? handleLeaveSchoolDesk : undefined;
-  const secondaryButtonLabel = isMember && canJoin ? "Remove Desk" : undefined;
+  const secondaryButtonLabel = isMember && canJoin ? "Leave" : undefined;
   const secondaryButtonVariant = isMember && canJoin ? "destructive" : "outline";
   const primaryAction = canJoin ? handleJoinSchoolDesk : isMember ? handleLeaveSchoolDesk : undefined;
-  const primaryButtonLabel = canJoin ? "Join Desk" : isMember ? "Leave desk" : "Join Desk";
+  const primaryButtonLabel = canJoin ? "Join Desk" : isMember ? "Leave" : "Join Desk";
   if(!deskPolicy?.canView){
     return (
-      <Column title={desk.name} {...props}>
+      <Column showsHeader={false} {...props}>
         <div className="h-full flex-1 flex items-center justify-center">
           <EmptyState 
             variant="card" imageUrl="https://i.ibb.co/H87K7h0/desk.png" 
-            message="You do not have permission to view this Desk." 
+            message="You don't have permission to view this Desk at the moment." 
             buttonVariant={"tertiary" }
             onAction={primaryAction} 
             actionLabel={primaryButtonLabel}
@@ -191,8 +203,8 @@ type DeskTitleProps = {
 
 function DeskTitle({title, icon}: DeskTitleProps) {
   return (
-    <span className="text-md bg-primary text-white font-semibold rounded-full px-2 py-1 flex items-center gap-2">
-      <Icon src={icon} alt={title} className="size-5 invert"/>
+    <span className="text-md bg-muted border font-semibold rounded-full px-2 py-1 flex items-center gap-2">
+      <Icon src={icon} alt={title} className="size-7"/>
       {title}
     </span>
   )

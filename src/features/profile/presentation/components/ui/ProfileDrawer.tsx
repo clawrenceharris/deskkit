@@ -1,7 +1,7 @@
 "use client";
 import { Button, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui";
 import { X } from "lucide-react";
-import { useNotebooksByUserId } from "@/features/notebook/presentation/hooks";
+import { useUserNotebooks } from "@/features/notebook/presentation/hooks";
 
 import { useProfileDetail } from "../../hooks";
 
@@ -16,7 +16,7 @@ type ProfileDrawerProps = {
 }
 export function ProfileDrawer({userId}: ProfileDrawerProps) {
     const { data: profile } = useProfileDetail(userId);
-    const {data: notebooks = []} = useNotebooksByUserId(userId);
+    const {data: notebooks = []} = useUserNotebooks(userId);
     
 
 
@@ -35,7 +35,7 @@ export function ProfileDrawer({userId}: ProfileDrawerProps) {
   return (
     <DrawerContent aria-describedby={undefined} className="w-full p-4 before:bg-transparent border-none">   
       <div className="flex bg-popover shadow-lg border relative rounded-2xl flex-col h-full min-h-0 overflow-hidden">
-        <DrawerHeader className="shrink-0">
+        <DrawerHeader className="shrink-0 border-b">
           <div className="flex items-center justify-between">
             <ProfileButton profile={profile} showsName nameClassName="text-lg font-bold" />
             <DrawerClose asChild className="absolute top-3 right-3">

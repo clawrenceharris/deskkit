@@ -7,7 +7,7 @@ export interface DeskRepository {
   query: DeskReadRepository;
   createDesk(input: CreateDeskData): Promise<Desk>;
   updateDesk(input: UpdateDeskData): Promise<Desk>;
-  deleteDesk(id: string): Promise<void>;
+  deleteDesk(id: string): Promise<Desk>;
   joinDesk(input: JoinOrLeaveDeskInput): Promise<void>;
   leaveDesk(input: JoinOrLeaveDeskInput): Promise<void>;
   createSchoolDesk(input: CreateSchoolDeskInput): Promise<DeskForDetail>;

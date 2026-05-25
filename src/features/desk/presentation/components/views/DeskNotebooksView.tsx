@@ -1,7 +1,7 @@
 "use client";
 import { useDeskContext, useSchoolContext, useUser } from "@/app/providers";
 import { EmptyState, LoadingState } from "@/components/states";
-import { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { NotebookForCard, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
 import { Plus } from "lucide-react";
 import { NotebookGridItem } from "../ui";
 import { DeskHeader } from "../ui/DeskHeader";
@@ -9,16 +9,17 @@ import { Column, ColumnProps } from "../columns";
 import { DeskForDetail } from "@/features/desk/infrastructure/queries";
 import { useModals } from "@/hooks/useModals";
 import { Button } from "@/components/ui";
-import { useNotebooksByDeskId } from "@/features/notebook/presentation/hooks";
+import { useDeskNotebookCards, useDeskNotebooks } from "@/features/notebook/presentation/hooks";
 import { useSearch } from "@/hooks";
 import { SearchBar } from "@/components/shared";
 import { useDeskPolicy } from "../../hooks";
+import { cn } from "@/lib/utils";
 
 interface NotebooksViewProps extends ColumnProps {
-  onNotebookClick: (notebook: NotebookForDetail) => void;
+  onNotebookClick: (notebook: NotebookForCard) => void;
   desk: DeskForDetail;
 }
-export function NotebooksView({
+export function DeskNotebooksView({
   onNotebookClick,
   desk,
   ...props
@@ -28,22 +29,22 @@ export function NotebooksView({
   const { currentNotebookId } = useDeskContext();
   const { currentSchoolId } = useSchoolContext();
   function filterNotebooks(
-    notebook: NotebookForDetail,
+    notebook: NotebookForCard,
     search: string
   ): boolean {
     return notebook.title.toLowerCase().includes(search.toLowerCase());
   } 
-  const { data: notebooks = [], isLoading: isLoadingNotebooks } = useNotebooksByDeskId(desk.id);
+  const { data: notebooks = [], isLoading: isLoadingNotebooks } = useDeskNotebookCards(desk.id);
   const {
     query,
     clearResults,
     search: searchNotebooks,
     results: filteredNotebooks,
-  } = useSearch<NotebookForDetail>({
+  } = useSearch<NotebookForCard>({
     filter: (notebook, q) => filterNotebooks(notebook, q),
     data: notebooks,
   });
-  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId: desk.id, userId: user.id, schoolId: currentSchoolId, resourceType: "notebook"});
+  const { data: deskPolicy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId: desk.id, userId: user.id, resourceType: "notebook"});
   function handleCreateNotebook() {
     if(!deskPolicy?.canPost) return;
     createNotebookModal.open(desk.id);
@@ -130,7 +131,6 @@ export function NotebooksView({
   return (
     <Column 
       title="Notebooks" 
-      contentContainerClassName="h-full overflow-y-auto" 
       headerRight={headerRight}
       {...props}
     >
@@ -155,4 +155,4 @@ export function NotebooksView({
   );
 };
 
-export default NotebooksView;
+export default DeskNotebooksView;

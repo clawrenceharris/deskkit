@@ -37,7 +37,7 @@ export function NotebookGridItem({
 
         
         <CardTitle className="text-sm">{notebook.title}</CardTitle>
-        <span className="text-muted-foreground text-xs">{`${getShortDate(new Date(notebook.updatedAt))}`}</span>
+        <span className="text-muted-foreground text-xs">{getShortDate(new Date(notebook.createdAt))}</span>
       </div>
     </CardHeader>
     <CardFooter className="flex justify-between pb-4 px-3 w-full rounded-b-xl bg-primary-foreground">

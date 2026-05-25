@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/sonner";
 import { prefetchAuthenticatedAppData } from "@/lib/queries/prefetchAuthenticatedAppData";
 import "./globals.css";
 import { AuthProvider, QueryProvider, ThemeProvider, UserProvider } from "./providers";
+import { TooltipProvider, Toaster } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "deskkit",
@@ -41,27 +41,28 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`antialiased ${geistSans.variable} ${geistMono.variable} font-sans ${figtree.variable}`}
     >
+     
       <body>
-        
-        <QueryProvider dehydratedState={dehydratedState}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange={false}
-          >
+        <TooltipProvider> 
+          <QueryProvider dehydratedState={dehydratedState}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange={false}
+            >
+              
+                <AuthProvider>
+                  <UserProvider>  
+                    {children}
+                  </UserProvider>
+                </AuthProvider>
             
-              <AuthProvider>
-                <UserProvider>  
-                  {children}
-                </UserProvider>
-              </AuthProvider>
-           
-            <Toaster />
+              <Toaster />
 
-          </ThemeProvider>
-        </QueryProvider>
-
+            </ThemeProvider>
+          </QueryProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

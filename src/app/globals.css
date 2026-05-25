@@ -79,7 +79,7 @@
   --tertiary: #6a16e9;
   --accent-foreground: #000000;
   --primary-foreground: #fcfcfc;
-  --secondary-foreground: #edf3f8;  
+  --secondary-foreground: #eaecee;  
   --muted: #c4c7e546;
   --muted-foreground: #a1a3ad;
   --destructive: #f24579;
@@ -180,7 +180,7 @@
     @apply w-full h-full flex-1 flex items-center justify-center;
   }
    .column-header{
-    @apply sticky  top-0 flex items-center justify-between px-4 h-16 py-2 w-full border-b
+    @apply sticky  top-0 flex items-center justify-between px-4 h-16 py-2 w-full
   }
   
 

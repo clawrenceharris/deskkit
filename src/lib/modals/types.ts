@@ -17,15 +17,11 @@ export interface ModalProps {
  */
 export type ModalType =
   | "profile:create"
-  | "profile:view"
-  | "profile:delete"
   | "profile:update"
   | "desk:create"
   | "desk:update"
-  | "desk:delete"
   | "notebook:create"
   | "notebook:update"
-  | "notebook:delete"
   | "confirmation"
 /**
  * State interface for ModalProvider

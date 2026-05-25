@@ -1,10 +1,11 @@
 import { DeskSection } from "@/app/providers/HomeNavigationProvider";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { Lock, LockIcon } from "lucide-react";
 import { motion, type TargetAndTransition } from "motion/react";
 import type { ReactNode } from "react";
 
-type DeskSectionSupply = {
+type DeskSpaceSupply = {
   id: string;
   className?: string;
   children: ReactNode;
@@ -12,17 +13,17 @@ type DeskSectionSupply = {
   hover: TargetAndTransition;
 };
 
-type DeskSectionCardProps = {
+type DeskSpaceCardProps = {
   section: DeskSection;
   onClick?: (section: DeskSection) => void;
-  supplies?: DeskSectionSupply[];
+  supplies?: DeskSpaceSupply[];
   label: string;
   selected?: boolean;
-  disabled?: boolean;
+  locked?: boolean;
 }
 
 
-export function DeskSectionCard({selected, section, label, onClick, supplies = [], disabled = false }: DeskSectionCardProps) {
+export function DeskSpaceCard({selected, section, label, onClick, supplies = [], locked = false }: DeskSpaceCardProps) {
   
   return (
     <motion.button
@@ -31,7 +32,7 @@ export function DeskSectionCard({selected, section, label, onClick, supplies = [
       whileHover="hover"
       whileFocus="focus"
       onClick={() => onClick?.(section)}
-      aria-disabled={disabled}
+      disabled={locked}
       className={cn(
         `flex-1 
         cursor-pointer
@@ -54,7 +55,7 @@ export function DeskSectionCard({selected, section, label, onClick, supplies = [
         hover:bg-white
         focus:bg-white
         `,
-        disabled && "pointer-events-none",
+        locked && "pointer-events-none",
         // Selected state: apply the same outline and text styles as focus & hover states for each section
         {
           "focus:outline-secondary": section === DeskSection.notebooks,
@@ -77,6 +78,11 @@ export function DeskSectionCard({selected, section, label, onClick, supplies = [
         }
       )}
     >
+     {locked && (
+      <div className="absolute top-0 left-0 w-full h-full bg-black/30 backdrop-blur-xs z-30 flex items-center justify-center">
+        <Lock strokeWidth={3} className="size-6 text-white" />
+      </div>
+     )}
       <div className="relative z-20 px-3 py-5 rounded-t-lg w-full ">
         <h3 className="font-bold text-lg">
           {label}

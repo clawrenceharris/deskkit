@@ -70,7 +70,7 @@ export function QueryProvider({
       {children}
       </HydrationBoundary>
       
-      <ReactQueryDevtools />
+      <ReactQueryDevtools hideDisabledQueries buttonPosition="top-right"/>
 
     </QueryClientProvider>
   );

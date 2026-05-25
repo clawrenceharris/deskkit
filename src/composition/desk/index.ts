@@ -5,3 +5,4 @@ export * from "./joinOrLeaveDeskUseCase";
 export * from "./makeUpdateDeskUseCase";
 export * from "./makeDeskReadService";
 export * from "./makeGetDeskPolicyUseCase";
+export * from "./makeDeleteDeskUseCase";

@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDeskContext, useLayout } from "@/app/providers";
 import type { Desk } from "@/lib/db/prisma";
-import type { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import type { Notebook, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export const APP_ROUTES = {
   desks: "/desks",
@@ -49,7 +50,7 @@ export enum DeskSection {
 type HomeNavigationContextType = {
   materialIndex: number;
   setMaterialIndex: (index: number) => void;
-  handleNotebookClick: (notebook: NotebookForDetail) => void;
+  handleNotebookClick: (notebook: Notebook) => void;
   handleDeskClick: (deskId: string) => void;
   handleDesksOpen: () => void;
   handleDeskExit: () => void;
@@ -121,8 +122,11 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
     closeRightLayout,
     openExpandedLayout,
     openRightLayout,
+    openDeskLayout
   } = useLayout();
-  
+  const isMobile = useMediaQuery("(max-width: 768px)", {
+    initializeWithValue: false,
+  });
   /**
    * Sets the current section based on the route state.
    */
@@ -137,27 +141,27 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
   }, [pathname, setCurrentSection]);
   
 
+  
   /**
-   * Sets the current desk and notebook based on the route state.
+   * Sets the current desk and notebook id based on the route state and opens the appropriate layout.
    */
   useEffect(() => {
     const route = getRouteState(pathname);
-   
     setCurrentDeskId(route.deskId);
     setCurrentNotebookId(route.notebookId);
-   
-    
-  }, [pathname, setCurrentDeskId, setCurrentNotebookId]);
-  useEffect(() => {
-    const route = getRouteState(pathname);
     if(route.notebookId) {
       openRightLayout();
+      return;
 
     }
-    else if(route.deskId) {
+    if(route.section && isMobile){
+      openDeskLayout();
+      return;
+    }
+    if(route.deskId) {
       openLeftLayout();
     }
-  }, [openLeftLayout, openRightLayout, pathname]);
+  }, [isMobile, openDeskLayout, openLeftLayout, openRightLayout, pathname, setCurrentDeskId, setCurrentNotebookId]);
   /**
    * Navigates to the given path with the current search params.
    */
@@ -165,6 +169,7 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
     const params = new URLSearchParams(searchParams);
     router.push(`${path}?${params.toString()}`);
   }, [router, searchParams]);
+  
   const handleSectionClick = useCallback((section: DeskSection) => {
     if(!currentDeskId) {
       return;
@@ -209,9 +214,11 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
     }
   }, [openExpandedLayout, searchParams]);
 
-  const handleNotebookClick = useCallback((notebook: NotebookForDetail) => {
+  const handleNotebookClick = useCallback((notebook: Notebook) => {
     setMaterialIndex(0);
+
     navigateTo(APP_ROUTES.notebook(notebook.deskId, notebook.id));
+
   }, [navigateTo]);
 
   const handleDeskClick = useCallback((deskId: string) => {
@@ -233,6 +240,7 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
       router.push(`${pathname}?${params.toString()}`);
     }
   }, [router, pathname, searchParams]);
+  
   const handleExpandLayout = useCallback(() => {
     const params = new URLSearchParams(searchParams);
     if (params.get("expanded") !== "true") {
@@ -240,6 +248,7 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
       router.push(`${pathname}?${params.toString()}`);
     }
   }, [router, pathname, searchParams]);
+  
   const handleDeskExit = useCallback(() => {
     setCurrentDeskId(null);
     setCurrentNotebookId(null);

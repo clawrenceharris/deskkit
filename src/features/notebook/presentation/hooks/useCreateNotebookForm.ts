@@ -47,7 +47,7 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
                 
             });
             if(!result.success){
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },

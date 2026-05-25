@@ -78,7 +78,7 @@ export function useUpdateNotebookForm({notebookId, onSuccess, onError}: UseUpdat
                 "Updating this notebook timed out. Please try again."
             );
             if (!result.success) {
-                throw new ApplicationError(result.error);
+                throw result.error;
             }
             return result.data;
         },
