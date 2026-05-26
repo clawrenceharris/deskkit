@@ -58,6 +58,7 @@ export function NotebookColumn({
   return (
     <Column
       {...props}
+      title={currentNotebook.title}
       toggleIcon={ <X strokeWidth={3} /> }
     >
       <div className="relative min-h-0 flex-1 overflow-hidden">
