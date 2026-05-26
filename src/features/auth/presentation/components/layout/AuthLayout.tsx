@@ -19,9 +19,9 @@ export function AuthLayout({ children, authType }: AuthLayoutProps) {
     
       <Card className="w-full ring-0 bg-surface rounded-none max-w-110 mx-auto shadow-none overflow-y-auto h-full">
         <CardHeader className="border-b flex items-center">
-         <Image src="/images/logo-secondary.png" alt="deskkit Logo" width={80} height={80}/>
+         <Image src="/images/logo-secondary.png" alt="Deskitt Logo" width={80} height={80}/>
           <CardTitle className="text-2xl flex items-center font-semibold">
-            Welcome to deskkit!
+            Welcome to Deskitt!
           </CardTitle>
         </CardHeader>
         <CardContent className="flex h-full items-center">

@@ -16,7 +16,7 @@ import type {
   PresenceClientMessage,
   PresenceServerMessage,
   ResolvedActivityStatus,
-} from "../domain/types";
+} from "../../domain/types";
 import { setActivityStatusAction } from "@/actions/presence";
 
 type PresenceContextValue = {
@@ -186,6 +186,7 @@ export function PresenceProvider({ children, userId }: PresenceProviderProps) {
         pingTimer.current = null;
       }
       reconnectTimer.current = setTimeout(() => {
+        // eslint-disable-next-line react-hooks/immutability
         void connect();
       }, RECONNECT_DELAY_MS);
     };

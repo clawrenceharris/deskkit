@@ -4,7 +4,6 @@
  * Run: npm run dev:presence
  * Requires Redis (REDIS_URL) and Supabase env vars for auth.
  */
-import dotenv from "dotenv";
 import { WebSocketServer, WebSocket } from "ws";
 import { verifySupabaseAccessToken } from "./lib/auth";
 import { connectRedisClients, getRedisSubscriber } from "../src/features/presence/infrastructure/redis";
@@ -16,7 +15,6 @@ import {
   type ResolvedActivityStatus,
 } from "../src/features/presence/domain/types";
 
-dotenv.config({ path: ".env.local" });
 
 const PORT = Number(process.env.PRESENCE_WS_PORT ?? 3001);
 const HEARTBEAT_INTERVAL_MS = 30_000;

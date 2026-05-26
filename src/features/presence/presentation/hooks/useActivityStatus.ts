@@ -20,7 +20,7 @@ export function useActivityStatus(userId: string | null | undefined) {
   if (!userId) {
     return { status: "offline" as ActivityStatusValue, isManual: false, expiresAt: null };
   }
-
+  console.log("getStatus", getStatus(userId));
   return getStatus(userId);
 }
 

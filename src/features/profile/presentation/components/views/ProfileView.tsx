@@ -58,7 +58,7 @@ export function ProfileView({ profile }: ProfileViewProps){
     <>
       <ProfileNavbar onTabClick={handleTabClick} currentTab={activeTab} profile={profile}/>
 
-      <div className="flex min-h-0 flex-1 py-4 flex-col bg-muted/30 overflow-hidden">
+      <div className="flex min-h-0 flex-1 py-4 flex-col  overflow-hidden">
 
         {activeTab === ProfileTab.PROFILE && (
           <div className="flex flex-col min-h-0 flex-1 px-5 py-3">
@@ -67,8 +67,12 @@ export function ProfileView({ profile }: ProfileViewProps){
               onEditUsernameClick={handleEditUsernameClick}
               profile={profile} />
             {isCurrentUser && (
-              <div className="mt-4">
+              <div className="w-full max-w-[190px] mt-4 flex flex-col gap-2">
+                <Button variant="secondary" className="w-full rounded-xl">
+                  Edit Profile
+                </Button>
                 <ActivityStatusPicker />
+                
               </div>
             )}
             <div className="flex flex-col gap-3 mt-4">

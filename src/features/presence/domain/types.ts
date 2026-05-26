@@ -1,3 +1,5 @@
+import { AlarmClockOff, Ban, CircleDot, Clock, Dot, LucideProps, Minus, Moon, Timer } from "lucide-react";
+
 export type ActivityStatusValue = "online" | "offline" | "away" | "dnd";
 
 export type ManualActivityStatus = ActivityStatusValue | "auto";
@@ -35,7 +37,28 @@ export const ACTIVITY_STATUS_LABELS: Record<ActivityStatusValue, string> = {
   away: "Away",
   dnd: "Do Not Disturb",
 };
-
+export const ACTIVITY_STATUS_INDICATORS: Record<ActivityStatusValue, { Icon: React.ComponentType<LucideProps> | null; backgroundColor: string; iconClassName: string | null;}> = {
+  online: {
+    Icon: null,
+    iconClassName: null,
+    backgroundColor: "bg-success",
+  },
+  offline: {
+    Icon: Minus,
+    backgroundColor: "bg-gray-400",
+    iconClassName: "text-white fill-white stroke-white stroke-[4px]",
+  },
+  away: {
+    Icon: null,
+    backgroundColor: "bg-yellow-400",
+    iconClassName: null,
+  },
+  dnd: {
+    Icon: Moon,
+    backgroundColor: "bg-tertiary",
+    iconClassName: "text-white fill-white stroke-white stroke-[4px]",
+  },
+}
 export const STATUS_DURATION_OPTIONS = [
   { label: "30 minutes", minutes: 30 },
   { label: "1 hour", minutes: 60 },

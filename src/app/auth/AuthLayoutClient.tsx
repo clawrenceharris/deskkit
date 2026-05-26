@@ -25,7 +25,7 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
                 </Tile>
               
                 <Tile className="z-4 text-primary top-[30%] left-[70%] md:top-[70%] md:left-[55%] rotate-[7deg]">
-                    deskkit.
+                Deskitt.
                 </Tile>
             </div>
         </div>

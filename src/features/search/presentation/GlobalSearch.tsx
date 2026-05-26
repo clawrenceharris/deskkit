@@ -55,7 +55,7 @@ export function GlobalSearch({
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
-          title="Search deskkit"
+          title="Search Deskitt"
           description="Jump between desks, notebooks, and people without leaving the current layout."
         >
           <Command

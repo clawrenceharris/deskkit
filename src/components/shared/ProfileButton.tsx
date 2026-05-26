@@ -1,9 +1,9 @@
 "use client"
 import { ProfileForButton } from "@/features/profile/infrastructure/queries";
-import { Avatar, AvatarFallback, AvatarImage, Button, ButtonProps, DrawerTrigger } from "../ui";
+import { Button, ButtonProps } from "../ui";
 import { useProfileContext, useUser } from "@/app/providers";
 import { cn } from "@/lib/utils";
-import { ProfileAvatar } from "@/features/profile/presentation/components/ui";
+import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 
 interface ProfileButtonProps extends ButtonProps {
   showsName?: boolean;
@@ -31,7 +31,7 @@ export function ProfileButton({
         variant="default"
         className="p-0"
       >
-        {profile && <ProfileAvatar size="lg" profile={profile} className={className} />}
+        {profile && <ProfileAvatarWithStatus size="lg" profile={profile} className={className} />}
     
 
      

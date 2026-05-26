@@ -1,8 +1,9 @@
 import { Avatar } from "@/components/ui/avatar";
-import { Profile, ProfileForButton } from "../../../infrastructure/queries";
+import { ProfileForButton } from "../../../infrastructure/queries";
 import { AvatarBadge, AvatarImage, AvatarFallback } from "@/components/ui";
-import { Ban, CircleCheck, CircleDot, CircleX, Dot, Moon, UserIcon, X } from "lucide-react";
+import { UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ActivityStatusIndicator } from "@/components/shared";
 
 type ProfileAvatarProps = {
     profile: ProfileForButton | null;
@@ -11,26 +12,7 @@ type ProfileAvatarProps = {
     statusClassName?: string;
 } & React.ComponentProps<typeof Avatar>;
 export function ProfileAvatar({profile, previewUrl, status, statusClassName, className, ...props}: ProfileAvatarProps) {
-  const statusBadge = {
-    online: "bg-success",
-    offline: "bg-gray-400",
-    away: "bg-orange-400",
-    dnd: "bg-tertiary",
-  }
-  function getStatusIcon() {
-    switch (status) {
-      case "online":
-        return <Dot strokeWidth={17} className="text-white" />;
-      case "offline":
-        return <Ban strokeWidth={4} className="text-white" />;
 
-      case "away":
-        return <Dot strokeWidth={17} className="text-white" />;
-      case "dnd":
-        return <Moon  fill="currentColor" className="text-white" />;
-
-    }
-  }
   return (
     <Avatar
       className={cn(
@@ -39,9 +21,7 @@ export function ProfileAvatar({profile, previewUrl, status, statusClassName, cla
       {...props}
     >
       {status &&  (
-        <AvatarBadge className={cn(statusBadge[status], statusClassName)}>
-          {getStatusIcon()}
-        </AvatarBadge>
+         <ActivityStatusIndicator status={status}/>
       )}
       <AvatarImage
         src={previewUrl ?? profile?.avatarUrl ?? undefined}

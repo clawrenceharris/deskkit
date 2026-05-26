@@ -76,7 +76,7 @@ export const profileForPolicyArgs = {
                 desk: {
                     select:{
                         id: true,
-                        isPublic: true,
+                        visibility: true,
                         creatorId: true
                         
                     }

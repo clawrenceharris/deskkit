@@ -7,7 +7,7 @@ import { LogOut, Pencil, Settings, Trash2 } from "lucide-react";
 import { useDeskPolicy } from "../../hooks";
 import { useAuth } from "@/app/providers";
 import { toast } from "sonner";
-import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
+import { ProfileAvatar } from "@/features/profile/presentation/components/ui";
 
 interface DeskListItemProps extends MotionProps {
   onClick?: (desk: DeskForCard) => void;
@@ -100,7 +100,7 @@ export function DeskListItem ({
               {showMembers && (
                 <AvatarGroup  className="flex items-center">
                 {desk.members.slice(0, 3).map((member) => (
-                  <ProfileAvatarWithStatus className="border-none" tabIndex={-1} profile={member.profile} key={member.profile.userId}/>
+                  <ProfileAvatar className="border-none" profile={member.profile} key={member.profile.userId}/>
                 ))}
                 {desk.members.length > 3 && <AvatarGroupCount className="text-foreground size-[20px] bg-secondary-foreground">+{desk.members.length - 3}</AvatarGroupCount>}
               </AvatarGroup>

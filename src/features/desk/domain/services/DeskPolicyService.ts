@@ -1,6 +1,6 @@
 import { ProfileForPolicy } from "@/features/profile/infrastructure/queries";
 import { DeskForDetail } from "../../infrastructure/queries";
-import { MemberRole } from "@/lib/db/prisma";
+import { DeskVisibility, MemberRole } from "@/lib/db/prisma";
 import { SchoolForDetail } from "@/features/school/infrastructure/queries";
 import { DeskPolicy } from "./";
 
@@ -16,7 +16,7 @@ export class DeskPolicyService implements DeskPolicy {
     canPreview(): boolean {
         const { desk } = this;
         if(!desk) return false;
-        return desk.isPublic;
+        return desk.visibility === DeskVisibility.PUBLIC;
     }
     /**
      * @remark A user can view a desk if they are a member of the desk
@@ -66,7 +66,7 @@ export class DeskPolicyService implements DeskPolicy {
     canJoin(): boolean {
         const { desk, user } = this;
         if(!desk || !user) return false;
-        return desk.isPublic && desk.schoolId === user.schoolId;
+        return desk.visibility === DeskVisibility.PUBLIC && desk.schoolId === user.schoolId;
     }
 
 }

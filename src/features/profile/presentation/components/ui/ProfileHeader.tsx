@@ -9,6 +9,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import { ProfileTab, UpdateProfileFormValues } from "@/types/profile";
 import { useProfileContext } from "@/app/providers";
 import { useActivityStatus } from "@/features/presence/presentation/hooks";
+import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 
 type ProfileHeaderProps = {
     profile: ProfileForDetail;
@@ -43,7 +44,7 @@ export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps
                 showDescription={false}
               />
             ) : (
-              <ProfileAvatar status={activityStatus.status} size="2xl" previewUrl={profile.avatarUrl} profile={profile} />
+              <ProfileAvatarWithStatus size="2xl" previewUrl={profile.avatarUrl} profile={profile} />
             )}
              {isDirty && isValid && (  
               <Button type="submit" size="xs" variant="tertiary" disabled={isLoading}>

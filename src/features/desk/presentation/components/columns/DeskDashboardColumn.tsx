@@ -7,7 +7,7 @@ import { useDeskPolicy } from "../../hooks";
 import { DeskSection, useDeskContext, useHomeNavigation, useUser } from "@/app/providers";
 import { DeskSpaceCard } from "../ui";
 import { chalkboardSupplies, notebookSupplies, studyRoomsSupplies } from "@/lib/constants";
-import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
+import { ProfileAvatar } from "@/features/profile/presentation/components/ui";
 
 type DeskDetailsColumnProps = {
     deskId: string;
@@ -50,7 +50,7 @@ export function DeskDashboardColumn({deskId}: DeskDetailsColumnProps) {
           <AvatarGroup  className="flex items-center text-black">
             {desk.members?.slice(0, 3).map((member) => (
               <span key={member.profile.userId} onClick={e => e.stopPropagation()}>
-                <ProfileAvatarWithStatus size="default" profile={member.profile} className="shadow-none"/>
+                <ProfileAvatar size="default" profile={member.profile} className="shadow-none"/>
               </span>
             ))}
             {desk.members?.length > 3 &&

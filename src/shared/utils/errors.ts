@@ -41,7 +41,7 @@ export class ApplicationError extends Error {
     [AppErrorCode.AUTH_USER_NOT_FOUND]: "We couldn’t find an account for that email.",
     [AppErrorCode.AUTH_EMAIL_NOT_CONFIRMED]: "Please confirm your email before signing in.",
     [AppErrorCode.AUTH_PASSWORD_TOO_WEAK]: "That password is too weak. Try adding numbers and symbols.",
-    [AppErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: "Looks like this email already has a deskkit. Try logging in instead.",
+    [AppErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: "Looks like this email already has a Deskitt. Try logging in instead.",
     [AppErrorCode.AUTH_SESSION_EXPIRED]: "Your session expired. Please sign in again.",
     [AppErrorCode.AUTH_RATE_LIMITED]: "Slow down a bit. We’re protecting the site.",
     [AppErrorCode.AUTH_UNAUTHENTICATED]: "You need to sign in before doing that.",

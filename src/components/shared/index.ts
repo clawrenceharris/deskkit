@@ -9,3 +9,4 @@ export * from "./NavButton";
 export * from "./ConfirmationModal";
 export * from "./Icon";
 export * from "./Column";
+export * from "./PresenceIndicator";

@@ -5,7 +5,7 @@ export async function getCurrentDeskOrNotebookTitle(deskId: string) {
   const currentDesk = await getDeskAction(deskId);
   if (!currentDesk.success) {
     return {
-      title: "deskkit",
+      title: "Deskitt",
       description: "Share and manage your study materials in one shared desk space.",
     };
   }

@@ -7,7 +7,7 @@ import { AuthProvider, QueryProvider, ThemeProvider, UserProvider } from "./prov
 import { TooltipProvider, Toaster } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "deskkit",
+  title: "Deskitt",
   description: "Share and manage your study materials in one shared desk space.",
 };
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});

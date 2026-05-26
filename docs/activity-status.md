@@ -1,6 +1,6 @@
 # Activity Status System
 
-This guide explains how real-time user activity statuses work in deskkit. It uses **WebSockets** for live updates and **Redis** for fast, shared state.
+This guide explains how real-time user activity statuses work in Deskitt. It uses **WebSockets** for live updates and **Redis** for fast, shared state.
 
 ---
 
@@ -188,7 +188,7 @@ docker run -d --name redis -p 6379:6379 redis:7-alpine
 
 ### 2. Environment variables
 
-Add to `.env.local`:
+Add to `.env`:
 
 ```env
 REDIS_URL=redis://127.0.0.1:6379

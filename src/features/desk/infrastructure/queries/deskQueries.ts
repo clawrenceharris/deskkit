@@ -17,15 +17,8 @@ export type MemberForDetail = Prisma.MemberGetPayload<typeof memberForDetailArgs
 
 
 export const deskForDetailArgs = {
-    select: {
-      id: true,
-      name: true,
-      createdAt: true,
-      schoolId: true,
-      creatorId: true,
-      description: true,
-      imageUrl: true,
-      isPublic: true,
+    include: {
+      
       creator: {
         select: {
           userId: true,
@@ -66,15 +59,7 @@ export const deskForDetailArgs = {
   } satisfies Prisma.DeskDefaultArgs;
   
   export const deskForCardArgs = {
-    select: {
-      id: true,
-      imageUrl: true,
-      isPublic: true,
-      schoolId: true,
-      creatorId: true,
-      name: true,
-      createdAt: true,
-      updatedAt: true,
+    include: {
       creator: {
         select: {
           userId: true,
@@ -125,7 +110,7 @@ export const deskForDetailArgs = {
       updatedAt: true,
       schoolId: true,
       imageUrl: true,
-      isPublic: true,
+      visibility: true,
     },
   } satisfies Prisma.DeskDefaultArgs;
 
