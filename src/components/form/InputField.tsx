@@ -1,73 +1,69 @@
 "use client"
 import React, { forwardRef } from "react";
 import {
-  Control,
-  Controller,
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
   Path,
+  useController,
+  useFormContext,
 } from "react-hook-form";
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, Input } from "../ui";
-interface InputFieldProps<T extends FieldValues>  extends React.ComponentProps<"input">{
-  name: Path<T>;
+interface InputFieldProps<T extends FieldValues, U extends Path<T>>  extends React.ComponentProps<"input">{
   label: string;
-  control: Control<T>;
+  name: U;
+  showsDescription?: boolean;
   description?: string;
   showsLabel?: boolean;
-  renderInput?: ({field, fieldState, inputProps}: {field: ControllerRenderProps<T, Path<T>>; fieldState: ControllerFieldState; inputProps: React.ComponentProps<"input">}) => React.ReactNode;
+  renderInput?: ({field, fieldState}: {field: ControllerRenderProps<T, U>; fieldState: ControllerFieldState;}) => React.ReactNode;
 
 }
-function InputFieldInner<T extends FieldValues>(props: InputFieldProps<T>, ref: React.ForwardedRef<HTMLInputElement>) {
+function InputFieldInner<T extends FieldValues, U extends Path<T>>(props: InputFieldProps<T, U>, ref: React.ForwardedRef<HTMLInputElement>) {
   
   const {
-    name,
     label,
+    name,
     placeholder,
-    control,
+    showsDescription = true,
     description,
     required,
     showsLabel = true,
     renderInput,
     ...inputProps
   } = props;
-  
+  const {control} = useFormContext<T>();
+  const {field, fieldState} = useController({control, name});
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({field, fieldState}) => (
-        <Field ref={ref}>
-          <FieldContent>
-          <FieldLabel
-            className={!showsLabel ? "sr-only" : ""}
-              htmlFor={field.name}>
-              {label} {" "}
-              {required && <span className="text-primary font-bold">(required)</span>}
-            </FieldLabel>
-          {description && <FieldDescription>{description}</FieldDescription>}
+   
+    <Field ref={ref}>
+      <FieldContent>
+      <FieldLabel
+        className={!showsLabel ? "sr-only" : ""}
+          htmlFor={field.name}>
+          {label} {" "}
+          {required && <span className="text-primary font-bold">(required)</span>}
+        </FieldLabel>
+      {description && <FieldDescription className={!showsDescription ? "sr-only" : ""}>{description}</FieldDescription>}
 
-          </FieldContent>
-          
-           {renderInput ? renderInput({field, fieldState, inputProps}) : 
-           <Input
-              {...field}
-              {...inputProps}
-              aria-required={required}
-              id={field.name}
-              placeholder={`${placeholder} ${!required ? "(Optional)" : ""}`}
-              aria-invalid={fieldState.invalid}
-    
-            />}
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-        </Field>
-      )}
-     
-    />
+      </FieldContent>
+      
+        {renderInput ? renderInput({field, fieldState}) : 
+        <Input
+          {...field}
+          {...inputProps}
+          aria-required={required}
+          id={field.name}
+          placeholder={`${placeholder} ${!required ? "(Optional)" : ""}`}
+          aria-invalid={fieldState.invalid}
+
+        />}
+      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+    </Field>
+  
   );
 }
 
 
-export const InputField = forwardRef(InputFieldInner) as <T extends FieldValues>(
-  props: InputFieldProps<T> & React.RefAttributes<HTMLInputElement>,
+export const InputField = forwardRef(InputFieldInner) as <T extends FieldValues, U extends Path<T>>(
+  props: InputFieldProps<T, U> & React.RefAttributes<HTMLInputElement>,
 ) => React.ReactElement;

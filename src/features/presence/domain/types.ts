@@ -1,4 +1,4 @@
-import { AlarmClockOff, Ban, CircleDot, Clock, Dot, LucideProps, Minus, Moon, Timer } from "lucide-react";
+import { LucideProps, Minus, Moon } from "lucide-react";
 
 export type ActivityStatusValue = "online" | "offline" | "away" | "dnd";
 

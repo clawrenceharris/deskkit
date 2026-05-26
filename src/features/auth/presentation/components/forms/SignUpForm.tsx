@@ -16,7 +16,6 @@ export function SignupForm() {
         password: "",
     },
 });
-  const { control } = form;
 return (
   <Form<SignUpFormValues>  
   form={form}
@@ -30,9 +29,8 @@ return (
     <FieldGroup>
       
       {/* Email */}
-      <InputField
+      <InputField<SignUpFormValues, "email">
         name="email"
-        control={control}
         placeholder="Your email"
         label="Email" 
         autoComplete="email"
@@ -40,8 +38,7 @@ return (
       />
 
       {/* Password */}
-      <InputField
-        control={control}
+      <InputField<SignUpFormValues, "password">
         name="password"
         label="Password" 
         placeholder={"Your password"} 

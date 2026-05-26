@@ -92,7 +92,6 @@ export function useDeskNotebooks(deskId: string | null, select?: (data: Notebook
 }
 
 export function useDeskNotebookCards(deskId: string | null, select?: (data: NotebookForCard[]) => NotebookForCard[]) {
-    const queryClient = useQueryClient();
     return useQuery({
         queryKey: notebookKeys.listByDeskId(deskId ?? "", "card"),
         queryFn: async () => {

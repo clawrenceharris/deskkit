@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ActivityStatusIndicator } from "@/components/shared";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 
 const STATUS_OPTIONS: {
   value: ActivityStatusValue;
@@ -48,20 +48,8 @@ const STATUS_OPTIONS: {
   },
 ];
 
-function formatExpiresAt(expiresAt: string | null): string | null {
-  if (!expiresAt) return null;
-  const date = new Date(expiresAt);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
 export function ActivityStatusPicker() {
-  const { myStatus, setStatus, isConnected } = usePresence();
+  const { myStatus, setStatus } = usePresence();
   const [selectedStatus, setSelectedStatus] = useState<ManualActivityStatus>(myStatus?.status ?? "auto");
   const [durationMinutes, setDurationMinutes] = useState<string>("60");
   const [isSaving, setIsSaving] = useState(false);
@@ -98,7 +86,7 @@ export function ActivityStatusPicker() {
       <Button variant="outline" className="border rounded-xl px-2 justify-between w-full">
 
        <div className="flex items-center gap-3">
-        <ActivityStatusIndicator isBadge={false} status={myStatus?.status ?? "offline"} />
+        {isSaving ? <Loader2 className="size-4 text-muted-foreground animate-spin" /> : <ActivityStatusIndicator isBadge={false} status={myStatus?.status ?? "offline"} />}
         <h4 className="text-sm font-semibold">{currentLabel}</h4>
         </div>
         <ChevronRight strokeWidth={3} className="size-4" />

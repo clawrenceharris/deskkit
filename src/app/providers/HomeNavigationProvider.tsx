@@ -3,8 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDeskContext, useLayout } from "@/app/providers";
-import type { Desk } from "@/lib/db/prisma";
-import type { Notebook, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import type { Notebook } from "@/features/notebook/infrastructure/queries";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export const APP_ROUTES = {

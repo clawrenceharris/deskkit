@@ -1,5 +1,6 @@
 import { DeskRepository } from "../../domain/repositories";
 import { DeskStorage } from "../../domain/services";
+import { DeskVisibility } from "../../domain/value-objects";
 import { CreateDeskInput,CreateDeskResult } from "../dto";
 import {  ok, Result } from "@/shared/application";
 
@@ -8,7 +9,7 @@ export class CreateDeskUseCase {
   constructor(private readonly deskRepository: DeskRepository, private readonly storage: DeskStorage) {}
 
   async execute(input: CreateDeskInput): Promise<CreateDeskUseCaseResult> {
-    const { name, schoolId, imageFile, isPublic, creatorId } = input;
+    const { name, schoolId, imageFile, visibility, creatorId } = input;
     let uploadedImage: { path: string; url: string | null } | null = null;
   
       try {
@@ -19,7 +20,7 @@ export class CreateDeskUseCase {
           schoolId,
           imageUrl:  null,
           imagePath: null,
-          isPublic: isPublic ?? true,
+          visibility: visibility ?? DeskVisibility.SCHOOL,
           description: null,
         });
         if (imageFile) {

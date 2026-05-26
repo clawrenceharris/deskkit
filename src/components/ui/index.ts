@@ -25,6 +25,7 @@ export * from "./skeleton";
 export * from "./context-menu";
 export * from "./alert-dialog";
 export * from "./hover-card";
+export * from "./radio-group";
 export * from "./tabs";
 export * from "./tooltip";
 export * from "./sonner";

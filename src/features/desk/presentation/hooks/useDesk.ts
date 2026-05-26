@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { getDeskAction, getDeskCardAction } from "@/actions/desk/queries/getDeskAction";
-import { deskKeys, schoolKeys } from "@/lib/queries";
+import { deskKeys } from "@/lib/queries";
 import { getMyDeskAction, getDeskDetailAction, getMyDeskDetailAction, getSchoolDeskAction, getSchoolDeskDetailAction, getSchoolDeskCardAction } from "@/actions/desk";
 
 export function useDesk(deskId: string | null) {

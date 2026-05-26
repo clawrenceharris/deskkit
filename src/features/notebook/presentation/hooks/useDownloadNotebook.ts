@@ -2,7 +2,6 @@
 import { downloadNotebookAction } from "@/actions/notebook"
 import { DownloadNotebookInput } from "@/features/notebook/application/dto";
 import { notebookKeys, deskKeys } from "@/lib/queries";
-import { ApplicationError } from "@/shared/utils/errors";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react";
 import { NotebookForDetail } from "../../infrastructure/queries/notebookQueries";

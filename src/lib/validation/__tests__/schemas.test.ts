@@ -8,6 +8,7 @@ import {
 import { createDeskSchema } from "../desk";
 import { createNotebookSchema, updateNotebookSchema } from "../notebook";
 import { createProfileSchema, updateProfileSchema, usernameSchema } from "../profile";
+import { DeskVisibility } from "@/features/desk/domain/value-objects";
 
 function makeFile(name: string, type: string, size = 1024) {
   return new File(["x".repeat(size)], name, { type });
@@ -41,7 +42,7 @@ describe("desk validation", () => {
       name: "Biology",
       schoolId: "0f6a30a1-3193-4948-aeb4-95a803b9ee7a",
       imageFile: makeFile("desk.png", "image/png"),
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
     });
 
     expect(result.success).toBe(true);

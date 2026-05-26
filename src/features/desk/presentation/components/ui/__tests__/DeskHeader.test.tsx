@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type { NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import type { NotebookForCard } from "@/features/notebook/infrastructure/queries";
 import { DeskHeader } from "../DeskHeader";
 
 describe("DeskHeader", () => {
@@ -10,12 +10,14 @@ describe("DeskHeader", () => {
       {
         downloads: [{}, {}, {}, {}],
         votes: [{ isUpvote: true }, { isUpvote: false }],
+        creatorId: "1",
       },
       {
         downloads: [{}],
         votes: [{ isUpvote: true }],
+        creatorId: "1",
       },
-    ] as NotebookForDetail[];
+    ] as NotebookForCard[];
 
     render(<DeskHeader notebooks={notebooks} />);
 

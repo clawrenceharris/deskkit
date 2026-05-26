@@ -29,9 +29,8 @@ export function LoginForm() {
     >
       <FieldGroup>
         {/* Email */}
-        <InputField
+        <InputField<LoginFormValues, "email">
           name="email"
-          control={form.control}
           placeholder="Email"
           label="Email"
           required
@@ -40,9 +39,8 @@ export function LoginForm() {
 
         {/* Password */}
         <div className="space-y-2">
-          <InputField 
+          <InputField<LoginFormValues, "password">
             placeholder="Your password" 
-            control={form.control} 
             type="password" 
             label="Password" 
             name="password" 

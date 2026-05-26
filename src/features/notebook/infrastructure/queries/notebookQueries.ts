@@ -17,22 +17,15 @@ export const notebookMaterialArgs = {
   select: {
     id: true,
     notebookId: true,
-    path: true,
-    notebook: {
-      select: {
-        id: true,
-        deskId: true,
-        title: true,
-      },
-    },
     url: true,
     title: true,
     updatedAt: true,
+    path: true,
+    createdAt: true,
   },
 } satisfies Prisma.MaterialDefaultArgs;
 export const notebookForDetailArgs = {
-    select: {
-      ...notebookArgs.select,
+    include: {
       votes: {
         select: {
           userId: true,
@@ -52,14 +45,7 @@ export const notebookForDetailArgs = {
         },
       },
       materials: {
-        
-       select:{
-        id: true,
-        url: true,
-        title: true,
-        updatedAt: true,
-       }
-        
+        ...notebookMaterialArgs
       },
       creator: {
         select: {
@@ -73,8 +59,7 @@ export const notebookForDetailArgs = {
     
   } satisfies Prisma.NotebookDefaultArgs;
 export const notebookForCardArgs = {
-    select: {
-      ...notebookArgs.select,
+    include: {
       votes: {
         select: {
           userId: true,

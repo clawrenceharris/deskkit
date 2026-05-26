@@ -1,13 +1,14 @@
 "use client";
-import { FieldGroup, SelectContent, Select, SelectTrigger, SelectValue, SelectItem,  Button,Scroller, Field, FieldError } from "@/components/ui";
+import { FieldGroup, SelectContent, Select, SelectTrigger, SelectValue, SelectItem,  Button,Scroller, FieldError } from "@/components/ui";
 import { FileUpload, FileUploadTrigger, FileUploadDropzone, FileUploadList, FileUploadItem, FileUploadItemPreview, FileUploadItemDelete, FileUploadItemMetadata } from "@/components/ui/file-upload";
-import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { CreateNotebookFormValues, UpdateNotebookFormValues } from "@/types/desk";
 import { MaterialType } from "@/features/notebook/domain/value-objects";
 import {  Pencil, Trash2, Upload, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCallback, useRef } from "react";
 import { NotebookMaterial } from "@/features/notebook/infrastructure/queries";
+import { InputField } from "@/components/form";
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 type MaterialUploadSectionProps = {
@@ -113,16 +114,13 @@ export function MaterialUploadSection({
           
         <FileUploadList>
         <Scroller
-    hideScrollbar
-    withNavigation
-    orientation="horizontal"
-    scrollTriggerMode="click"
-    scrollStep={300}
-    
-    
-    className="flex gap-4 snap-x snap-mandatory scroll-smooth"
-
-  >
+          hideScrollbar
+          withNavigation
+          orientation="horizontal"
+          scrollTriggerMode="click"
+          scrollStep={300}
+          className="flex gap-4 snap-x snap-mandatory scroll-smooth"
+          >
 
   
           {fields.map((field, index) => (
@@ -136,16 +134,17 @@ export function MaterialUploadSection({
               </div>
 
                 <div className="flex w-full items-center gap-2">
-              <Controller 
-                  
+              <InputField<CreateNotebookFormValues, `materials.${number}.type`>
+                label={`Material type ${index + 1}`}
+                showsLabel={false}
                 name={`materials.${index}.type`}  
-                control={control} 
-                render={({field, fieldState}) => ( 
-                <Field className="flex-1" aria-invalid={fieldState.invalid}>
+                renderInput={({field, fieldState}) => ( 
+               
                   <Select
                     name={field.name}
                     value={field.value ?? undefined}
-                    onValueChange={field.onChange}>
+                    onValueChange={field.onChange}
+                    >
                     <SelectTrigger
                       id="form-select-material-type"
                       aria-invalid={fieldState.invalid}
@@ -160,7 +159,7 @@ export function MaterialUploadSection({
                       ))}
                     </SelectContent>
                   </Select>
-                </Field>
+                
               )}/>
                 <input onChange={(e) => handleReplaceMaterial(index, e.target.files?.[0])} id="edit-material" type="file" ref={inputRef} className="hidden" />
                 

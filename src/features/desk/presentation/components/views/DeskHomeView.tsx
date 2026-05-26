@@ -1,18 +1,15 @@
 
 import { Column, ColumnProps } from "../columns/Column";
 import { DeskForDetail } from "@/features/desk/infrastructure/queries";
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui";
+import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Separator } from "@/components/ui";
 import {
-  BookOpen,
-  Users,
   TrendingUp,
   Clock,
   Star,
-  MessageSquare,
   ChevronRight,
   Calendar,
   Download,
@@ -25,7 +22,7 @@ import { Icon } from "@/components/shared";
 import notebookIcon from "@/assets/notebook-icon.png";
 import users from "@/assets/users.png";
 import chatBubble from "@/assets/chat-bubble.png";
-import { useDeskNotebookCards, useDeskNotebooks } from "@/features/notebook/presentation/hooks";
+import { useDeskNotebookCards } from "@/features/notebook/presentation/hooks";
 type DeskHomeViewProps = ColumnProps & {
   desk: DeskForDetail;
 }
@@ -33,20 +30,20 @@ type DeskHomeViewProps = ColumnProps & {
 export function DeskHomeView({ desk, ...props }: DeskHomeViewProps) {
   // Calculate desk statistics
   const {data: notebooks = []} = useDeskNotebookCards(desk.id);
-  const stats = useMemo(() => {
-    const totalNotebooks = notebooks.length;
-    const totalMembers = desk.members.length;
-    const totalDownloads = notebooks.reduce((acc, notebook) =>
-      acc + notebook.downloads.length, 0
-    );
-    const totalVotes = notebooks.reduce((acc, notebook) => {
-      const upvotes = notebook.votes.filter(v => v.isUpvote).length;
-      const downvotes = notebook.votes.filter(v => !v.isUpvote).length;
-      return acc + (upvotes - downvotes);
-    }, 0);
+  // const stats = useMemo(() => {
+  //   const totalNotebooks = notebooks.length;
+  //   const totalMembers = desk.members.length;
+  //   const totalDownloads = notebooks.reduce((acc, notebook) =>
+  //     acc + notebook.downloads.length, 0
+  //   );
+  //   const totalVotes = notebooks.reduce((acc, notebook) => {
+  //     const upvotes = notebook.votes.filter(v => v.isUpvote).length;
+  //     const downvotes = notebook.votes.filter(v => !v.isUpvote).length;
+  //     return acc + (upvotes - downvotes);
+  //   }, 0);
 
-    return { totalNotebooks, totalMembers, totalDownloads, totalVotes };
-  }, [desk.members.length, notebooks]);
+  //   return { totalNotebooks, totalMembers, totalDownloads, totalVotes };
+  // }, [desk.members.length, notebooks]);
 
   // Get featured content (most recent and popular)
   const featuredContent = useMemo(() => {

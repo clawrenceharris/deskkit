@@ -3,24 +3,20 @@ import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { ProfileAvatarField } from "../forms";
 import { useUpdateProfileForm } from "../../hooks";
 import { Button } from "@/components/ui";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { ProfileAvatar } from "./ProfileAvatar";
-import { ProfileTab, UpdateProfileFormValues } from "@/types/profile";
-import { useProfileContext } from "@/app/providers";
+import { UpdateProfileFormValues } from "@/types/profile";
 import { useActivityStatus } from "@/features/presence/presentation/hooks";
 import { ProfileAvatarWithStatus } from "@/features/presence/presentation/components";
 
 type ProfileHeaderProps = {
     profile: ProfileForDetail;
-    onEditUsernameClick: () => void;
 }
-export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps){
+export function ProfileHeader({profile}: ProfileHeaderProps){
     const {form, isLoading, updateProfile} = useUpdateProfileForm({profile});
     const {control, formState: { isDirty, isValid }, resetField} = form;
     
     const { user } = useAuth();
-    const { isCurrentUser } = useProfileContext();
     const activityStatus = useActivityStatus(profile.userId);
    
     function handleSubmit(data: UpdateProfileFormValues){
@@ -33,12 +29,12 @@ export function ProfileHeader({profile, onEditUsernameClick}: ProfileHeaderProps
         <div className="flex flex-col justify-start items-start gap-4">
          <div className="flex items-end gap-2">
           {profile.userId === user?.id ? (
-              <ProfileAvatarField
+              <ProfileAvatarField<UpdateProfileFormValues, "avatarFile">
                 profile={profile}
+                control={control}
                 status={activityStatus.status}
                 size="2xl"
                 isLoading={isLoading}
-                control={control}
                 name="avatarFile"
                 showLabel={false}
                 showDescription={false}

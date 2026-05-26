@@ -5,6 +5,7 @@ import { updateDeskSchema } from "@/lib/validation";
 import { useDesk, useUpdateDesk } from "./";
 import { UpdateDeskFormValues } from "@/types";
 import { UpdateDeskResult } from "../../application/dto";
+import { DeskVisibility } from "../../domain/value-objects";
 
 type UseUpdateDeskFormProps = {
     deskId: string;
@@ -20,7 +21,8 @@ export function useUpdateDeskForm ({deskId, onSuccess, onError}: UseUpdateDeskFo
             name: desk?.name ?? "",
             schoolId: desk?.schoolId ?? "",
             imageFile: null,
-            isPublic: desk?.isPublic ?? true,
+            visibility: desk?.visibility as DeskVisibility | undefined
+       
         },
     });
 

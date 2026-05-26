@@ -1,7 +1,6 @@
 import { ProfileForPolicy } from "@/features/profile/infrastructure/queries";
 import { DeskForDetail } from "../../infrastructure/queries";
 import { DeskVisibility, MemberRole } from "@/lib/db/prisma";
-import { SchoolForDetail } from "@/features/school/infrastructure/queries";
 import { DeskPolicy } from "./";
 
 export class DeskPolicyService implements DeskPolicy {

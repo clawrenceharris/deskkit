@@ -1,7 +1,7 @@
 "use client";
-import { useDeskContext, useSchoolContext, useUser } from "@/app/providers";
+import { useDeskContext, useUser } from "@/app/providers";
 import { EmptyState, LoadingState } from "@/components/states";
-import { NotebookForCard, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { NotebookForCard } from "@/features/notebook/infrastructure/queries";
 import { Plus } from "lucide-react";
 import { NotebookGridItem } from "../ui";
 import { DeskHeader } from "../ui/DeskHeader";
@@ -9,11 +9,10 @@ import { Column, ColumnProps } from "../columns";
 import { DeskForDetail } from "@/features/desk/infrastructure/queries";
 import { useModals } from "@/hooks/useModals";
 import { Button } from "@/components/ui";
-import { useDeskNotebookCards, useDeskNotebooks } from "@/features/notebook/presentation/hooks";
+import { useDeskNotebookCards } from "@/features/notebook/presentation/hooks";
 import { useSearch } from "@/hooks";
 import { SearchBar } from "@/components/shared";
 import { useDeskPolicy } from "../../hooks";
-import { cn } from "@/lib/utils";
 
 interface NotebooksViewProps extends ColumnProps {
   onNotebookClick: (notebook: NotebookForCard) => void;
@@ -27,7 +26,6 @@ export function DeskNotebooksView({
   const { modals: { "notebook:create": createNotebookModal }} = useModals();
   const { user } = useUser();
   const { currentNotebookId } = useDeskContext();
-  const { currentSchoolId } = useSchoolContext();
   function filterNotebooks(
     notebook: NotebookForCard,
     search: string

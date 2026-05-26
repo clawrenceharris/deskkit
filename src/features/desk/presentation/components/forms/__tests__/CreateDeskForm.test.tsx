@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateDeskForm } from "../CreateDeskForm";
+import { DeskVisibility } from "@/features/desk/domain/value-objects";
 
 const mocks = vi.hoisted(() => ({
   createDeskAction: vi.fn(),
@@ -70,7 +71,7 @@ describe("CreateDeskForm", () => {
         name: "Biology",
         schoolId: "0f6a30a1-3193-4948-aeb4-95a803b9ee7a",
         imageFile: null,
-        isPublic: true,
+        visibility: DeskVisibility.SCHOOL,
         description: "",
       });
       expect(onSuccess).toHaveBeenCalledWith(desk);

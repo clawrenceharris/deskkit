@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createDeskAction } from "@/actions/desk";
-import { ApplicationError } from "@/shared/utils/errors";
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { deskKeys } from "@/lib/queries/keys";
 import { CreateDeskInput, CreateDeskResult } from "../../application/dto";
 import { CreateDeskFormValues } from "@/types";
+import { DeskVisibility } from "../../domain/value-objects";
 
 type UseCreateDeskProps = {
     onSuccess?: (result: CreateDeskResult) => void;
@@ -38,7 +38,7 @@ export function useCreateDesk({userId, onSuccess, onError}: UseCreateDeskProps) 
         return await createDeskMutation.mutateAsync({
             ...data,
             creatorId: userId,
-            isPublic: data.isPublic ?? true,
+            visibility: data.visibility ?? DeskVisibility.SCHOOL,
             
         });
     }, [createDeskMutation, userId]);

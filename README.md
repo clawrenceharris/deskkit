@@ -1,10 +1,10 @@
-# deskkit
+# Deskitt
 
-deskkit is a collaborative study platform where students can discover and join desks, share notebooks and materials, and engage with content through downloads and votes.
+Deskitt is a collaborative study platform where students can discover and join desks, share notebooks and materials, and engage with content through downloads and votes.
 
 ## Purpose
 
-deskkit helps users:
+Deskitt helps users:
 
 - Create or join desks around classes, clubs, or topics
 - Upload and organize study materials inside notebooks

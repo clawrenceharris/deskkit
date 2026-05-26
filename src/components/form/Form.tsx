@@ -15,7 +15,6 @@ import { getUserErrorMessage } from "@/shared/utils";
 
 export interface FormProps<T extends FieldValues>{
   children?: ((methods: UseFormReturn<T>) => ReactNode) | ReactNode;
-  error?: {message: string};
   showsSubmitButton?: boolean;
   showsCancelButton?: boolean;
   submitText?: string;
@@ -78,7 +77,6 @@ function FormFooter({showsCancelButton,submitText, onCancel, cancelText, showsSu
 
 export function Form<T extends FieldValues>({
   children,
-  error,
   showsSubmitButton = true,
   showsCancelButton = false,
   submitText = "Done",

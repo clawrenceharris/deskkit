@@ -1,23 +1,19 @@
 "use client";
-import { useDeskContext, useLayout, useUser } from "@/app/providers";
+import { useDeskContext, useLayout } from "@/app/providers";
 import { useMediaQuery } from "@/hooks";
 import { DesksColumn, DeskColumn } from "@/features/desk/presentation/components/columns";
 import { NotebookColumn } from "./_components";
 import { AnimatePresence } from "motion/react";
 import { useHomeNavigation } from "@/app/providers";
-import { cn } from "@/lib/utils";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { RootHeader } from "@/components/shared/RootHeader";
-import { Footer } from "@/components/shared/Footer";
 import { startUiProfiler, stopUiProfiler } from "@/instrumentation";
 
 export function HomePageClient() {
   const {
     currentDeskId,
   } = useDeskContext();
-  const { profile } = useUser();
   const { isColumnOpen, isRightLayout } = useLayout();
-  const isRightMode = useMemo(() => isColumnOpen("right"), [isColumnOpen]);
   const {  
     materialIndex,
     setMaterialIndex,
@@ -113,7 +109,6 @@ export function HomePageClient() {
       
         
       </main>
-      <Footer profile={profile} />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { ProfileRepository } from "@/features/profile/domain/repositories";
 import { SchoolRepository } from "@/features/school/domain/repositories";
 import { DeskRepository } from "../../domain/repositories";
 import { GetDeskPolicyData } from "../types";
-import { DeskPolicyService, MyDeskPolicy, SchoolDeskPolicy } from "../../domain/services";
+import { DeskPolicyService, MyDeskPolicy } from "../../domain/services";
 import { DeskPolicyProviderInterface } from "../../domain/interfaces";
 import { DeskContent } from "../../domain/entities";
 import { ApplicationError } from "@/shared/utils/errors";

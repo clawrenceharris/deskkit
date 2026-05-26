@@ -1,7 +1,9 @@
+import { DeskVisibility } from "../../domain/value-objects";
+
 export type UpdateDeskData = {
     name?: string;
     schoolId?: string;
-    isPublic?: boolean;
+    visibility?: DeskVisibility;
     imageUrl?: string | null;
     deskId: string;
     imagePath?: string | null;

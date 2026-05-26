@@ -1,4 +1,4 @@
-import { notebookForCardArgs, notebookForDetailArgs } from "@/features/notebook/infrastructure/queries";
+import { notebookForCardArgs } from "@/features/notebook/infrastructure/queries";
 import { Prisma } from "@/lib/db/prisma";
 export const memberForDetailArgs = {
   select: {

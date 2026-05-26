@@ -58,11 +58,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             >
                 
                   
-              <InputField
-              control={form.control}
+              <InputField<ForgotPasswordFormValues, "email">
                 name="email"
                 label="Email"
                 placeholder="Your email"
+                required
               />
             
              

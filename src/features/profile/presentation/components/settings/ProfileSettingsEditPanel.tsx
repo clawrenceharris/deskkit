@@ -14,12 +14,11 @@ export function ProfileSettingsEditPanel({
   onSuccess,
 }: ProfileSettingsEditPanelProps) {
   const { form, isLoading, updateProfile } = useUpdateProfileForm({profile, onSuccess });
-  const { control} = form;
   
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-        <UpdateProfileForm control={control} isLoading={isLoading} form={form} onSubmit={updateProfile} submitText="Save" />
+        <UpdateProfileForm isLoading={isLoading} form={form} onSubmit={updateProfile} submitText="Save" />
       </div>
     </div>
   );

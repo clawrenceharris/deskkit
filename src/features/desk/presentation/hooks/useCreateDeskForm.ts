@@ -6,6 +6,7 @@ import { useProfile } from "@/features/profile/presentation/hooks";
 import { useCreateDesk } from "./";
 import { CreateDeskFormValues } from "@/types";
 import { CreateDeskResult } from "../../application/dto";
+import { DeskVisibility } from "../../domain/value-objects";
 
 type UseCreateDeskFormProps = {
     userId: string;
@@ -21,7 +22,7 @@ export function useCreateDeskForm ({userId, onSuccess, onError}: UseCreateDeskFo
             name: "",
             schoolId: profile?.schoolId ?? "",
             imageFile: null,
-            isPublic: true,
+            visibility: DeskVisibility.SCHOOL,
             description: "",
         },
     });

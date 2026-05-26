@@ -1,7 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {  updateDeskAction } from "@/actions/desk";
-import { ApplicationError } from "@/shared/utils/errors";
-import { toast } from "sonner";
 import { useCallback } from "react";
 import { deskKeys } from "@/lib/queries/keys";
 import { UpdateDeskFormValues } from "@/types";

@@ -5,6 +5,7 @@ import { DeskRepository } from "../../../domain/repositories";
 import { DeskStorage } from "../../../domain/services";
 import { ApplicationError } from "@/shared/utils/errors";
 import { Desk } from "@/lib/db/prisma";
+import { DeskVisibility } from "../../../domain/value-objects";
 import { AppErrorCode } from "@/types";
 
 // Helper to create a mock DeskRepository
@@ -44,7 +45,7 @@ describe("CreateDeskUseCase", () => {
         id: "1",
         name: "Test Desk",
         schoolId: "1",
-        isPublic: true,
+        visibility: DeskVisibility.SCHOOL,
         creatorId: "1",
         imageUrl: "test.png",
         imagePath: "test.png",
@@ -54,7 +55,7 @@ describe("CreateDeskUseCase", () => {
         id: "1",
         name: "Test Desk",
         schoolId: "1",
-        isPublic: true,
+        visibility: DeskVisibility.SCHOOL,
         creatorId: "1",
         imageUrl: "test.png",
         imagePath: "test.png",
@@ -75,7 +76,7 @@ describe("CreateDeskUseCase", () => {
     const desk = await createDeskUseCase.execute({
       name: "Test Desk",
       schoolId: "1",
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       creatorId: "1",
       imageFile: new File([], "test.png"),
     });
@@ -86,7 +87,7 @@ describe("CreateDeskUseCase", () => {
       schoolId: "1",
       imageUrl: null,
       imagePath: null,
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       description: null,
     });
     expect(storage.uploadImage).toHaveBeenCalledWith({
@@ -102,7 +103,7 @@ describe("CreateDeskUseCase", () => {
         id: "1",
         name: "Test Desk",
         schoolId: "1",
-        isPublic: true,
+        visibility: DeskVisibility.SCHOOL,
         creatorId: "1",
         imageUrl: "test.png",
         imagePath: "test.png",
@@ -121,7 +122,7 @@ describe("CreateDeskUseCase", () => {
     const desk = await createDeskUseCase.execute({
       name: "Test Desk",
       schoolId: "1",
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       creatorId: "1",
       imageFile: new File([], "test.png"),
     });
@@ -141,7 +142,7 @@ describe("CreateDeskUseCase", () => {
     const desk = await createDeskUseCase.execute({
       name: "Test Desk",
       schoolId: "1",
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       creatorId: "1",
       imageFile: new File([], "test.png"),
     });
@@ -158,7 +159,7 @@ describe("CreateDeskUseCase", () => {
         id: "1",
         name: "Test Desk",
         schoolId: "1",
-        isPublic: true,
+        visibility: DeskVisibility.SCHOOL,
         creatorId: "1",
         imageUrl: null,
         imagePath: null,
@@ -179,7 +180,7 @@ describe("CreateDeskUseCase", () => {
     await createDeskUseCase.execute({
       name: "Test Desk",
       schoolId: "1",
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       creatorId: "1",
       imageFile: new File([], "test.png"),
     });

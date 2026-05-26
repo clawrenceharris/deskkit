@@ -1,7 +1,6 @@
 import { DeskSection } from "@/app/providers/HomeNavigationProvider";
-import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { Lock, LockIcon } from "lucide-react";
+import { Lock } from "lucide-react";
 import { motion, type TargetAndTransition } from "motion/react";
 import type { ReactNode } from "react";
 

@@ -1,6 +1,6 @@
 import { Avatar } from "@/components/ui/avatar";
 import { ProfileForButton } from "../../../infrastructure/queries";
-import { AvatarBadge, AvatarImage, AvatarFallback } from "@/components/ui";
+import { AvatarImage, AvatarFallback } from "@/components/ui";
 import { UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActivityStatusIndicator } from "@/components/shared";
@@ -21,7 +21,7 @@ export function ProfileAvatar({profile, previewUrl, status, statusClassName, cla
       {...props}
     >
       {status &&  (
-         <ActivityStatusIndicator status={status}/>
+         <ActivityStatusIndicator statusClassName={statusClassName} status={status}/>
       )}
       <AvatarImage
         src={previewUrl ?? profile?.avatarUrl ?? undefined}

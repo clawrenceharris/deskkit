@@ -48,8 +48,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
             onSubmit={handleResetPassword}
             
           >
-              <InputField
-                control={form.control}
+              <InputField<ResetPasswordFormValues, "newPassword">
                 label="New password"
                 name="newPassword"
               />

@@ -1,34 +1,35 @@
-import {  Button, Field, FieldContent, FieldDescription, FieldError, FieldLabel   } from "@/components/ui";
-import { useEffect, useMemo, useState } from "react";
-import { Control, Controller, FieldValues, Path, useWatch } from "react-hook-form";
+import {  Button   } from "@/components/ui";
+import { useEffect, useState } from "react";
+import { Control, FieldValues, Path, useWatch } from "react-hook-form";
 import { Profile } from "../../../infrastructure/queries";
 import { Loader2, Pencil, Trash2} from "lucide-react";
 import { ProfileAvatar } from "../ui";
 import { cn } from "@/lib/utils";
+import { InputField } from "@/components/form";
 
-const AVATAR_INPUT_ID = "profileImage-upload";
+const AVATAR_INPUT_ID = "avatar-image-upload";
 
-type ProfileAvatarFieldProps<T extends FieldValues> = {
-    control: Control<T>;
+type ProfileAvatarFieldProps<T extends FieldValues, U extends Path<T>> = {
     profile: Profile | null;
+    control: Control<T>;
     showLabel?: boolean;
     showDescription?: boolean;
     className?: string;
-    name: Path<T>;
+    name: U;
     isLoading?: boolean;
     
   } & React.ComponentProps<typeof ProfileAvatar>;
 
-export function ProfileAvatarField<T extends FieldValues>({
-  control,
+export function ProfileAvatarField<T extends FieldValues, U extends Path<T>>({
   profile,
-  showLabel, 
-  showDescription,
+  control,
+  showLabel = true, 
+  showDescription = true,
   isLoading,
   className,
   name,
   ...props
-}: ProfileAvatarFieldProps<T>) {
+}: ProfileAvatarFieldProps<T, U>) {
   const file = useWatch({ control, name });
   
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -54,34 +55,24 @@ export function ProfileAvatarField<T extends FieldValues>({
     };
   }, [file]);
   return (
-    <Controller
+    <InputField<T, U>
       name={name}
-      control={control}
-      render={({ field, fieldState }) => (
-        <Field
-          className={cn("flex flex-col items-center", className, isLoading && "pointer-events-none opacity-50"  )}
-          data-invalid={fieldState.invalid ? true : undefined}
-        >
-          <FieldContent className="items-center text-center">
-            {showLabel && <FieldLabel htmlFor={AVATAR_INPUT_ID}>
-              Profile photo
-              <span className="text-muted-foreground text-sm font-normal">
-                (Optional)
-              </span>
-            </FieldLabel>}
-            {showDescription && <FieldDescription>
-              JPG, PNG or GIF. Square images work best.
-            </FieldDescription>}  
-          </FieldContent>
+      label="Profile photo"
+      showsLabel={showLabel}
+      showsDescription={showDescription}
+      className={className}
+      description={"JPG, PNG or GIF. Square images work best."}
+      renderInput={({ field, fieldState }) => (
+        
           <div className="relative w-full flex justify-center">
             <label
               htmlFor={AVATAR_INPUT_ID}
               className="group relative flex max-w-24 h-24 w-full cursor-pointer justify-center rounded-full transition-all duration-300 hover:shadow-lg shadow-secondary/50"
             >
               <ProfileAvatar 
-              profile={profile} 
-              previewUrl={previewUrl ?? profile?.avatarUrl} 
-              {...props}
+                profile={profile} 
+                previewUrl={previewUrl ?? profile?.avatarUrl} 
+                {...props}
               />
               <div
                   className={cn("pointer-events-none absolute inset-0 flex items-center justify-center rounded-full",
@@ -117,11 +108,6 @@ export function ProfileAvatarField<T extends FieldValues>({
               <Trash2 className="size-4" />
             </Button>}
           </div>
-          {fieldState.invalid ? (
-            <FieldError errors={[fieldState.error]} />
-          ) : null}
-        </Field>
-  
       )}
     />
   );

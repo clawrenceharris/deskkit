@@ -2,7 +2,7 @@ import { ProfileTab, SettingsAction } from "@/types";
 import { ProfileNotebooksView } from ".";
 import { ProfileSettingsStack } from "../settings";
 import { MinimalDeskListItem } from "@/features/desk/presentation/components/ui/MinimalDeskListItem";
-import { AtSign, GraduationCap, Pencil } from "lucide-react";
+import { GraduationCap, Pencil } from "lucide-react";
 import { Button } from "@/components/ui";
 import { ProfileHeader, ProfileNavbar } from "../ui";
 import { useState } from "react";
@@ -24,10 +24,7 @@ export function ProfileView({ profile }: ProfileViewProps){
   const { signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.PROFILE);
   const { isCurrentUser } = useProfileContext();
-  function handleEditUsernameClick() {
-    setActiveTab(ProfileTab.SETTINGS);
-    settings.push("edit-profile");
-  }
+  
   const settings = useUserSettings();
 
   function handleAction(action: SettingsAction) {
@@ -64,7 +61,6 @@ export function ProfileView({ profile }: ProfileViewProps){
           <div className="flex flex-col min-h-0 flex-1 px-5 py-3">
             
             <ProfileHeader
-              onEditUsernameClick={handleEditUsernameClick}
               profile={profile} />
             {isCurrentUser && (
               <div className="w-full max-w-[190px] mt-4 flex flex-col gap-2">

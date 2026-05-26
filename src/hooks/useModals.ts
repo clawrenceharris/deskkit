@@ -1,13 +1,13 @@
 import { useDeskContext, useModal } from "@/app/providers";
 import { DESK_MODAL_TYPES } from "@/features/desk/presentation/components/modals";
 import { NOTEBOOK_MODAL_TYPES } from "@/features/notebook/presentation/components/modals";
-import { CreateNotebookModalProps, CreateDeskModalProps, CreateProfileModalProps, UpdateDeskModalProps, UpdateProfileModalProps, DeleteDeskModalProps, ConfirmationModalProps, UpdateNotebookModalProps } from "@/lib/modals/types";
+import { CreateNotebookModalProps, CreateDeskModalProps, CreateProfileModalProps, UpdateDeskModalProps, UpdateProfileModalProps, ConfirmationModalProps, UpdateNotebookModalProps } from "@/lib/modals/types";
 import { PROFILE_MODAL_TYPES } from "@/features/profile/presentation/components/modals";
 import { useQueryClient } from "@tanstack/react-query";
 import { notebookKeys, deskKeys, profileKeys } from "@/lib/queries/keys";
 import { toast } from "sonner";
 import { CreateNotebookResult, UpdateNotebookResult } from "@/features/notebook/application/dto";
-import { CreateDeskResult, DeleteDeskResult, UpdateDeskResult } from "@/features/desk/application/dto";
+import { CreateDeskResult, UpdateDeskResult } from "@/features/desk/application/dto";
 import { CreateProfileResult, UpdateProfileResult } from "@/features/profile/application/dto";
 
 
@@ -28,12 +28,7 @@ export function useModals() {
         toast.success("Desk updated successfully");
         closeModal();
     }
-    function handleDeleteDesk (result: DeleteDeskResult) {
-        queryClient.invalidateQueries({ queryKey: deskKeys.lists() });
-        queryClient.invalidateQueries({ queryKey: deskKeys.detail(result.deskId) });
-        toast.success("Desk deleted successfully");
-        closeModal();
-    }
+   
     function handleCreateNotebook (result: CreateNotebookResult) {
         queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(result.deskId) });
         queryClient.invalidateQueries({ queryKey: notebookKeys.listByUserId(result.creatorId) });

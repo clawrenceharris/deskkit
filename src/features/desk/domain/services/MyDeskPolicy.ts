@@ -1,6 +1,5 @@
 import { DeskPolicyService } from ".";
 import { ProfileForPolicy } from "@/features/profile/infrastructure/queries";
-import { SchoolForPolicy } from "@/features/school/infrastructure/queries";
 import { MemberRole } from "@/lib/db/prisma";
 import { DeskForDetail } from "../../infrastructure/queries";
 

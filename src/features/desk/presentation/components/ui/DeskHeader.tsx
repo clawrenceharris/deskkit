@@ -1,5 +1,5 @@
 
-import { NotebookForCard, NotebookForDetail } from "@/features/notebook/infrastructure/queries";
+import { NotebookForCard } from "@/features/notebook/infrastructure/queries";
 import { useMemo } from "react";
 
 interface DeskHeaderProps {
@@ -24,7 +24,6 @@ export function DeskHeader({notebooks}: DeskHeaderProps) {
           <div
             style={{
               flex: 1,
-
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",

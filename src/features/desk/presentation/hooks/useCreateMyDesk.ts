@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import { createMyDeskAction } from "@/actions/desk";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys } from "@/lib/queries";
 
 export function useCreateMyDesk() {

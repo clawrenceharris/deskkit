@@ -3,39 +3,26 @@
 import { Form, FormProps, InputField } from "@/components/form";
 import { FieldGroup } from "@/components/ui";
 import { UpdateProfileFormValues } from "@/types/profile";
-import { Control } from "react-hook-form";
 
-type UpdateProfileFormProps = FormProps<UpdateProfileFormValues> & {
-  control: Control<UpdateProfileFormValues>
-};
-
-
-export function UpdateProfileForm({
-  control,
-  ...formProps
-
-}: UpdateProfileFormProps) {
+export function UpdateProfileForm(props: FormProps<UpdateProfileFormValues>) {
   return (
     <Form<UpdateProfileFormValues>
         showsCancelButton={false}
-
-        {...formProps}
+        {...props}
         >
        
       <FieldGroup>
-        <InputField
+        <InputField<UpdateProfileFormValues, "displayName">
           placeholder="Display name"
           name="displayName"
           required={false}
           label="Display name"
-          control={control}
         />
-        <InputField
+        <InputField<UpdateProfileFormValues, "username">
           placeholder="Username"
           name="username"
           required
           label="Username"
-          control={control}
         />
       </FieldGroup>
     </Form>

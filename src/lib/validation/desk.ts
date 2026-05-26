@@ -1,3 +1,4 @@
+import { DeskVisibility } from "@/features/desk/domain/value-objects";
 import z from "zod";
 
 export const createDeskSchema = z.object({
@@ -9,7 +10,7 @@ export const createDeskSchema = z.object({
   imageFile: z.instanceof(File)
     .refine((f) => f && f.size <= 10 * 1024 * 1024, "Image must be 10MB or smaller")
     .refine((f) => f && f.type.startsWith("image/"), "Please choose an image file").nullable().optional(),
-  isPublic: z.boolean().optional(),
+  visibility: z.enum(DeskVisibility).optional(),
   description: z.string().optional(),
   
 });

@@ -3,25 +3,17 @@ import { Form, InputField } from "@/components/form";
 import { CreateDeskFormValues } from "@/types";
 import { useCreateDeskForm } from "../../hooks";
 import {SearchSelect} from "@/components/shared";
-import { Switch } from "@/components/ui";
 import { useSchools } from "@/features/school/presentation/hooks";
 import { CreateDeskModalProps } from "@/lib/modals/types";
+import { RadioGroup, RadioGroupItem } from "@/components/ui";
 
 
 
 export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDeskModalProps) {
   const {form, createDesk, isLoading} = useCreateDeskForm({userId, onSuccess, onError});
-  const {control, setValue} = form;
   const {data: schools = [], isLoading: isLoadingSchools} = useSchools();  
   
-  const handleSchoolChange = (value: string) => {
-    if(value.startsWith("__new__:")) {
-      const newSchoolName = value.split("__new__:")[1];
-      console.log(newSchoolName);
-    } else {
-      setValue("schoolId", value);
-    }
-  }
+  
   return (
     <Form<CreateDeskFormValues>
       form={form}
@@ -31,22 +23,20 @@ export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDesk
       enableBeforeUnloadProtection
     >
     
-        <InputField
+        <InputField<CreateDeskFormValues, "name">
           name="name"
-          control={control}
           label="Name"
           placeholder="Enter the name of the desk"
           required
         />
         
-        <InputField 
+        <InputField<CreateDeskFormValues, "schoolId">
         
-        name="schoolId"
-        control={control}
-        label="School"
-        placeholder="Select a school"
-        required
-        renderInput={() => (
+          name="schoolId"
+          label="School"
+          placeholder="Select a school"
+          required
+          renderInput={({field}) => (
 
             <SearchSelect
               items={schools.map((school) => ({
@@ -54,31 +44,29 @@ export function CreateDeskForm({userId,onCancel, onSuccess, onError}: CreateDesk
                 label: school.name,
               }))}
               disabled={isLoadingSchools}
-              value={form.getValues("schoolId")}
-              onChange={handleSchoolChange}
+              value={field.value}
+              onChange={field.onChange}
               placeholder="Select a school"
               searchPlaceholder="Find a school"
               newItemLabel="Add school"
             />
-        )}
+          )}
         
         />
        
-        <InputField<CreateDeskFormValues>
-          name="isPublic"
-          control={control}
+        <InputField<CreateDeskFormValues, "visibility">
+          name="visibility"
           label="Privacy"
           required={false}
           renderInput={({ field }) => (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Public</span>
-              <Switch
-                size="lg"
-                checked={field.value as boolean}
-                onCheckedChange={field.onChange}
-                id="isPublic-switch"
-                name="isPublic"
-              />
+              <RadioGroup value={field.value} onValueChange={field.onChange}>
+                <RadioGroupItem value="PUBLIC">Public</RadioGroupItem>
+                <RadioGroupItem value="PRIVATE">Private</RadioGroupItem>
+                <RadioGroupItem value="SCHOOL">School</RadioGroupItem>
+                <RadioGroupItem value="RESTRICTED">Restricted</RadioGroupItem>
+              </RadioGroup>
             </div>
             )}
           />

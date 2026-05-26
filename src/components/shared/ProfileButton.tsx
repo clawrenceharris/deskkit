@@ -15,7 +15,6 @@ export function ProfileButton({
   showsName,
   nameClassName,
   profile,
-  disabled,
   className,
   ...props
 }: ProfileButtonProps) {

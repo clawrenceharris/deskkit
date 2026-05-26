@@ -7,10 +7,10 @@ import { createNotebookSchema } from "@/lib/validation";
 import { useCallback } from "react";
 import { createNotebookAction } from "@/actions/notebook";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApplicationError } from "@/shared/utils/errors";
 import { deskKeys, notebookKeys } from "@/lib/queries";
 import { CreateNotebookResult } from "@/features/notebook/application/dto";
 import { DeskForDetail } from "@/features/desk/infrastructure/queries";
+import { NotebookForCard } from "../../infrastructure/queries";
 
 type UseCreateNotebookFormProps = {
     deskId: string;
@@ -63,19 +63,21 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
                 id: tempId,
                 title: data.title,
                 deskId,
-                creator: { 
-                    userId: userId ?? "", 
-                    username: "", 
-                    displayName: null, 
-                    avatarUrl: null 
+                creator: {
+                    userId: userId ?? "",
+                    username: "",
+                    displayName: null,
+                    avatarUrl: null
                 },
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 votes: [],
                 downloads: [],
                 materials: [],
-                
-            };
+                description: data.description ?? null,
+                creatorId: userId ?? "",
+                isLocked: false,
+            }  as NotebookForCard;
 
             if (previousDesk) {
                 queryClient.setQueryData<DeskForDetail>(deskKeys.detail(deskId, "detail"), {
@@ -94,6 +96,7 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
 
             return { previousDesk, previousUserDesks, tempId };
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onSuccess: (data, _variables, _context: any) => {
             onSuccess?.(data);
             queryClient.invalidateQueries({ queryKey: notebookKeys.listByDeskId(deskId) });

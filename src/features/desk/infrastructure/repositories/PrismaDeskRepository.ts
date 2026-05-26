@@ -1,6 +1,6 @@
-import { type Desk, deskArgs, DeskForCard, type DeskForDetail, myDeskForDetailArgs, schoolDeskForDetailArgs } from "../queries";
+import { type Desk, type DeskForDetail, myDeskForDetailArgs, schoolDeskForDetailArgs } from "../queries";
 import { CreateSchoolDeskInput, JoinOrLeaveDeskInput, UpdateDeskInput } from "../../application/dto";
-import {  MemberRole, Prisma, PrismaClient } from "@/lib/db/prisma";
+import {  DeskVisibility, MemberRole, Prisma, PrismaClient } from "@/lib/db/prisma";
 import { DeskReadRepository, DeskRepository } from "../../domain/repositories";
 import { CreateDeskData } from "../types";
 import { PrismaDeskReadRepository } from "./PrismaDeskReadRepository";
@@ -13,12 +13,12 @@ export class PrismaDeskRepository implements DeskRepository {
     this.query = new PrismaDeskReadRepository(prisma);
     this.prisma = prisma;
   }
-  async createDesk({name, schoolId, creatorId, isPublic, imageUrl, imagePath, description}: CreateDeskData): Promise<Desk> {
+  async createDesk({name, schoolId, creatorId, visibility, imageUrl, imagePath, description}: CreateDeskData): Promise<Desk> {
    const data: Prisma.DeskCreateInput = {
     name,
     school: { connect: { id: schoolId } },
     creator: { connect: { userId: creatorId } },
-    isPublic,
+    visibility,
     imageUrl,
     imagePath,
     description,
@@ -68,7 +68,7 @@ export class PrismaDeskRepository implements DeskRepository {
     const deskData: Prisma.DeskCreateInput = {
       name: `${input.schoolName} Desk`,
       school: { connect: { id: input.schoolId } },
-      isPublic: true,
+      visibility: DeskVisibility.SCHOOL,
       creator: { connect: { userId: "system" } },
       members: { create: { profile: { connect: { userId: "system" } }, role: MemberRole.CONTRIBUTOR } }
     };
@@ -100,7 +100,7 @@ export class PrismaDeskRepository implements DeskRepository {
     const deskData: Prisma.DeskCreateInput = {
       name: `${profile.displayName}'s Desk`,
       creator: { connect: { userId: profile.userId } },
-      isPublic: false,
+      visibility: DeskVisibility.PRIVATE,
       members: { create: { profile: { connect: { userId: profile.userId } }, role: MemberRole.OWNER } },
     };
     const desk = await this.prisma.desk.create({ data: deskData });

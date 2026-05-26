@@ -2,30 +2,21 @@ import { Form, FormProps, InputField } from "@/components/form";
 import { SearchSelect } from "@/components/shared/SearchSelect";
 import { UpdateProfileFormValues } from "@/types/profile";
 import { useSchools } from "@/features/school/presentation/hooks";
-import { Control, useController } from "react-hook-form";
-type UpdateSchoolsFormProps = FormProps<UpdateProfileFormValues> & {
-  control: Control<UpdateProfileFormValues>
-};
 
 
-export function UpdateSchoolsForm({control, form, ...formProps}: UpdateSchoolsFormProps) {
+
+export function UpdateSchoolsForm(props: FormProps<UpdateProfileFormValues>) {
     const {data: schools = [], isLoading: isLoadingSchools} = useSchools();
-    const {field} = useController({
-      control: control,
-      name: "schoolId",
-    });
     return (
     <Form<UpdateProfileFormValues> 
-      form={form}
-      {...formProps}
+      {...props}
     >
 
-        <InputField
+        <InputField<UpdateProfileFormValues, "schoolId">
           name="schoolId"
-          control={control}
           label="My School"
           placeholder="Select a school"
-          renderInput={() => (
+          renderInput={({field}) => (
             <SearchSelect
               items={schools.map((school) => ({
                 value: school.id,

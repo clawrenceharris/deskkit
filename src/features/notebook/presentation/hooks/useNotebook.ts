@@ -45,3 +45,23 @@ export function useNotebook(notebookId: string | null) {
         retry: 1,
     });
 }
+
+export function useNotebookDetail(notebookId: string | null) {
+    return useQuery({
+        queryKey: notebookKeys.detail(notebookId ?? ""),
+        queryFn: async () => {
+            if(!notebookId){
+                throw new Error("notebookId is required to fetch a notebook.");
+            }
+            const result = await withTimeout(
+                getNotebookDetailAction(notebookId),
+                DESK_ITEM_QUERY_TIMEOUT_MS,
+                "Loading this notebook is taking longer than expected. Please try again."
+            );
+            if(!result.success){
+                throw result.error;
+            }
+            return result.data;
+        },
+    });
+}

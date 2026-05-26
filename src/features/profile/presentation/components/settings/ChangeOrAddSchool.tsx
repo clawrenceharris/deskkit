@@ -10,7 +10,6 @@ type ChangeOrAddSchoolProps = {
 export function ChangeOrAddSchool({profile, onSuccess, }: ChangeOrAddSchoolProps){
 
     const { form, updateProfile, isLoading } = useUpdateProfileForm({profile, onSuccess});
-    const { control } = form;
    
     return (
         <div className="flex h-full min-h-0 flex-col">
@@ -18,7 +17,6 @@ export function ChangeOrAddSchool({profile, onSuccess, }: ChangeOrAddSchoolProps
         <div className="min-h-0 mt-5 overflow-y-auto px-4 pb-4">
           <UpdateSchoolsForm
             isLoading={isLoading} 
-            control={control} 
             form={form} 
             onSubmit={updateProfile} 
             submitText="Save"

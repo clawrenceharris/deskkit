@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UpdateNotebookFormValues } from "@/types";
-import { useNotebook } from "./useNotebook";
+import { useNotebookDetail } from "./useNotebook";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateNotebookSchema } from "@/lib/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateNotebookAction } from "@/actions/notebook";
-import { ApplicationError } from "@/shared/utils/errors";
 import { useCallback, useState, useEffect } from "react";
 import { deskKeys, notebookKeys } from "@/lib/queries";
 import { withTimeout } from "@/shared/utils/withTimeout";
@@ -20,7 +19,7 @@ type UseUpdateNotebookFormProps = {
 }
 export function useUpdateNotebookForm({notebookId, onSuccess, onError}: UseUpdateNotebookFormProps) {
     const queryClient = useQueryClient();
-    const { data: notebook } = useNotebook(notebookId);
+    const { data: notebook } = useNotebookDetail(notebookId);
     const form = useForm<UpdateNotebookFormValues>({
         resolver: zodResolver(updateNotebookSchema),
         defaultValues: {
