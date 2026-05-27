@@ -30,6 +30,10 @@ export function HomePageClient() {
    
     if(currentDeskId ) {
       e.preventDefault();
+      if(isExpandedMode) {
+        handleExitExpandedLayout();
+        return;
+      }
     }
     handleDeskExit();
   }

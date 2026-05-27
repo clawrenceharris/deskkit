@@ -4,7 +4,7 @@ import { Column, type ColumnProps } from "@/components/shared";
 import { DeskDashboardColumn } from "./";
 import { DeskSection, useDeskContext, useHomeNavigation, useLayout, useSchoolContext, useUser } from "@/app/providers";
 import { Button, Card, CardDescription, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui";
-import { ChevronDown, ChevronLeft, ChevronRight, Loader2, LogOut, Plus, Settings, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, LogOut, Plus, Settings, Trash2, X } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
@@ -111,7 +111,7 @@ export function DesksColumn ({
             size="sm"
             onClick={() => onDeskClick(currentDesk)}
           >
-            <span title={currentDesk.name} className="truncate w-full max-w-[270px]">
+            <span title={currentDesk.name} className="truncate max-w-[270px]">
               {currentDesk.name}
             </span>
             <ChevronDown strokeWidth={3} />
@@ -196,10 +196,16 @@ export function DesksColumn ({
       headerRight={!currentDesk ? headerRight : undefined}
       contentContainerClassName="flex relative flex-col overflow-hidden"
       hideContentOnCollapse={false}
-      showsHeader={isExpandedMode || isRightLayout}
-      toggle={<Button variant="ghost" size="icon" onClick={onCollapse}>
-        <ChevronLeft strokeWidth={3}/>
-      </Button>}
+      toggle={
+        isExpandedMode || isRightLayout ? (
+        <Button variant="ghost" size="icon" onClick={onCollapse}>
+          <ChevronRight strokeWidth={3}/>
+        </Button>
+      ) : (
+        <Button variant="ghost" size="icon" onClick={onCollapse}>
+          <ChevronLeft strokeWidth={3}/>
+        </Button>
+      )}
     >  
       {isExpandedMode || isRightLayout ? (
          <div className="flex flex-col gap-4 h-full max-h-[400px] items-center justify-between p-4">
@@ -209,7 +215,7 @@ export function DesksColumn ({
           className="flex-1 h-full border-0"
           sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members]}
           showsLabels={false}
-          disabled={!policy?.canView || !policy?.canPreview}
+          disabled={!policy || !policy.canView}
           onNavigate={handleSectionClick}
           orientation="vertical"
         />

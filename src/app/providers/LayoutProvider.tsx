@@ -25,6 +25,7 @@ interface LayoutContextType {
   openExpandedLayout: () => void;
   closeRightLayout: () => void;
   openLeftLayout: () => void;
+  closeExpandedLayout: () => void;
 }
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 const useLayout = () => {
@@ -98,6 +99,11 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
     setIsExpandedMode(true);
 }, [commitColumns]);
 
+  const closeExpandedLayout = useCallback(() => {
+    commitColumns(["left"]);
+    setIsExpandedMode(false);
+  }, [commitColumns]);
+
 
   const closeRightLayout = useCallback(() => {
     setRightMode("notebook");
@@ -164,8 +170,9 @@ const LayoutProvider = ({ children, initialColumns }: LayoutProviderProps) => {
       openRightLayout,
       openLeftLayout,
       openDeskLayout,
+      closeExpandedLayout,
     }),
-    [closeColumn,openDeskLayout, closeRightLayout, isColumnOpen, isExpandedMode, openColumn, openColumns, openExpandedLayout, openLeftLayout, openRightLayout, rightMode],
+    [closeColumn,openDeskLayout, closeRightLayout, isColumnOpen, isExpandedMode, openColumn, openColumns, openExpandedLayout, openLeftLayout, openRightLayout, rightMode, closeExpandedLayout],
   );
 
   return (
