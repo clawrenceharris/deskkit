@@ -1,4 +1,4 @@
-import { ProfileTab, SettingsAction } from "@/types";
+import { ProfileTab, SettingsAction, SettingsRoute } from "@/types";
 import { ProfileNotebooksView } from ".";
 import { ProfileSettingsStack } from "../settings";
 import { MinimalDeskListItem } from "@/features/desk/presentation/components/ui/MinimalDeskListItem";
@@ -45,9 +45,9 @@ export function ProfileView({ profile }: ProfileViewProps){
       settings.pop();
     }
   };
-  function handleEditSchoolClick() {
+  function handleSettingsRouteClick(route: Exclude<SettingsRoute, "menu">) {
     setActiveTab(ProfileTab.SETTINGS);
-    settings.push("manage-school");
+    settings.push(route);
   }
 
  
@@ -64,7 +64,7 @@ export function ProfileView({ profile }: ProfileViewProps){
               profile={profile} />
             {isCurrentUser && (
               <div className="w-full max-w-[190px] mt-4 flex flex-col gap-2">
-                <Button variant="secondary" className="w-full rounded-xl">
+                <Button onClick={() => handleSettingsRouteClick("edit-profile")} variant="secondary" className="w-full rounded-xl">
                   Edit Profile
                 </Button>
                 <ActivityStatusPicker />
@@ -78,14 +78,17 @@ export function ProfileView({ profile }: ProfileViewProps){
                     <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
                       <GraduationCap className="size-5" />
                       {profile.school.name}
-                      { isCurrentUser && <Button
-                        onClick={handleEditSchoolClick}
-                        size="icon-sm"
-                        variant="ghost"
-                        className="text-muted-foreground"
-                      >
-                        <Pencil className="size-3" strokeWidth={3} />
-                      </Button> }
+                      
+                      {isCurrentUser && (
+                          <Button
+                          onClick={()  => handleSettingsRouteClick("manage-school")}
+                          size="icon-sm"
+                          variant="ghost"
+                          className="text-muted-foreground"
+                        >
+                          <Pencil className="size-3" strokeWidth={3} />
+                        </Button>
+                      )}
                     </span>
                   ) : null}
             </div>
