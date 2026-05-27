@@ -4,3 +4,4 @@ export * from "./useNotebooks";
 export * from "./useDownloadNotebook";
 export * from "./useNotebook";
 export * from "./useDeleteNotebook";
+export * from "./useNotebookPolicy";

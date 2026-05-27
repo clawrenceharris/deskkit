@@ -10,6 +10,7 @@ export const notebookArgs = {
     description: true,
     createdAt: true,
     updatedAt: true,
+    isLocked: true,
   },
 } satisfies Prisma.NotebookDefaultArgs;
 

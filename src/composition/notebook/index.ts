@@ -4,3 +4,4 @@ export * from "./makeDownloadNotebookUseCase";
 export * from "./makeDeleteNotebookUseCase";
 export * from "./makeUpdateNotebookUseCase";
 export * from "./makeNotebookReadService";
+export * from "./makeGetNotebookPolicyUseCase";

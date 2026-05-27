@@ -10,13 +10,12 @@ import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
 import { useCreateMyDesk, useCreateSchoolDesk, useDesk, useMyDesk, useSchoolDeskDetail, useDeskPolicy } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
-import { Icon, SearchBar } from "@/components/shared";
+import { SearchBar } from "@/components/shared";
 import { useSchool } from "@/features/school/presentation/hooks";
 import { motion } from "motion/react";
 import { useJoinedDesksCard, useDeleteDesk, useJoinOrLeaveDesk } from "../../hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { deskKeys } from "@/lib/queries";
-import deskIcon from "@/assets/desk-icon.png";
 import { Desk } from "@/features/desk/infrastructure/queries";
 import { toast } from "sonner";
 
@@ -36,7 +35,7 @@ export function DesksColumn ({
   onCollapse,
   ...props
 }: DesksColumnProps) {
-  const { user, profile } = useUser();
+  const { user } = useUser();
   const { currentDeskId } = useDeskContext();
   const { data: desks = [], isLoading: isLoadingDesks, error } = useJoinedDesksCard(user.id);
 
@@ -57,7 +56,6 @@ export function DesksColumn ({
   const { handleSectionClick } = useHomeNavigation();
   const { leaveDesk } = useJoinOrLeaveDesk();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: myDesk, isLoading: isLoadingMyDesk } = useDesk(profile.myDesk?.desk.id ?? null);
   const { data: policy, isLoading: isLoadingDeskPolicy } = useDeskPolicy({deskId: currentDeskId, userId: user.id});
   const { deleteDesk } = useDeleteDesk();
   
@@ -142,6 +140,7 @@ export function DesksColumn ({
     )
   )
   const headerRight = (
+  
     <div className="flex items-center gap-2">
       <SearchBar
         placeholder="Search desks"
@@ -157,7 +156,8 @@ export function DesksColumn ({
         <Plus strokeWidth={3}/>
       </Button>
     </div>
-  );
+    );
+  
   
   if(query && isFilteredDesksLoading) {
     return (
@@ -192,18 +192,19 @@ export function DesksColumn ({
   return (
     <Column 
       {...props}
-      title={renderDeskTitle()}
+      title={isExpandedMode || isRightLayout ? undefined : renderDeskTitle()}
       headerRight={!currentDesk ? headerRight : undefined}
       contentContainerClassName="flex relative flex-col overflow-hidden"
       hideContentOnCollapse={false}
+      showsHeader={isExpandedMode || isRightLayout}
       toggle={<Button variant="ghost" size="icon" onClick={onCollapse}>
         <ChevronLeft strokeWidth={3}/>
       </Button>}
     >  
       {isExpandedMode || isRightLayout ? (
-         <div className="flex flex-col gap-4 max-h-[500px] my-auto h-full items-center justify-center p-4">
+         <div className="flex flex-col gap-4 h-full max-h-[400px] items-center justify-between p-4">
          
-        
+       
         <DeskNavbar
           className="flex-1 h-full border-0"
           sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members]}
@@ -240,18 +241,6 @@ export function DesksColumn ({
           </div>
         ) : ( 
           <div className="flex flex-col gap-4 h-full  overflow-y-auto p-4">
-             { myDesk && (
-                <Button  
-                  variant="secondary" 
-                  className="w-full rounded-lg font-bold" 
-                  onClick={() => onDeskClick(myDesk)}
-                  disabled={isLoadingMyDesk}
-                >
-                  <Icon src={deskIcon} alt="Desk Icon" className="size-4 invert " />
-                  My Desk
-                  <ChevronRight strokeWidth={3} className="ml-auto" />
-                </Button>
-            )}
             
             <PlaceholderDesks />
             {(query ? filteredDesks : desks).map((desk) => (

@@ -76,7 +76,7 @@ export function useCreateNotebookForm({deskId, userId, onSuccess, onError}: UseC
                 materials: [],
                 description: data.description ?? null,
                 creatorId: userId ?? "",
-                isLocked: false,
+                isLocked: true,
             }  as NotebookForCard;
 
             if (previousDesk) {

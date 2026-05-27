@@ -20,6 +20,7 @@ export const notebookKeys = {
     details: () => [...notebookKeys.all, "detail"] as const,
     votes: (notebookId: string) => [...notebookKeys.all, "votes", notebookId] as const,
     detail: (notebookId: string, shape: "base" | "detail" | "card" = "base") => [...notebookKeys.details(), notebookId, shape] as const,
+    policy: (notebookId: string) => [...notebookKeys.all, "policy", notebookId] as const,
 }
 
 export const schoolKeys = {

@@ -15,7 +15,7 @@ import { Button, DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMe
 import { FilePreviewer, ProfileButton } from "@/components/shared";
 import { useDownload } from "@/hooks";
 import { toast } from "sonner";
-import { useDeleteNotebook, useMakeVote, useVotes } from "../../hooks";
+import { useDeleteNotebook, useMakeVote, useNotebookPolicy, useVotes } from "../../hooks";
 import { AnimatedValue } from "../ui";
 import { useDownloadNotebook } from "../../hooks";
 import { useModals } from "@/hooks/useModals";
@@ -41,7 +41,7 @@ export function NotebookView({
   const { setCurrentNotebookId } = useDeskContext();
   const {closeRightLayout} = useLayout();
   const { data: votes = [] } = useVotes(notebook?.id ?? null);
-
+  const {data: policy} = useNotebookPolicy({notebookId: notebook?.id ?? null, userId: user.id, deskId: notebook?.deskId ?? null});
 
   const { download: downloadNotebook } = useDownloadNotebook();
   const { deleteNotebook } = useDeleteNotebook();
@@ -59,6 +59,10 @@ export function NotebookView({
   
   const handleDownload = async () => {
     if (!notebook || downloading) return;
+    if(!policy || !policy.canDownload){
+      toast.error("You do not have permission to download this notebook");
+      return;
+    }
       try{
       await download(notebook.materials.map((material) => material.url) ?? []);
       downloadNotebook({notebookId: notebook.id, userId: user.id, deskId: notebook.deskId});
@@ -72,31 +76,54 @@ export function NotebookView({
   };
   const handleUpVote = () => {
     if (!notebook) return;
-
-    if(isUpvoted === true){
-      removeVote({notebookId: notebook.id, deskId: notebook.deskId});
-    } else{
-      makeVote({notebookId: notebook.id, deskId: notebook.deskId, isUpvote: true});
+    if(policy && policy.canView){
+      toast.error("You do not have permission to vote on this notebook");
+      if(isUpvoted === true){
+        removeVote({notebookId: notebook.id, deskId: notebook.deskId});
+      } else{
+        makeVote({notebookId: notebook.id, deskId: notebook.deskId, isUpvote: true});
+      }
+    }
+    else{
+      toast.error("You do not have permission to vote on this notebook");
     }
   };
   const handleDownVote = () => {
     if (!notebook) return;
-    if(isUpvoted ?? true){
-      makeVote({notebookId: notebook.id, deskId: notebook.deskId, isUpvote: false});
-    } else if(isUpvoted === false){
-      removeVote({notebookId: notebook.id, deskId: notebook.deskId});
+    if(policy && policy.canView){
+      if(isUpvoted ?? true){
+        makeVote({notebookId: notebook.id, deskId: notebook.deskId, isUpvote: false});
+      } 
+      else if(isUpvoted === false){
+        removeVote({notebookId: notebook.id, deskId: notebook.deskId});
+      }
     }
+    else{
+      toast.error("You do not have permission to vote on this notebook");
+
+    }
+   
   };
 
   const handleDelete = () => {
     if (!notebook) return;
-    deleteNotebook({notebookId: notebook.id, deskId: notebook.deskId});
-    setCurrentNotebookId(null);
-    closeRightLayout();
+    if(policy && policy.canDelete){
+      deleteNotebook({notebookId: notebook.id, deskId: notebook.deskId});
+      setCurrentNotebookId(null);
+      closeRightLayout();
+    }
+    else {
+      toast.error("You do not have permission to delete this notebook");
+    }
   };
   const handleEdit = () => {
     if (!notebook) return;
-    updateNotebookModal.open(notebook.id, notebook.deskId);
+    if(policy && policy.canUpdate){
+      updateNotebookModal.open(notebook.id, notebook.deskId);
+    }
+    else {
+      toast.error("You do not have permission to update this notebook");
+    }
   };
   const voteCount = useMemo(() => {
     return votes.reduce((acc, vote) => {
@@ -104,7 +131,7 @@ export function NotebookView({
       return acc - 1;
     }, 0) ?? 0;
   }, [votes]);
-
+  
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
       <div className="column-header sticky pl-8">

@@ -211,7 +211,10 @@ export function HomeNavigationProvider({ children }: HomeNavigationProviderProps
     if(expanded) {
       openExpandedLayout();
     }
-  }, [openExpandedLayout, searchParams]);
+    else {
+      openLeftLayout();
+    }
+  }, [openExpandedLayout, openLeftLayout, searchParams]);
 
   const handleNotebookClick = useCallback((notebook: Notebook) => {
     setMaterialIndex(0);

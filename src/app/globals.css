@@ -180,7 +180,7 @@
     @apply w-full h-full flex-1 flex items-center justify-center;
   }
    .column-header{
-    @apply sticky  top-0 flex items-center justify-between px-4 h-16 py-2 w-full
+    @apply sticky  top-0 flex border-b items-center justify-between px-4 h-16 py-2 w-full
   }
   
 

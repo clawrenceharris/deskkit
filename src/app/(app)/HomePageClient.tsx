@@ -98,6 +98,8 @@ export function HomePageClient() {
           {isRightLayout && 
             <NotebookColumn 
               materialIndex={materialIndex}
+              style={{borderLeft: isMobile ? "none" : "1px solid var(--border)"}}
+
               onMaterialIndexChange={setMaterialIndex}
               closedWidth={0}
               onCollapse={handleNotebookExit}

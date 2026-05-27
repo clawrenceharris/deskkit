@@ -89,7 +89,7 @@ export function Column ({
     >
       
         <div className="flex flex-col h-full">
-            {showsHeader && isOpen && (
+            {showsHeader && (isOpen || !hideContentOnCollapse) && (
             <div className={"column-header"} style={headerStyle}>
               <div className="flex items-center gap-3 w-full">
                 {collapsable && !toggle && (

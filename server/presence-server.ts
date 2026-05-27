@@ -16,7 +16,7 @@ import {
 } from "../src/features/presence/domain/types";
 
 
-const PORT = Number(process.env.PRESENCE_WS_PORT ?? 3001);
+const PORT = Number(process.env.PORT ?? process.env.PRESENCE_WS_PORT ?? 3001);
 const HEARTBEAT_INTERVAL_MS = 30_000;
 
 type ClientState = {
@@ -184,7 +184,7 @@ async function main() {
   });
 
   const wss = new WebSocketServer({ port: PORT });
-  console.log(`[presence] WebSocket server listening on ws://localhost:${PORT}`);
+  console.log(`[presence] WebSocket server listening on ${process.env.NEXT_PUBLIC_PRESENCE_WS_URL}:${PORT}`);
 
   wss.on("connection", (ws) => {
     getState(ws);
