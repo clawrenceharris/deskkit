@@ -18,7 +18,7 @@ export function DeskHeader({notebooks}: DeskHeaderProps) {
     } ,0)
   },[notebooks])
   return (
-    <div  className="column-header justify-between bg-surface -top-30  p-5">
+    <div  className="column-header justify-between -top-30  p-5">
      
         <div className="flex flex-1 justify-between w-full">
           <div

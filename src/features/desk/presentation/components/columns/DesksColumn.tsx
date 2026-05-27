@@ -208,17 +208,15 @@ export function DesksColumn ({
       )}
     >  
       {isExpandedMode || isRightLayout ? (
-         <div className="flex flex-col gap-4 h-full max-h-[400px] items-center justify-between p-4">
-         
-       
-        <DeskNavbar
-          className="flex-1 h-full border-0"
-          sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members]}
-          showsLabels={false}
-          disabled={!policy || !policy.canView}
-          onNavigate={handleSectionClick}
-          orientation="vertical"
-        />
+        <div className="flex flex-col gap-4 h-full max-h-[400px] my-auto items-center justify-between p-4">
+          <DeskNavbar
+            className="flex-1 h-full border-0"
+            sections={[DeskSection.home, DeskSection.notebooks, DeskSection.chalkboards, DeskSection.members]}
+            showsLabels={false}
+            disabled={!policy || !policy.canView}
+            onNavigate={handleSectionClick}
+            orientation="vertical"
+          />
         </div>
       ) : (
        <> 
