@@ -184,7 +184,14 @@ async function main() {
   });
 
   const wss = new WebSocketServer({ port: PORT });
-  console.log(`[presence] WebSocket server listening on ${process.env.NEXT_PUBLIC_PRESENCE_WS_URL}:${PORT}`);
+  const address = wss.address();
+  if (typeof address === "string") {
+    console.log(`[presence] WebSocket server listening on ${address}`);
+  } else if (address && typeof address === "object") {
+    console.log(`[presence] WebSocket server listening on ws://${address.address}:${address.port}`);
+  } else {
+    console.log("[presence] WebSocket server listening (unknown address)");
+  }
 
   wss.on("connection", (ws) => {
     getState(ws);
