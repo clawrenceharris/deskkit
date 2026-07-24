@@ -170,7 +170,7 @@ async function main() {
   const subscriber = getRedisSubscriber();
   await subscriber.subscribe(PRESENCE_REDIS_KEYS.updatesChannel);
 
-  subscriber.on("message", (_channel, payload) => {
+  subscriber.on("message", (_channel: string, payload: string) => {
     try {
       const update = JSON.parse(payload) as { userId: string } & ResolvedActivityStatus;
       broadcastStatusUpdate(update.userId, {
@@ -184,14 +184,8 @@ async function main() {
   });
 
   const wss = new WebSocketServer({ port: PORT });
-  const address = wss.address();
-  if (typeof address === "string") {
-    console.log(`[presence] WebSocket server listening on ${address}`);
-  } else if (address && typeof address === "object") {
-    console.log(`[presence] WebSocket server listening on ws://${address.address}:${address.port}`);
-  } else {
-    console.log("[presence] WebSocket server listening (unknown address)");
-  }
+  console.log(`[presence] WebSocket server listening on ws://localhost:${PORT}`);
+  
 
   wss.on("connection", (ws) => {
     getState(ws);

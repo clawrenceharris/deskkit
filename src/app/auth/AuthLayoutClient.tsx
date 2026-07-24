@@ -7,8 +7,8 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
     <div  className="page p-0 bg-linear-to-br  to-primary from-accent">
    
 
-    <main className="flex-col md:flex-row">
-        <div className=" flex-[0.3] md:flex-1 p-4  ">
+    <main className="flex flex-col md:flex-row">
+        <div className="flex-[0.3] md:flex-1 p-4  ">
             <Header profile={null}/>
             <div
             className="mx-auto max-w-md relative w-full h-full"
@@ -17,15 +17,15 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
                <Tile className="text-accent top-[10%] md:top-[7%] md:left-[10%] rotate-[-7deg]">
                     learn it.
                </Tile>
-                 <Tile className="z-3 text-white top-[40%] md:top-[49%] left-[20%] md:left-[20%] rotate-[10deg] md:rotate-[-5deg]">
+                 <Tile className="z-3 text-white top-[40%] md:top-[49%] left-[20%] md:left-[20%] rotate-10 md:rotate-[-5deg]">
                     share it.
                 </Tile>
-                <Tile className="z-2 text-secondary top-[24%] md:top-[27%] left-[47%] md:left-[47%] rotate-[-12deg] md:rotate-[12deg]"> 
+                <Tile className="z-2 text-secondary top-[24%] md:top-[27%] left-[47%] md:left-[47%] -rotate-12 md:rotate-12"> 
                     save it.
                 </Tile>
               
                 <Tile className="z-4 text-primary top-[30%] left-[70%] md:top-[70%] md:left-[55%] rotate-[7deg]">
-                deskitt!
+                deskkit!
                 </Tile>
             </div>
         </div>

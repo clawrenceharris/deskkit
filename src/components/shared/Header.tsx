@@ -9,7 +9,6 @@ import Link from "next/link";
 import { ProfileForDetail } from "@/features/profile/infrastructure/queries";
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from "../ui";
 import desk from "@/assets/desk.png";
-import { useAuth } from "@/app/providers";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 

@@ -4,7 +4,7 @@ import { Column, type ColumnProps } from "@/components/shared";
 import { DeskDashboardColumn } from "./";
 import { DeskSection, useDeskContext, useHomeNavigation, useLayout, useSchoolContext, useUser } from "@/app/providers";
 import { Button, Card, CardDescription, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui";
-import { ChevronDown, ChevronLeft, ChevronRight, Loader2, LogOut, Plus, Settings, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, LogOut, Plus, Settings, Trash2 } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { useMediaQuery, useSearch } from "@/hooks";
 import { DeskListItem, DeskNavbar } from "../ui";
